@@ -32,7 +32,10 @@ from signal_metadata import (SignalMetadataError, load_metadata,
                              validate_arguments)
 
 
-SKIP = {'tests', 'testdata', 'perf', '.venv', 'venv', '__pycache__', 'node_modules'}
+SKIP = {
+    'tests', 'testdata', 'perf', 'evidence',
+    '.venv', 'venv', '__pycache__', 'node_modules',
+}
 CADENCE_WEB_URL = 'http://localhost:8088'
 CADENCE_CLUSTER = 'cluster0'
 SCENARIOS = {
@@ -827,7 +830,8 @@ class Explorer:
                         '--address' if cli['kind'] == 'java' else '-address')
         address = cli['root'].get(address_flag, {}).get('default')
         services = [self.tcp_probe('Cadence', address)]
-        services.append(self.http_probe('Cadence-Web', 'http://localhost:8088', expect_json=False))
+        services.append(self.http_probe(
+            'Cadence-Web', self.cadence_web_url, expect_json=False))
         if resolved['mock']:
             services.append(dict(name='Inference', state='unavailable check',
                 endpoint=None, detail='Mock mode does not use inference services.'))

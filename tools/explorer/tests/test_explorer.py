@@ -199,8 +199,8 @@ echo "Dependencies prepared."
         state=self.explorer.snapshot()
         self.assertEqual([r['id'] for r in state['recipes']],
                          ['agent-handoffs','auto-research','human-in-the-loop',
-                          'recurring-ai-watch','ticket-routing'])
-        handoffs,auto,hitl,watch,ticket=state['recipes']
+                          'incident-triage','recurring-ai-watch','ticket-routing'])
+        handoffs,auto,hitl,triage,watch,ticket=state['recipes']
         self.assertEqual([v['framework'] for v in handoffs['variants']],
                          ['google-adk','openai-agents'])
         self.assertTrue(all(v['modes']==['mock','live']
@@ -211,6 +211,17 @@ echo "Dependencies prepared."
         self.assertEqual([v['framework'] for v in watch['variants']],['google-adk','openai-agents'])
         self.assertTrue(all(v['supported'] for v in
                             hitl['variants']+watch['variants']+ticket['variants']))
+        self.assertEqual([v['id'] for v in triage['variants']],
+                         ['recipes/incident-triage/python/bare'])
+        self.assertTrue(triage['variants'][0]['supported'])
+        self.assertEqual(triage['variants'][0]['modes'],['mock','live'])
+        triage_result=self.explorer.resolve(dict(
+            sample='incident-triage',
+            implementation='recipes/incident-triage/python/bare',
+            mode='mock'))
+        self.assertEqual(
+            [signal['id'] for signal in triage_result['signals']],
+            ['add-guidance','revise-brief','approval-decision'])
         self.assertEqual(hitl['variants'][0]['modes'],['mock','live'])
         self.assertEqual(watch['variants'][0]['modes'],['mock','live'])
         ticket_variant=next(v for v in ticket['variants']
@@ -222,6 +233,16 @@ echo "Dependencies prepared."
             sorted(entry['id'] for entry in state['classifiers']),
             ['jev-default', 'laya-local'],
         )
+
+    def test_service_check_uses_configured_cadence_web_port(self):
+        explorer=Explorer(self.root,cadence_web_url='http://localhost:28088')
+        request=dict(sample='incident-triage',
+            implementation='recipes/incident-triage/python/bare',mode='mock')
+        with patch.object(explorer,'tcp_probe',return_value={}), \
+                patch.object(explorer,'http_probe',return_value={}) as http_probe:
+            explorer.check(request)
+        http_probe.assert_called_once_with(
+            'Cadence-Web','http://localhost:28088',expect_json=False)
 
     def test_agent_handoffs_resolves_both_framework_commands_without_imports(self):
         for framework in ('google-adk','openai-agents'):
