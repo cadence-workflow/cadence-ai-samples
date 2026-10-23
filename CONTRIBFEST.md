@@ -10,10 +10,52 @@ Agent Examples** during KubeCon + CloudNativeCon North America 2026.
 - **Event work:** [ContribFest
   milestone](https://github.com/cadence-workflow/cadence-ai-samples/milestone/2)
 
-The goal is useful, reviewable progress with enough evidence for someone to
-continue safely. A signed draft pull request is welcome, but a durable handoff
-is also a successful outcome. Not every contribution will merge during the
-session.
+## Why this session
+
+This ContribFest is a hands-on way to contribute to Cadence while KubeCon is
+focused on durable AI. You gain first-hand experience building agentic
+workflows and addressing industry-wide problems those workloads hit in
+practice. Organizers prepare partial recipes with intentional failures so you
+can reproduce a common issue, follow concrete instructions to fix it with
+Cadence, and leave a reviewable contribution that helps future Cadence users
+build durable recipes—not only a durable agent run.
+
+A signed draft pull request is welcome; a durable Issue handoff is also a
+successful outcome. Not every contribution will merge during the session.
+Coding agents are optional. Bring a laptop. Prefer installing Ollama beforehand
+when your Issue needs a local model. Event tasks do not require a paid API key
+or prior Cadence experience.
+
+## Find a ContribFest Issue
+
+Session candidates live on this repository under the
+[ContribFest milestone](https://github.com/cadence-workflow/cadence-ai-samples/milestone/2)
+and the `event:contribfest` label. Open, unassigned Issues labeled
+`status:agent-ready` are available to claim (that label may be renamed to
+`status:ready` before the event; the claim rules stay the same).
+
+Choose a difficulty that matches your time and energy:
+
+| Path | Good when you want to… |
+| --- | --- |
+| **Low-stakes** | Get a first win: one prepared failure, a small file set, exact commands |
+| **Mid-level** | Harden a real durability gap with a bit more surface area |
+| **High-level / stretch** | Take on deeper multi-step durability work; still scaffolded, with a clear 45-minute stopping point if you cannot finish |
+
+Pick the path that fits you. Excited contributors should feel empowered to claim
+a stretch Issue—maintainers are in the room to help. Claim through the
+coordinator path below; do not open competing branches for the same Issue.
+
+## Related Cadence sessions at KubeCon NA 2026
+
+- **Secure Your Agents in 5 Minutes: Durable Execution with Cadence** — short
+  intro to when an agent should become a durable workflow, where Cadence sits in
+  the AI stack, and a path into samples and this ContribFest.
+- **Agents Fail. Workflows Recover. Durable Agent Orchestration with Cadence.**
+  — deeper talk on why production agents need a durability layer and how Cadence
+  integrations support agent SDKs.
+- **This ContribFest** — the contribution path: pick a leveled Issue, harden a
+  recipe against a prepared failure, and ship or hand off with evidence.
 
 ## Participant guide
 
