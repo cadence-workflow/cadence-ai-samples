@@ -14,26 +14,19 @@ Agent Examples** during KubeCon + CloudNativeCon North America 2026.
 
 ## Goal
 
-This ContribFest is a working session on the AI-agent developer path: runnable
-examples, docs, and starter Issues that show how to model long-running agentic
-workflows as durable workflows.
+Working session on Cadence’s AI-agent path: examples, docs, and starter Issues
+for long-running agentic workflows as durable workflows.
 
 In this session you can:
 
-1. **Learn Cadence on agent workloads.** Start from a short overview, run
-   prepared examples, reproduce familiar failures (lost progress, bad retries,
-   stalled approvals), and see what changes when the same work is durable,
-   including when replay makes cost and wasted work visible.
-2. **Build on the AI samples.** Create or polish an AI-agent workflow sample in
-   [`cadence-ai-samples`](https://github.com/cadence-workflow/cadence-ai-samples),
-   or harden one from a scaffolded Issue.
-3. **Improve the onramp.** Work with maintainers on concrete tasks such as
-   validating the local quickstart, clarifying docs for retries, timeouts, and
-   idempotent activities, spotting confusing setup or contribution steps,
-   opening docs PRs, updating samples, or triaging Issues.
-
-The project benefit is a better contributor onramp and more practical examples
-for developers building reliable agent workflows with Cadence.
+1. **Learn Cadence on agent workloads.** Run a prepared example, hit a familiar
+   failure (lost progress, bad retries, stalled approval), and see the durable
+   path recover, including when replay shows wasted work and cost.
+2. **Build on the AI samples.** Add or polish a recipe in
+   [`cadence-ai-samples`](https://github.com/cadence-workflow/cadence-ai-samples).
+3. **Ship a concrete contribution.** Validate the local quickstart, clarify
+   retries/timeouts/idempotent-activity docs, or triage an Issue with
+   maintainers.
 
 ## Find a ContribFest Issue
 
