@@ -14,7 +14,7 @@ Agent Examples** during KubeCon + CloudNativeCon North America 2026.
 
 ## Goal
 
-Working session on Cadence’s AI-agent path: examples, docs, and starter Issues
+Working session on Cadence's AI-agent path: examples, docs, and starter Issues
 for long-running agentic workflows as durable workflows.
 
 In this session you can:
