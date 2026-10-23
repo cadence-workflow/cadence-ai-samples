@@ -14,7 +14,6 @@ Agent Examples** during KubeCon + CloudNativeCon North America 2026.
 
 ## Goal
 
-Cadence Workflow is a CNCF sandbox project for durable workflow orchestration.
 This ContribFest is a working session on the AI-agent developer path: runnable
 examples, docs, and starter Issues that show how to model long-running agentic
 workflows as durable workflows.
@@ -28,10 +27,10 @@ In this session you can:
 2. **Build on the AI samples.** Create or polish an AI-agent workflow sample in
    [`cadence-ai-samples`](https://github.com/cadence-workflow/cadence-ai-samples),
    or harden one from a scaffolded Issue.
-3. **Improve the onramp in whatever form helps.** Work with maintainers on
-   concrete tasks such as validating the local quickstart, clarifying docs for
-   retries, timeouts, and idempotent activities, spotting confusing setup or
-   contribution steps, opening docs PRs, updating samples, or triaging Issues.
+3. **Improve the onramp.** Work with maintainers on concrete tasks such as
+   validating the local quickstart, clarifying docs for retries, timeouts, and
+   idempotent activities, spotting confusing setup or contribution steps,
+   opening docs PRs, updating samples, or triaging Issues.
 
 The project benefit is a better contributor onramp and more practical examples
 for developers building reliable agent workflows with Cadence.
