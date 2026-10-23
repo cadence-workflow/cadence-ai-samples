@@ -36,8 +36,16 @@ QUICK_ACTIVITY = {
         "backoff_coefficient": 2.0,
         "maximum_interval": timedelta(seconds=2),
         "maximum_attempts": 3,
-        "non_retryable_error_reasons": ["NonRetryableHttpError"],
+        "non_retryable_error_reasons": [
+            "NonRetryableHttpError",
+            "LiveConfigurationError",
+            "LiveAuthenticationError",
+        ],
     },
+}
+MODEL_ACTIVITY = {
+    **QUICK_ACTIVITY,
+    "schedule_to_close_timeout": timedelta(seconds=180),
 }
 SCAN_ACTIVITY = {
     **QUICK_ACTIVITY,
@@ -155,7 +163,7 @@ class IncidentTriageWorkflow:
                     "guidance": self.guidance_notes,
                     "force_draft": bool(self.guard),
                 },
-                **QUICK_ACTIVITY,
+                **MODEL_ACTIVITY,
             )
             self.hypothesis = action["hypothesis"]
             if action["tool"] == "draft":
@@ -308,7 +316,7 @@ class IncidentTriageWorkflow:
                     "request": request,
                     "hops": [gateway, *self.hops],
                 },
-                **QUICK_ACTIVITY,
+                **MODEL_ACTIVITY,
             )
             self.revision += 1
 
@@ -340,7 +348,7 @@ class IncidentTriageWorkflow:
                     "request": self.pending_revisions.pop(0),
                     "hops": [gateway, *self.hops],
                 },
-                **QUICK_ACTIVITY,
+                **MODEL_ACTIVITY,
             )
             self.revision += 1
             self.phase = "AWAITING_APPROVAL"

@@ -16,6 +16,7 @@ py-modules = [
     "activities",
     "check_clean_copy",
     "durability_manifest",
+    "live_model",
     "main",
     "raw_agent",
     "run_compare",

@@ -24,8 +24,13 @@ makes synthetic work faster.
 
 ### Non-goals
 
-- No model provider, tokenizer, token or cost estimate, production data,
-  autonomous remediation, or real paging, ticketing, or monitoring system.
+- Mock mode, the rehearsal, the variants, and the comparison do not call a
+  model provider or invent token prices.
+- Live mode calls one catalog model from the existing plan and revise
+  activities and prints reported usage. It does not replace the scripted
+  inventory wrong turn.
+- No production data, autonomous remediation, or real paging, ticketing, or
+  monitoring system.
 - No claim that Cadence is faster or that an Activity executes exactly once.
 - No OpenAI Agents or Google ADK dependency in this slice.
 
@@ -45,9 +50,12 @@ Generated from the `python/bare` profile defined by the
 - **Classifier integration:** none
 - **Agent integration:** none
 - **Implementation directory:** `python/bare`
-- **Mock and live behavior:** Both modes run identical local synthetic
-  Activities. Neither makes an external model or classifier request.
-- **Runtime catalog use:** None.
+- **Mock and live behavior:** Mock runs the scripted planner, including the
+  inventory wrong turn modeled on the real run. Live reads `models.yaml` and
+  calls that model from the plan and revise activities. The default live model
+  is `llama3.2-local`. Start does not select a model.
+- **Runtime catalog use:** Only the live Worker reads repository-root
+  `models.yaml`.
 - **Workflow ID reuse:** `start` uses the stable demo Workflow ID
   `incident-triage-demo` with `ALLOW_DUPLICATE`. A new Run may start after the
   previous Run closes; a start while a Run is open is rejected and reported.

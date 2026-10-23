@@ -12,6 +12,7 @@ from typing import Any
 
 from cadence import activity
 
+import live_model
 import story
 
 
@@ -158,12 +159,18 @@ def plan_next(context: dict[str, Any]) -> dict[str, Any]:
         step=context["step"],
         forced=context.get("force_draft", False),
     )
+    if live_model.enabled():
+        return live_model.plan(context)
     return story.plan_next(context)
 
 
 @activity.defn(name=REVISE_ACTIVITY)
 def revise_draft(request: dict[str, Any]) -> dict[str, Any]:
     record("revise_draft", request=request["request"])
+    if live_model.enabled():
+        return live_model.revise(
+            request["conclusion"], request["request"], request["hops"]
+        )
     return story.revise_draft(
         request["conclusion"], request["request"], request["hops"]
     )

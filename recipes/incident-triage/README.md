@@ -15,8 +15,9 @@ dependency graph, follows errors through checkout, payments, and ledger, accepts
 operator guidance and a changed output brief, waits for approval, and writes one
 keyed conclusion.
 
-The fixtures and planner are deterministic and synthetic. No provider,
-tokenizer, credential, paid API, or production data is used.
+Mock mode uses a deterministic synthetic planner. That planner keeps the
+inventory wrong turn from the real run. Live mode calls a local model. No paid
+API or production data is used.
 
 ## Requirements
 
@@ -52,9 +53,20 @@ Terminal 2:
 ./run.sh start --mode mock
 ```
 
-Both `mock` and `live` use the same provider-free synthetic Activities. The
-`live` mode preserves the repository's generic `worker|start --mode mock|live`
-shape; it does not call a model provider.
+`mock` keeps the scripted planner. `live` calls catalog model `llama3.2-local`
+from the plan and revise activities. Ollama must be running at
+`http://localhost:11434` with `llama3.2:latest` pulled. Each model activity
+prints one `SPEND` line: reported input and output tokens, a running total, and
+an external API charge of $0. Local compute is unpriced. A missing token count
+stays unavailable.
+
+```bash
+./run.sh worker --mode live
+./run.sh start --mode live
+```
+
+The comparison command stays on the scripted planner and prints the raw asyncio
+column beside local Cadence.
 
 The Workflow waits first for a `guidance` Signal and later for an `approval`
 Signal. `explorer.yaml` exposes guidance, revision, and approval controls in the

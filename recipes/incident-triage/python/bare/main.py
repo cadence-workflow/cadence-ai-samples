@@ -3,6 +3,7 @@
 import argparse
 import asyncio
 import logging
+import os
 from collections.abc import Sequence
 from datetime import timedelta
 
@@ -12,6 +13,7 @@ from cadence.contrib.pydantic import PydanticDataConverter
 from cadence.error import WorkflowExecutionAlreadyStartedError
 from cadence.worker import Worker
 
+import live_model
 from workflow import WORKFLOW, RecipeInput, build_registry
 
 
@@ -50,13 +52,28 @@ def client(args: argparse.Namespace) -> cadence.Client:
     )
 
 
+def configure_mode(mode: str) -> str:
+    if mode == "live":
+        os.environ["INCIDENT_TRIAGE_MODEL"] = "live"
+        selection = live_model.prepare()
+        return (
+            f"live model {selection.model} at {selection.endpoint}; "
+            "spend lines print as each model call returns"
+        )
+    os.environ["INCIDENT_TRIAGE_MODEL"] = "scripted"
+    return "scripted planner, including the inventory wrong turn"
+
+
 async def run_worker(args: argparse.Namespace) -> None:
+    mode_line = configure_mode(args.mode)
     worker = Worker(client(args), args.task_list, build_registry())
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     async with worker:
+        print(mode_line, flush=True)
         print(
-            f"{args.mode} synthetic incident worker polling domain={args.domain} "
-            f"task-list={args.task_list}"
+            f"{args.mode} incident worker polling domain={args.domain} "
+            f"task-list={args.task_list}",
+            flush=True,
         )
         await asyncio.Event().wait()
 
