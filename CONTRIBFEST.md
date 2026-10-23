@@ -12,8 +12,7 @@ Agent Examples** during KubeCon + CloudNativeCon North America 2026.
 
 ## Goal
 
-ContribFest is hybrid on purpose: there should be something useful whether you
-are new to Cadence or ready to stretch. In this session you can:
+In this session you can:
 
 1. **Learn Cadence on agent workloads.** Run prepared AI-workflow examples,
    reproduce familiar failures (lost progress, bad retries, stalled approvals),
@@ -25,7 +24,7 @@ are new to Cadence or ready to stretch. In this session you can:
 3. **Contribute to Cadence.** Leave a reviewable fix or durable handoff with
    maintainers in the room, at low, mid, or stretch difficulty.
 
-Pick the path that matches why you showed up. Coding agents are optional.
+Coding agents are optional.
 
 ## Find a ContribFest Issue
 
