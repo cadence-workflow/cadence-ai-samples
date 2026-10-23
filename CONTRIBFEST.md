@@ -5,6 +5,8 @@ Agent Examples** during KubeCon + CloudNativeCon North America 2026.
 
 - **When:** Wednesday, November 11, 2026, 2:20-3:40 PM MST (80 minutes)
 - **Where:** Salt Palace, Level 2, room 255 D, Salt Lake City, Utah
+- **Session page:** [Cadence Workflow ContribFest: Build Durable AI Agent
+  Examples](https://sessionize.com/s/diana-zawadzki/cadence-workflow-contribfest-build-durable-ai-agen/182913)
 - **Event details:** [official KubeCon + CloudNativeCon North America
   schedule](https://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/program/schedule/)
 - **Event work:** [ContribFest
@@ -12,19 +14,27 @@ Agent Examples** during KubeCon + CloudNativeCon North America 2026.
 
 ## Goal
 
+Cadence Workflow is a CNCF sandbox project for durable workflow orchestration.
+This ContribFest is a working session on the AI-agent developer path: runnable
+examples, docs, and starter Issues that show how to model long-running agentic
+workflows as durable workflows.
+
 In this session you can:
 
-1. **Learn Cadence on agent workloads.** Run prepared AI-workflow examples,
-   reproduce familiar failures (lost progress, bad retries, stalled approvals),
-   and see what changes when the same work is durable, including when replay
-   makes cost and wasted work visible.
-2. **Build on the AI samples.** Take an existing
-   [`cadence-ai-samples`](https://github.com/cadence-workflow/cadence-ai-samples)
-   recipe and extend or harden it from a scaffolded Issue.
-3. **Contribute to Cadence.** Leave a reviewable fix or durable handoff with
-   maintainers in the room, at low, mid, or stretch difficulty.
+1. **Learn Cadence on agent workloads.** Start from a short overview, run
+   prepared examples, reproduce familiar failures (lost progress, bad retries,
+   stalled approvals), and see what changes when the same work is durable,
+   including when replay makes cost and wasted work visible.
+2. **Build on the AI samples.** Create or polish an AI-agent workflow sample in
+   [`cadence-ai-samples`](https://github.com/cadence-workflow/cadence-ai-samples),
+   or harden one from a scaffolded Issue.
+3. **Improve the onramp in whatever form helps.** Work with maintainers on
+   concrete tasks such as validating the local quickstart, clarifying docs for
+   retries, timeouts, and idempotent activities, spotting confusing setup or
+   contribution steps, opening docs PRs, updating samples, or triaging Issues.
 
-Coding agents are optional.
+The project benefit is a better contributor onramp and more practical examples
+for developers building reliable agent workflows with Cadence.
 
 ## Find a ContribFest Issue
 
