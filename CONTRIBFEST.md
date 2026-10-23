@@ -3,28 +3,20 @@
 Join Cadence maintainers at **Cadence Workflow ContribFest: Build Durable AI
 Agent Examples** during KubeCon + CloudNativeCon North America 2026.
 
-- **When:** Wednesday, November 11, 2026, 2:20–3:40 PM MST (80 minutes)
+- **When:** Wednesday, November 11, 2026, 2:20-3:40 PM MST (80 minutes)
 - **Where:** Salt Palace, Level 2, room 255 D, Salt Lake City, Utah
 - **Event details:** [official KubeCon + CloudNativeCon North America
   schedule](https://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/program/schedule/)
 - **Event work:** [ContribFest
   milestone](https://github.com/cadence-workflow/cadence-ai-samples/milestone/2)
 
-## Why this session
+## Goal
 
-This ContribFest is a hands-on way to contribute to Cadence while KubeCon is
-focused on durable AI. You gain first-hand experience building agentic
-workflows and addressing industry-wide problems those workloads hit in
-practice. Organizers prepare partial recipes with intentional failures so you
-can reproduce a common issue, follow concrete instructions to fix it with
-Cadence, and leave a reviewable contribution that helps future Cadence users
-build durable recipes—not only a durable agent run.
-
-A signed draft pull request is welcome; a durable Issue handoff is also a
-successful outcome. Not every contribution will merge during the session.
-Coding agents are optional. Bring a laptop. Prefer installing Ollama beforehand
-when your Issue needs a local model. Event tasks do not require a paid API key
-or prior Cadence experience.
+Contributors claim prepared Issues, fix the failures they demonstrate, and make
+those fixes durable with Cadence. Each task is a partial AI-workflow recipe with
+an intentional gap (lost progress, unsafe retries, stalled approvals, and the
+like), so you practice the problem first-hand and leave a reviewable change
+future users can run.
 
 ## Find a ContribFest Issue
 
@@ -43,19 +35,8 @@ Choose a difficulty that matches your time and energy:
 | **High-level / stretch** | Take on deeper multi-step durability work; still scaffolded, with a clear 45-minute stopping point if you cannot finish |
 
 Pick the path that fits you. Excited contributors should feel empowered to claim
-a stretch Issue—maintainers are in the room to help. Claim through the
+a stretch Issue; maintainers are in the room to help. Claim through the
 coordinator path below; do not open competing branches for the same Issue.
-
-## Related Cadence sessions at KubeCon NA 2026
-
-- **Secure Your Agents in 5 Minutes: Durable Execution with Cadence** — short
-  intro to when an agent should become a durable workflow, where Cadence sits in
-  the AI stack, and a path into samples and this ContribFest.
-- **Agents Fail. Workflows Recover. Durable Agent Orchestration with Cadence.**
-  — deeper talk on why production agents need a durability layer and how Cadence
-  integrations support agent SDKs.
-- **This ContribFest** — the contribution path: pick a leveled Issue, harden a
-  recipe against a prepared failure, and ship or hand off with evidence.
 
 ## Participant guide
 
@@ -168,3 +149,27 @@ the normal abandonment workflow only after preserving the current state.
 - **Internet access is unreliable:** Keep working from the prepared checkout
   and Issue notes. Do not create a competing claim; coordinate ownership with
   event staff before pushing when access returns.
+
+## Related Cadence sessions at KubeCon NA 2026
+
+Cadence week is built so you can pick a track (or more than one):
+
+| Track | What you get |
+| --- | --- |
+| **See failure and cost** | Replay broken agent workflows, watch work and cost rack up without durability, then see Cadence recover |
+| **Build on AI samples** | Use [`cadence-ai-samples`](https://github.com/cadence-workflow/cadence-ai-samples), claim a ContribFest Issue, and extend a real recipe |
+| **Make your agents durable** | Learn when an agent should become a Cadence workflow and how retries, history, and approvals hold under failure |
+| **Contribute to Cadence** | Ship reviewable changes with maintainers in the room (this ContribFest), or talk shop at the project pavilion |
+
+Official schedule:
+[KubeCon + CloudNativeCon North America
+2026](https://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/program/schedule/).
+
+| When (MST) | Session | Where | Fits |
+| --- | --- | --- | --- |
+| Mon Nov 9, 11:17-11:22 AM | **Secure Your Agents in 5 Minutes: Durable Execution with Cadence** (Diana Laura Zawadzki) | Hyatt Regency, Level 4, Regency BD | Make agents durable |
+| Mon Nov 9, 3:20-3:45 PM | **Building and Maintaining Production-Ready SDKs with LLMs** (Ender Demirkaya, Shijie Sheng), Agentic Day | Agentics Day Room 1 | Contribute to Cadence |
+| Tue Nov 10, 3:00-7:00 PM | **Meet the Cadence Maintainers**, Project Pavilion kiosk P-15B | Solutions Showcase, Level 1, Hall 5 | Contribute to Cadence |
+| Wed Nov 11, 2:20-3:40 PM | **Cadence Workflow ContribFest: Build Durable AI Agent Examples** (Diana Laura Zawadzki, Shijie Sheng) | Salt Palace, Level 2, 255 D | Build on AI samples; contribute to Cadence |
+| Thu Nov 12, 2:40-3:10 PM | **Agents Fail. Workflows Recover. Durable Agent Orchestration with Cadence** (Diana Laura Zawadzki, Shijie Sheng) | Salt Palace, Level 1, Ballroom ACE | See failure and cost; make agents durable |
+| Thu Nov 12, 3:30-4:00 PM | **Splitting the Monolith at Cloudera: Building Fault-Tolerant Workflows with Cadence** (Soma Koltai, Ender Demirkaya) | Salt Palace, Level 1, Ballroom BDF | Contribute to Cadence (production journey) |
