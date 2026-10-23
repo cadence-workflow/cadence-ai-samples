@@ -12,11 +12,20 @@ Agent Examples** during KubeCon + CloudNativeCon North America 2026.
 
 ## Goal
 
-Contributors claim prepared Issues, fix the failures they demonstrate, and make
-those fixes durable with Cadence. Each task is a partial AI-workflow recipe with
-an intentional gap (lost progress, unsafe retries, stalled approvals, and the
-like), so you practice the problem first-hand and leave a reviewable change
-future users can run.
+ContribFest is hybrid on purpose: there should be something useful whether you
+are new to Cadence or ready to stretch. In this session you can:
+
+1. **Learn Cadence on agent workloads.** Run prepared AI-workflow examples,
+   reproduce familiar failures (lost progress, bad retries, stalled approvals),
+   and see what changes when the same work is durable, including when replay
+   makes cost and wasted work visible.
+2. **Build on the AI samples.** Take an existing
+   [`cadence-ai-samples`](https://github.com/cadence-workflow/cadence-ai-samples)
+   recipe and extend or harden it from a scaffolded Issue.
+3. **Contribute to Cadence.** Leave a reviewable fix or durable handoff with
+   maintainers in the room, at low, mid, or stretch difficulty.
+
+Pick the path that matches why you showed up. Coding agents are optional.
 
 ## Find a ContribFest Issue
 
