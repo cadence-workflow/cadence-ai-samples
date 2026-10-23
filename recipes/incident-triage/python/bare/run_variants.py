@@ -6,6 +6,7 @@ import argparse
 import asyncio
 import json
 import sqlite3
+import subprocess
 import tempfile
 import uuid
 from datetime import timedelta
@@ -53,14 +54,7 @@ async def run_variant(
     state = Path(tempfile.mkdtemp(prefix=f"incident-triage-{name}-"))
     task_list = f"incident-triage-{name}-{uuid.uuid4().hex}"
     workflow_id = f"incident-triage-{name}-{uuid.uuid4().hex}"
-    processes = [
-        spawn_worker(
-            "workflow", f"{name}-workflow", task_list, target, domain, state
-        ),
-        spawn_worker(
-            "activity", f"{name}-activities", task_list, target, domain, state
-        ),
-    ]
+    processes: list[subprocess.Popen[str]] = []
     client = cadence.Client(
         domain=domain,
         target=target,
@@ -68,6 +62,16 @@ async def run_variant(
         data_converter=PydanticDataConverter(),
     )
     try:
+        processes.append(
+            spawn_worker(
+                "workflow", f"{name}-workflow", task_list, target, domain, state
+            )
+        )
+        processes.append(
+            spawn_worker(
+                "activity", f"{name}-activities", task_list, target, domain, state
+            )
+        )
         await asyncio.sleep(0.75)
         if name == "not-found":
             (state / "faults.json").write_text(

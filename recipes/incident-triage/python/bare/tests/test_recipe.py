@@ -1,6 +1,7 @@
 import io
 import json
 import os
+import sqlite3
 import sys
 import tempfile
 import unittest
@@ -24,6 +25,7 @@ from durability_manifest import validate_manifest
 from raw_agent import RawAgent
 from run_compare import cadence_metrics, raw_metrics
 from workflow import (
+    APPROVAL_SIGNAL,
     GUIDANCE_SIGNAL,
     QUICK_ACTIVITY,
     REVISE_SIGNAL,
@@ -91,6 +93,17 @@ class RawAgentTests(unittest.IsolatedAsyncioTestCase):
             ]
             self.assertEqual(gateway[:2], [(0, 429), (1, 200)])
 
+    def test_raw_and_cadence_share_turn_and_repeat_limits(self) -> None:
+        recipe = Path(__file__).resolve().parents[1]
+        workflow_source = (recipe / "workflow.py").read_text(encoding="utf-8")
+        raw_source = (recipe / "raw_agent.py").read_text(encoding="utf-8")
+        self.assertEqual((story.MAX_STEPS, story.REPEAT_LIMIT), (6, 2))
+        self.assertIn('"max_steps": 6', workflow_source)
+        self.assertIn('"repeat_limit": 2', workflow_source)
+        self.assertIn("range(1, story.MAX_STEPS + 1)", raw_source)
+        self.assertIn("story.REPEAT_LIMIT", raw_source)
+        self.assertNotIn("MAX_TURNS", raw_source)
+
 
 class WorkflowTests(unittest.IsolatedAsyncioTestCase):
     async def test_guidance_reuses_setup_before_durable_timer_expires(self) -> None:
@@ -154,6 +167,98 @@ class WorkflowTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(names.count("fetch_dependency_graph"), 1)
             self.assertEqual(names.count("upload_conclusion"), 0)
 
+    async def test_late_approval_does_not_win_after_the_timer(self) -> None:
+        with tempfile.TemporaryDirectory() as directory, patch.dict(
+            os.environ, {"INCIDENT_TRIAGE_STATE": directory}
+        ):
+            workflow_id = "late-approval"
+            with environment() as env:
+                execution = await env.client.start_workflow(
+                    WORKFLOW,
+                    RecipeInput(
+                        story.trace_text(),
+                        {
+                            "approval_window_seconds": 5,
+                            "scan_seconds": 0,
+                            "rescan_seconds": 0,
+                        },
+                    ),
+                    workflow_id=workflow_id,
+                    task_list="test-task-list",
+                )
+                await env.client.signal_workflow(
+                    workflow_id, execution.run_id, GUIDANCE_SIGNAL, story.GUIDANCE
+                )
+                self.assertTrue(env.is_workflow_completed(workflow_id))
+                await env.client.signal_workflow(
+                    workflow_id, execution.run_id, APPROVAL_SIGNAL, "approve"
+                )
+                result = env.get_workflow_result(
+                    dict, workflow_id, execution.run_id
+                )
+            self.assertEqual(result["outcome"], "approval_expired")
+            database = Path(directory) / "store.db"
+            rows = sqlite3.connect(database).execute(
+                "select name from sqlite_master where name = 'conclusions'"
+            ).fetchall()
+            if rows:
+                receipts = sqlite3.connect(database).execute(
+                    "select receipt from conclusions"
+                ).fetchall()
+                self.assertEqual(receipts, [])
+
+    async def test_second_run_keeps_its_own_stored_input(self) -> None:
+        with tempfile.TemporaryDirectory() as directory, patch.dict(
+            os.environ, {"INCIDENT_TRIAGE_STATE": directory}
+        ):
+            workflow_id = "reused-workflow"
+            limits = {
+                "approval_window_seconds": 5,
+                "scan_seconds": 0,
+                "rescan_seconds": 0,
+            }
+            with environment() as env:
+                first = await env.client.start_workflow(
+                    WORKFLOW,
+                    RecipeInput(story.trace_text(), limits),
+                    workflow_id=workflow_id,
+                    task_list="test-task-list",
+                )
+                await env.client.signal_workflow(
+                    workflow_id, first.run_id, GUIDANCE_SIGNAL, story.GUIDANCE
+                )
+                first_result = env.get_workflow_result(
+                    dict, workflow_id, first.run_id
+                )
+                second = await env.client.start_workflow(
+                    WORKFLOW,
+                    RecipeInput(story.trace_text(), limits),
+                    workflow_id=workflow_id,
+                    task_list="test-task-list",
+                )
+                await env.client.signal_workflow(
+                    workflow_id, second.run_id, GUIDANCE_SIGNAL, story.GUIDANCE
+                )
+                second_result = env.get_workflow_result(
+                    dict, workflow_id, second.run_id
+                )
+            self.assertEqual(first_result["outcome"], "approval_expired")
+            self.assertEqual(second_result["outcome"], "approval_expired")
+            self.assertNotEqual(first.run_id, second.run_id)
+            keys = {
+                row[0]
+                for row in sqlite3.connect(Path(directory) / "store.db").execute(
+                    "select key from traces"
+                )
+            }
+            self.assertEqual(
+                keys,
+                {
+                    f"{workflow_id}/{first.run_id}/input",
+                    f"{workflow_id}/{second.run_id}/input",
+                },
+            )
+
     def test_retry_policy_is_bounded_and_strict(self) -> None:
         retry = QUICK_ACTIVITY["retry_policy"]
         self.assertEqual(retry["maximum_attempts"], 3)
@@ -179,6 +284,38 @@ class ActivityTests(unittest.TestCase):
         self.assertTrue(first["committed"])
         self.assertFalse(second["committed"])
         self.assertEqual(first["receipt"], second["receipt"])
+
+    def test_runs_do_not_share_a_conclusion_receipt(self) -> None:
+        with tempfile.TemporaryDirectory() as directory, patch.dict(
+            os.environ, {"INCIDENT_TRIAGE_STATE": directory}
+        ), patch(
+            "activities.activity.info",
+            return_value=SimpleNamespace(attempt=0, workflow_id="same-workflow"),
+        ):
+            first = activities.upload_conclusion(
+                {"key": "same-workflow/run-a/conclusion", "conclusion": {"n": 1}}
+            )
+            second = activities.upload_conclusion(
+                {"key": "same-workflow/run-b/conclusion", "conclusion": {"n": 2}}
+            )
+            replay = activities.upload_conclusion(
+                {"key": "same-workflow/run-a/conclusion", "conclusion": {"n": 3}}
+            )
+            rows = sqlite3.connect(Path(directory) / "store.db").execute(
+                "select key, receipt from conclusions order by key"
+            ).fetchall()
+        self.assertTrue(first["committed"])
+        self.assertTrue(second["committed"])
+        self.assertNotEqual(first["receipt"], second["receipt"])
+        self.assertFalse(replay["committed"])
+        self.assertEqual(replay["receipt"], first["receipt"])
+        self.assertEqual(
+            rows,
+            [
+                ("same-workflow/run-a/conclusion", first["receipt"]),
+                ("same-workflow/run-b/conclusion", second["receipt"]),
+            ],
+        )
 
 
 class EvidenceTests(unittest.TestCase):
@@ -216,6 +353,8 @@ class EvidenceTests(unittest.TestCase):
                 },
                 "zero_worker_seconds": 0.5,
                 "history_events_at_zero_workers": 10,
+                "upload_attempts": 1,
+                "committed_writes": 1,
             },
             1.2,
         )
@@ -224,6 +363,43 @@ class EvidenceTests(unittest.TestCase):
             self.assertNotIn("tokens", metrics)
             self.assertFalse(metrics["provider_called"])
             self.assertFalse(metrics["tokenizer_run"])
+
+    def test_lost_reply_counts_one_committed_write(self) -> None:
+        entries = [
+            {"tool": "upload_conclusion", "committed": True, "attempt": 0},
+            {"tool": "upload_conclusion", "committed": False, "attempt": 1},
+        ]
+        raw = raw_metrics(
+            {
+                "wall_seconds": 1.0,
+                "process_seconds_waiting_for_human": 0.2,
+                "root_cause": story.RIGHT_ROOT_CAUSE,
+                "call_path": story.CORRECT_PATH,
+                "outcome": "conclusion_uploaded",
+            },
+            entries,
+        )
+        cadence = cadence_metrics(
+            {
+                "ledger": {"upload_conclusion": 2},
+                "upload_attempts": 2,
+                "committed_writes": 1,
+                "final": {
+                    "outcome": "conclusion_uploaded",
+                    "conclusion": {
+                        "root_cause": story.RIGHT_ROOT_CAUSE,
+                        "call_path": story.CORRECT_PATH,
+                    },
+                },
+                "zero_worker_seconds": 0.5,
+                "history_events_at_zero_workers": 10,
+            },
+            1.2,
+        )
+        for metrics in (raw, cadence):
+            self.assertEqual(metrics["upload_attempts"], 2)
+            self.assertEqual(metrics["final_writes"], 1)
+            self.assertEqual(metrics["duplicate_uploads"], 0)
 
 
 class CommandTests(unittest.IsolatedAsyncioTestCase):

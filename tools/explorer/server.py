@@ -143,16 +143,10 @@ class ExplorerHTTPServer(ThreadingHTTPServer):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--port', type=int, default=8765, help='loopback port; 0 chooses an available port')
-    parser.add_argument(
-        '--cadence-web-port', type=int, default=8088,
-        help='loopback Cadence-Web port (default: 8088)')
     parser.add_argument('--no-browser', action='store_true', help='print the URL without opening a browser')
     args = parser.parse_args(argv)
     root = Path(__file__).resolve().parents[2]
-    if not 1 <= args.cadence_web_port <= 65535:
-        parser.error('--cadence-web-port must be between 1 and 65535')
-    explorer = Explorer(
-        root, cadence_web_url=f'http://localhost:{args.cadence_web_port}')
+    explorer = Explorer(root)
     try:
         server = ExplorerHTTPServer(
             ('127.0.0.1', args.port), explorer, MacTerminalLauncher())

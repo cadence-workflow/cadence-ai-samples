@@ -59,6 +59,28 @@ def repeated_calls(
     )
 
 
+def terminate_processes(processes: list[subprocess.Popen[str]]) -> None:
+    for process in processes:
+        if process.poll() is None:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            process.wait(timeout=5)
+
+
+def upload_totals(entries: list[dict[str, Any]]) -> tuple[int, int]:
+    attempts = 0
+    committed = 0
+    for entry in entries:
+        if entry.get("tool") != "upload_conclusion":
+            continue
+        attempts += 1
+        if entry.get("committed") is True:
+            committed += 1
+    return attempts, committed
+
+
 def run_raw(
     run_dir: Path, run_id: str
 ) -> tuple[dict[str, Any], list[dict[str, Any]], list[str]]:
@@ -75,71 +97,83 @@ def run_raw(
     ]
     commands = [command_text(first_command)]
     output: list[str] = []
+    processes: list[subprocess.Popen[str]] = []
     started = time.perf_counter()
-    process = subprocess.Popen(
-        first_command,
-        cwd=HERE,
-        env=environment,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        bufsize=1,
-        start_new_session=True,
-    )
-    if process.stdout is None:
-        raise RuntimeError("raw process did not expose stdout")
-    wait_started: float | None = None
-    for line in process.stdout:
-        output.append(line)
-        print(line, end="")
-        if line.startswith("RAW WAITING FOR APPROVAL:"):
-            wait_started = time.perf_counter()
-            break
-    if wait_started is None:
-        remainder = process.stdout.read()
-        raise RuntimeError(
-            f"raw process exited before approval wait ({process.wait()}): {remainder}"
+    try:
+        process = subprocess.Popen(
+            first_command,
+            cwd=HERE,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1,
+            start_new_session=True,
         )
+        processes.append(process)
+        if process.stdout is None:
+            raise RuntimeError("raw process did not expose stdout")
+        wait_started: float | None = None
+        for line in process.stdout:
+            output.append(line)
+            print(line, end="")
+            if line.startswith("RAW WAITING FOR APPROVAL:"):
+                wait_started = time.perf_counter()
+                break
+        if wait_started is None:
+            remainder = process.stdout.read()
+            raise RuntimeError(
+                "raw process exited before approval wait "
+                f"({process.wait()}): {remainder}"
+            )
 
-    time.sleep(RAW_CRASH_AFTER_SECONDS)
-    os.killpg(process.pid, signal.SIGKILL)
-    process.wait()
-    first_wait = time.perf_counter() - wait_started
-    lost = (
-        "RAW LOST WORK: process killed during approval wait; "
-        "in-memory state vanished\n"
-    )
-    print(lost, end="")
-    output.append(lost)
+        time.sleep(RAW_CRASH_AFTER_SECONDS)
+        os.killpg(process.pid, signal.SIGKILL)
+        process.wait()
+        first_wait = time.perf_counter() - wait_started
+        lost = (
+            "RAW LOST WORK: process killed during approval wait; "
+            "in-memory state vanished\n"
+        )
+        print(lost, end="")
+        output.append(lost)
 
-    remaining = max(0.0, COMPRESSED_HUMAN_WAIT_SECONDS - first_wait)
-    restart_command = [
-        PYTHON,
-        "raw_agent.py",
-        "--run-id",
-        run_id,
-        "--phase",
-        "restart",
-        "--approve-at",
-        f"{time.time() + remaining:.9f}",
-    ]
-    commands.append(command_text(restart_command))
-    restarted = subprocess.run(
-        restart_command,
-        cwd=HERE,
-        env=environment,
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
-    output.extend([restarted.stdout, restarted.stderr])
-    print(restarted.stdout, end="")
-    if restarted.returncode:
-        raise RuntimeError(restarted.stderr or restarted.stdout)
+        remaining = max(0.0, COMPRESSED_HUMAN_WAIT_SECONDS - first_wait)
+        restart_command = [
+            PYTHON,
+            "raw_agent.py",
+            "--run-id",
+            run_id,
+            "--phase",
+            "restart",
+            "--approve-at",
+            f"{time.time() + remaining:.9f}",
+        ]
+        commands.append(command_text(restart_command))
+        restarted = subprocess.Popen(
+            restart_command,
+            cwd=HERE,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            start_new_session=True,
+        )
+        processes.append(restarted)
+        try:
+            restarted_output, _ = restarted.communicate(timeout=30)
+        except subprocess.TimeoutExpired:
+            raise RuntimeError("raw restart timed out") from None
+        output.append(restarted_output)
+        print(restarted_output, end="")
+        if restarted.returncode:
+            raise RuntimeError(restarted_output)
+    finally:
+        terminate_processes(processes)
     wall_seconds = time.perf_counter() - started
     line = next(
         item
-        for item in restarted.stdout.splitlines()
+        for item in restarted_output.splitlines()
         if item.startswith("RAW RESULT ")
     )
     result = json.loads(line.removeprefix("RAW RESULT "))
@@ -183,7 +217,7 @@ def raw_metrics(
         and entry.get("service") == "api-gateway"
         and entry.get("status") == 200
     )
-    uploads = ledger.get("upload_conclusion", 0)
+    attempts, committed = upload_totals(entries)
     return {
         "wall_seconds": result["wall_seconds"],
         "observed_model_calls": len(model_entries),
@@ -197,8 +231,9 @@ def raw_metrics(
             max(0, ledger.get(key, 0) - 1) for key in setup
         )
         + max(0, gateway_successes - 1),
-        "duplicate_uploads": max(0, uploads - 1),
-        "final_writes": uploads,
+        "upload_attempts": attempts,
+        "duplicate_uploads": max(0, committed - 1),
+        "final_writes": committed,
         "process_seconds_waiting_for_human": result[
             "process_seconds_waiting_for_human"
         ],
@@ -217,7 +252,8 @@ def cadence_metrics(
 ) -> dict[str, Any]:
     ledger = manifest["ledger"]
     model_calls = ledger.get("plan_next", 0) + ledger.get("revise_draft", 0)
-    uploads = ledger.get("upload_conclusion", 0)
+    attempts = manifest["upload_attempts"]
+    committed = manifest["committed_writes"]
     final = manifest["final"]["conclusion"]
     return {
         "wall_seconds": wall_seconds,
@@ -236,8 +272,9 @@ def cadence_metrics(
                 "fetch_dependency_graph",
             )
         ),
-        "duplicate_uploads": max(0, uploads - 1),
-        "final_writes": uploads,
+        "upload_attempts": attempts,
+        "duplicate_uploads": max(0, committed - 1),
+        "final_writes": committed,
         "worker_seconds_during_zero_worker_wait": 0.0,
         "zero_worker_seconds_during_wait": manifest["zero_worker_seconds"],
         "history_events_at_zero_workers": manifest[
@@ -274,6 +311,11 @@ def print_table(raw: dict[str, Any], cadence_run: dict[str, Any]) -> None:
             "Completed setup steps redone",
             str(raw["completed_setup_steps_redone"]),
             str(cadence_run["completed_setup_steps_redone"]),
+        ),
+        (
+            "Upload attempts",
+            str(raw["upload_attempts"]),
+            str(cadence_run["upload_attempts"]),
         ),
         (
             "Duplicate uploads",

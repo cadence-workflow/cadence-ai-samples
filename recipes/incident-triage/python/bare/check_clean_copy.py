@@ -5,7 +5,6 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
-import sys
 import tempfile
 from pathlib import Path
 
@@ -34,17 +33,20 @@ def main() -> None:
             **os.environ,
             "PYTHONDONTWRITEBYTECODE": "1",
         }
+        setup = subprocess.run(
+            ["./run.sh", "setup"],
+            cwd=implementation,
+            env=environment,
+            capture_output=True,
+            text=True,
+            timeout=180,
+        )
+        if setup.returncode:
+            raise RuntimeError(setup.stdout + setup.stderr)
+        python = implementation / ".venv" / "bin" / "python"
         commands = (
-            [
-                sys.executable,
-                "-m",
-                "unittest",
-                "discover",
-                "-s",
-                "tests",
-                "-v",
-            ],
-            [sys.executable, "durability_manifest.py", "--json"],
+            [str(python), "-m", "unittest", "discover", "-s", "tests", "-v"],
+            [str(python), "durability_manifest.py", "--json"],
         )
         for command in commands:
             result = subprocess.run(
@@ -53,11 +55,11 @@ def main() -> None:
                 env=environment,
                 capture_output=True,
                 text=True,
-                timeout=60,
+                timeout=120,
             )
             if result.returncode:
                 raise RuntimeError(result.stdout + result.stderr)
-        print("CLEAN COPY PASSED: offline tests and manifest are independent")
+        print("CLEAN COPY PASSED: copied setup, tests, and manifest")
 
 
 if __name__ == "__main__":

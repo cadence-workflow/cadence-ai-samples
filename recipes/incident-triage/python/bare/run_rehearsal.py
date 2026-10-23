@@ -170,15 +170,15 @@ async def run_rehearsal(
         data_converter=PydanticDataConverter(),
     )
     try:
-        processes.extend(
-            [
-                spawn_worker(
-                    "workflow", "workflow-A", task_list, target, domain, state
-                ),
-                spawn_worker(
-                    "activity", "activities-A", task_list, target, domain, state
-                ),
-            ]
+        processes.append(
+            spawn_worker(
+                "workflow", "workflow-A", task_list, target, domain, state
+            )
+        )
+        processes.append(
+            spawn_worker(
+                "activity", "activities-A", task_list, target, domain, state
+            )
         )
         await asyncio.sleep(1)
         (state / "faults.json").write_text(
@@ -252,9 +252,9 @@ async def run_rehearsal(
             if before_wait.get(stable) != first_counts.get(stable):
                 raise AssertionError((stable, first_counts, before_wait))
 
-        marks["all_workers_down"] = time.time()
         stop_workers(processes)
         processes.clear()
+        marks["all_workers_down"] = time.time()
         print(
             "CADENCE WAIT: zero workers; Workflow state and approval timer "
             "remain in history",
@@ -268,15 +268,15 @@ async def run_rehearsal(
             raise AssertionError("an Activity ran while all Workers were down")
 
         marks["workers_back"] = time.time()
-        processes.extend(
-            [
-                spawn_worker(
-                    "workflow", "workflow-B", task_list, target, domain, state
-                ),
-                spawn_worker(
-                    "activity", "activities-B", task_list, target, domain, state
-                ),
-            ]
+        processes.append(
+            spawn_worker(
+                "workflow", "workflow-B", task_list, target, domain, state
+            )
+        )
+        processes.append(
+            spawn_worker(
+                "activity", "activities-B", task_list, target, domain, state
+            )
         )
         await asyncio.sleep(1)
         await client.signal_workflow(
@@ -289,9 +289,19 @@ async def run_rehearsal(
         marks["done"] = time.time()
         if final["outcome"] != "conclusion_uploaded":
             raise AssertionError(final)
-        final_counts = ledger_counts(read_ledger(state / "ledger.jsonl"))
-        if final_counts.get("upload_conclusion") != 1:
-            raise AssertionError(final_counts)
+        entries = read_ledger(state / "ledger.jsonl")
+        final_counts = ledger_counts(entries)
+        upload_attempts = sum(
+            1 for entry in entries if entry["tool"] == "upload_conclusion"
+        )
+        committed_writes = sum(
+            1
+            for entry in entries
+            if entry["tool"] == "upload_conclusion"
+            and entry.get("committed") is True
+        )
+        if upload_attempts != 1 or committed_writes != 1:
+            raise AssertionError((upload_attempts, committed_writes, final_counts))
         rows = sqlite3.connect(state / "store.db").execute(
             "select key, receipt from conclusions"
         ).fetchall()
@@ -318,6 +328,8 @@ async def run_rehearsal(
             "corrected_draft": right,
             "final": final,
             "ledger": final_counts,
+            "upload_attempts": upload_attempts,
+            "committed_writes": committed_writes,
             "upload_rows": len(rows),
             "upload_worker": uploader[0],
         }

@@ -14,9 +14,6 @@ from typing import Any
 import story
 
 
-MAX_TURNS = 4
-
-
 @dataclass
 class RawState:
     params: dict[str, Any] = field(default_factory=dict)
@@ -107,8 +104,10 @@ class RawAgent:
         start = graph["depth1"][0]
         print(f"RAW STEP 2: research complete ({pass_id})", flush=True)
 
+        repeats: dict[str, int] = {}
+        guard = False
         action: dict[str, Any] = {}
-        for step in range(1, MAX_TURNS + 1):
+        for step in range(1, story.MAX_STEPS + 1):
             self.record("plan_next", model_step=f"plan:{step}")
             action = story.plan_next(
                 {
@@ -116,14 +115,19 @@ class RawAgent:
                     "start": start,
                     "hops": self.memory.hops,
                     "guidance": self.memory.guidance,
-                    "force_draft": False,
+                    "force_draft": guard,
                 }
             )
+            guard = False
             if action["tool"] == "draft":
                 break
             call_key = action["tool"] + json.dumps(
                 action["args"], sort_keys=True
             )
+            repeats[call_key] = repeats.get(call_key, 0) + 1
+            if repeats[call_key] > story.REPEAT_LIMIT:
+                guard = True
+                continue
             self.memory.calls.append(call_key)
             self.memory.hops.append(
                 await self.logs_with_retry(
@@ -140,7 +144,7 @@ class RawAgent:
         else:
             action = {"conclusion": story.conclusion(self.memory.hops, False)}
             print(
-                f"RAW TURN LIMIT: stopped after {MAX_TURNS} planner turns",
+                f"RAW TURN LIMIT: stopped after {story.MAX_STEPS} planner turns",
                 flush=True,
             )
 

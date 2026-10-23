@@ -234,16 +234,6 @@ echo "Dependencies prepared."
             ['jev-default', 'laya-local'],
         )
 
-    def test_service_check_uses_configured_cadence_web_port(self):
-        explorer=Explorer(self.root,cadence_web_url='http://localhost:28088')
-        request=dict(sample='incident-triage',
-            implementation='recipes/incident-triage/python/bare',mode='mock')
-        with patch.object(explorer,'tcp_probe',return_value={}), \
-                patch.object(explorer,'http_probe',return_value={}) as http_probe:
-            explorer.check(request)
-        http_probe.assert_called_once_with(
-            'Cadence-Web','http://localhost:28088',expect_json=False)
-
     def test_agent_handoffs_resolves_both_framework_commands_without_imports(self):
         for framework in ('google-adk','openai-agents'):
             implementation=f'recipes/agent-handoffs/python/{framework}'

@@ -91,15 +91,18 @@ budget exhaustion, and a committed write whose first reply is lost.
 The command runs raw first and then the local Cadence rehearsal. It prints one
 human-readable table and writes a machine-readable record under
 `.evidence/compare-runs/`. The checked-in
-[`evidence/comparison-baseline.json`](evidence/comparison-baseline.json) retains
-three sanitized runs and their exact provenance.
+[`evidence/comparison-baseline.json`](evidence/comparison-baseline.json) is a
+summarized baseline from three runs. It keeps the command, runtime, and
+deterministic counters. It does not keep per-run ledgers or process output.
 
-Expected deterministic counters for this fault schedule are:
+Both paths use six planner steps and a repeated-call limit of two. Expected
+deterministic counters for this fault schedule are:
 
-- observed scripted model calls: raw 15, Cadence 11;
-- repeated tool calls: raw 15, Cadence 3;
+- observed scripted model calls: raw 16, Cadence 11;
+- repeated tool calls: raw 14, Cadence 3;
 - completed setup steps redone after interruption: raw 8, Cadence 0;
-- observed final writes: one on each path;
+- upload attempts: one on each path;
+- observed final writes: one committed write on each path;
 - duplicate uploads: zero on each path.
 
 Wall time is measured, retained, and expected to vary. Local Cadence is slower
@@ -110,9 +113,10 @@ and `revise_draft` ledger entries.
 
 ## Fairness and line counts
 
-The raw baseline has bounded retry with backoff, exception handling, a turn
-limit, an in-process changed-brief task, in-memory state, process-local write
-deduplication, and a live approval wait. It is not deliberately weakened.
+The raw baseline has the same step limit and repeated-call guard as the Cadence
+workflow, plus bounded retry with backoff, exception handling, an in-process
+changed-brief task, in-memory state, process-local write deduplication, and a
+live approval wait. It is not deliberately weakened.
 
 `durability-lines.json` classifies retry, state, and deduplication lines in
 `raw_agent.py` and `workflow.py` using the same rules. Every entry includes its
@@ -127,7 +131,8 @@ source lines.
 `start` uses `incident-triage-demo` with `ALLOW_DUPLICATE`. A new Run may reuse
 the ID after the previous Run closes. Cadence rejects a duplicate while a Run is
 open, and the CLI reports that condition. Use another `--workflow-id` when you
-want concurrent runs.
+want concurrent runs. Stored input and the conclusion receipt include the Run
+ID, so the new Run does not read the earlier Run's rows.
 
 ## Copying the recipe
 

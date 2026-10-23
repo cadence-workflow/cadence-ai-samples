@@ -89,13 +89,13 @@ quality or usage benchmark.
 ## Activity boundaries
 
 - `identify-input`: parse the fixture.
-- `store-trace`: record the input under a stable key.
+- `store-trace`: record the input under `<workflow-id>/<run-id>/input`.
 - `get-logs`: read one service fixture and exercise retry/fault behavior.
 - `fetch-graph`: read the dependency fixture.
 - `plan-next`: execute one scripted planner call.
 - `revise-draft`: apply one changed-brief request.
-- `upload-conclusion`: write once under `<workflow-id>/conclusion`; a retry
-  returns the stored receipt.
+- `upload-conclusion`: write once under `<workflow-id>/<run-id>/conclusion`; a retry
+  returns that Run's stored receipt.
 
 ## Input and output schemas
 

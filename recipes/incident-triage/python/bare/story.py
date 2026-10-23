@@ -15,6 +15,8 @@ RIGHT_ROOT_CAUSE = "payments v2.14 exhausted its ledger connection pool (50 of 5
 CORRECT_PATH = ["api-gateway", "checkout", "payments", "ledger"]
 GUIDANCE = "Payments deployed v2.14 at 10:02. Check payments."
 REVISION = "add the error at each hop"
+MAX_STEPS = 6
+REPEAT_LIMIT = 2
 
 
 def trace_text() -> str:

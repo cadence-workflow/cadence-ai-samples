@@ -13,6 +13,7 @@ DETERMINISTIC_FIELDS = (
     "observed_model_calls",
     "repeated_tool_calls",
     "completed_setup_steps_redone",
+    "upload_attempts",
     "duplicate_uploads",
     "final_writes",
     "final_correct",

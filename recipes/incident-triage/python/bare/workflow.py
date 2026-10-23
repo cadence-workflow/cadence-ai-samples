@@ -192,16 +192,19 @@ class IncidentTriageWorkflow:
             **recipe_input.limits,
         }
         self.approval_window_seconds = limits["approval_window_seconds"]
-        workflow_id = workflow.WorkflowContext.get().info().workflow_id
+        info = workflow.WorkflowContext.get().info()
+        workflow_id = info.workflow_id
+        run_id = info.workflow_run_id
 
         self.phase = "READING INPUT"
         self.params = await workflow.execute_activity(
             IDENTIFY_ACTIVITY, dict, recipe_input.text, **QUICK_ACTIVITY
         )
+        input_key = f"{workflow_id}/{run_id}/input"
         stored = await workflow.execute_activity(
             STORE_TRACE_ACTIVITY,
             dict,
-            {"key": f"{workflow_id}/input", "params": self.params},
+            {"key": input_key, "params": self.params},
             **QUICK_ACTIVITY,
         )
         self.stored_path = stored["path"]
@@ -312,12 +315,15 @@ class IncidentTriageWorkflow:
         expired: list[bool] = []
 
         async def approval_timer() -> None:
-            await workflow.sleep(
-                timedelta(seconds=limits["approval_window_seconds"])
-            )
+            try:
+                await workflow.sleep(
+                    timedelta(seconds=limits["approval_window_seconds"])
+                )
+            except asyncio.CancelledError:
+                return
             expired.append(True)
 
-        asyncio.create_task(approval_timer())
+        timer = asyncio.create_task(approval_timer())
         self.phase = "AWAITING_APPROVAL"
         while True:
             await workflow.wait_condition(
@@ -339,16 +345,18 @@ class IncidentTriageWorkflow:
             self.revision += 1
             self.phase = "AWAITING_APPROVAL"
 
-        if expired and not self.decision:
+        if expired:
             return self.finish("approval_expired")
+        timer.cancel()
         if self.decision != "approve":
             return self.finish("rejected")
         self.phase = "UPLOADING"
+        conclusion_key = f"{workflow_id}/{run_id}/conclusion"
         receipt = await workflow.execute_activity(
             UPLOAD_ACTIVITY,
             dict,
             {
-                "key": f"{workflow_id}/conclusion",
+                "key": conclusion_key,
                 "conclusion": self.conclusion,
             },
             **QUICK_ACTIVITY,
