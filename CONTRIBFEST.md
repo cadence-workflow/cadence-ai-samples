@@ -21,7 +21,7 @@ In this session you can:
 
 1. **Learn Cadence on agent workloads.** Run a prepared example, hit a familiar
    failure (lost progress, bad retries, stalled approval), and see the durable
-   path recover, including when replay shows wasted work and cost.
+   path recover. Inspect which calls repeat and which completed results are reused.
 2. **Build on the AI samples.** Add or polish a recipe in
    [`cadence-ai-samples`](https://github.com/cadence-workflow/cadence-ai-samples).
 3. **Ship a concrete contribution.** Validate the local quickstart, clarify
@@ -33,8 +33,8 @@ In this session you can:
 Session candidates live on this repository under the
 [ContribFest milestone](https://github.com/cadence-workflow/cadence-ai-samples/milestone/2)
 and the `event:contribfest` label. Open, unassigned Issues labeled
-`status:agent-ready` are available to claim (that label may be renamed to
-`status:ready` before the event; the claim rules stay the same).
+`status:ready` are available to claim through the coordinator path below.
+Recheck ownership and linked pull requests before claiming.
 
 Choose a difficulty that matches your time and energy:
 
@@ -47,6 +47,19 @@ Choose a difficulty that matches your time and energy:
 Pick the path that fits you. Excited contributors should feel empowered to claim
 a stretch Issue; maintainers are in the room to help. Claim through the
 coordinator path below; do not open competing branches for the same Issue.
+
+## Plan your session
+
+Start by running the existing live Incident Triage example. Inspect which
+model and tool calls completed and where the workflow waits for review. Then
+work with a maintainer on one small change and check what the workflow records.
+
+- [What you will do](contribfest/kubecon-na-2026/README.md)
+- [Set up and run the example](contribfest/kubecon-na-2026/setup.md)
+- [Choose a task](contribfest/kubecon-na-2026/shortlist.md)
+- [Proposed agenda](contribfest/kubecon-na-2026/agenda.md)
+
+The participant and claim rules below still apply.
 
 ## Participant guide
 
@@ -93,12 +106,12 @@ path](CONTRIBUTING.md#first-time-contributor-path) and its [approved-work claim
 instructions](CONTRIBUTING.md#claim-approved-work). During the event, the claim
 coordinator applies that workflow:
 
-1. You choose an open, unassigned `status:agent-ready` candidate.
+1. You choose an open, unassigned `status:ready` candidate.
 2. You post the documented claim request with your GitHub username and proposed
    `issue-N-short-slug` branch.
 3. The coordinator rechecks assignees, comments, labels, and active linked pull
    requests.
-4. The coordinator records ownership and changes `status:agent-ready` to
+4. The coordinator records ownership and changes `status:ready` to
    `status:in-progress`.
 5. Only then do you create the branch on your fork and begin work.
 
@@ -166,7 +179,7 @@ Cadence week is built so you can pick a track (or more than one):
 
 | Track | What you get |
 | --- | --- |
-| **See failure and cost** | Replay broken agent workflows, watch work and cost rack up without durability, then see Cadence recover |
+| **See failure and recovery** | Inspect failure and repeated work, then see what Cadence preserves |
 | **Build on AI samples** | Use [`cadence-ai-samples`](https://github.com/cadence-workflow/cadence-ai-samples), claim a ContribFest Issue, and extend a real recipe |
 | **Make your agents durable** | Learn when an agent should become a Cadence workflow and how retries, history, and approvals hold under failure |
 | **Contribute to Cadence** | Ship reviewable changes with maintainers in the room (this ContribFest), or talk shop at the project pavilion |
@@ -181,5 +194,5 @@ Official schedule:
 | Mon Nov 9, 3:20-3:45 PM | **Building and Maintaining Production-Ready SDKs with LLMs** (Ender Demirkaya, Shijie Sheng), Agentic Day | Agentics Day Room 1 | Contribute to Cadence |
 | Tue Nov 10, 3:00-7:00 PM | **Meet the Cadence Maintainers**, Project Pavilion kiosk P-15B | Solutions Showcase, Level 1, Hall 5 | Contribute to Cadence |
 | Wed Nov 11, 2:20-3:40 PM | **Cadence Workflow ContribFest: Build Durable AI Agent Examples** (Diana Laura Zawadzki, Shijie Sheng) | Salt Palace, Level 2, 255 D | Build on AI samples; contribute to Cadence |
-| Thu Nov 12, 2:40-3:10 PM | **Agents Fail. Workflows Recover. Durable Agent Orchestration with Cadence** (Diana Laura Zawadzki, Shijie Sheng) | Salt Palace, Level 1, Ballroom ACE | See failure and cost; make agents durable |
+| Thu Nov 12, 2:40-3:10 PM | **Agents Fail. Workflows Recover. Durable Agent Orchestration with Cadence** (Diana Laura Zawadzki, Shijie Sheng) | Salt Palace, Level 1, Ballroom ACE | See failure and recovery; make agents durable |
 | Thu Nov 12, 3:30-4:00 PM | **Splitting the Monolith at Cloudera: Building Fault-Tolerant Workflows with Cadence** (Soma Koltai, Ender Demirkaya) | Salt Palace, Level 1, Ballroom BDF | Contribute to Cadence (production journey) |
