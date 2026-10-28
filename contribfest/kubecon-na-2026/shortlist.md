@@ -1,22 +1,24 @@
-# Choose something to work on
+# Choose what to work on next
 
-Choose based on what you want to learn and which Issues are available. Start
-with the [live Incident Triage walkthrough](setup.md) if you are new to Cadence.
-It gives you a running example to inspect before you change one of your own.
+First, everyone makes the Incident Triage retry fix together. We'll compare
+the results before choosing separate contributions, so you can start the next
+task with someone who has worked through the same problem.
 
-## Run and understand the example
+## Finish the shared exercise
 
-Find the model Activity, a completed tool lookup and the point where the
-workflow waits for review. Compare a draft with the logs. Send guidance or a
-revision request and check which state changes. If you stop here, reject the
-run explicitly rather than leaving it waiting without a next step.
+With your partner, show the failed lookup, your policy edit and the recovered
+result. Explain why the permanently missing resource should stop once. Find
+one real model decision and its executed lookup, then compare the draft with
+the logs at the first review wait. Take turns explaining what happened.
 
-Running the same walkthrough is useful for many learners. It is a teaching
-activity, not a separate upstream Issue for every person.
+The first wait is `AWAITING_GUIDANCE`, before final approval. Follow the
+exercise's explicit rejection step when you finish this bounded activity.
+Many people can run the same exercise. It is one teaching asset, not a new
+upstream Issue for each participant.
 
-The proposed broken-lookup retry exercise is a follow-up to these pages. It
-still needs its repository integration and rehearsal before it can appear as
-an available task. Do not look for its commands in the current recipe.
+The retry exercise still needs integration and human rehearsal. The
+[setup page](setup.md) identifies the existing live example and the remaining
+exercise work. Do not assume an unmerged exercise command is available.
 
 ## Make an upstream contribution
 

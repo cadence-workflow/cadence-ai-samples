@@ -6,51 +6,48 @@ CloudNativeCon North America 2026.
 - **When:** Wednesday, November 11, 2:20 to 3:40 PM MST
 - **Where:** Salt Palace, Level 2, room 255 D, Salt Lake City
 
-## Start with a failed checkout
+## Make the first fix together
 
-You'll work with an AI agent that investigates a fictional checkout failure.
-Run the existing Incident Triage example with a local model, then inspect its
-work in Cadence. Which tool calls completed? What evidence reached the model?
-Where does the workflow wait for a person?
+We'll start with Incident Triage, an AI agent investigating a fictional
+checkout failure. A log lookup has an intentional rate-limit failure. You'll
+inspect it in Cadence Web and change its retry policy so the lookup can
+recover. In the repaired run, check that Cadence retries the log lookup while
+fetching the graph once. Then follow the real model's investigation to a draft
+for review.
 
-The model's draft is something to review. Compare its claims with the logs
-before sending guidance or approving a report. The model calls are real in
-live mode; the incident and tool responses are synthetic.
+Work in pairs and take turns driving. Before choosing another task, show each
+other what failed, what you changed and why the new policy let it continue.
+Then check a permanently missing resource: the same request should stop,
+rather than retrying an error it cannot repair.
 
-From there, work with a maintainer on one small improvement: a test, clearer
-instructions, a recipe change or a failure your own workflow needs to survive.
-Leave the result and enough evidence for another contributor to continue.
+The model calls are real. The incident data and API failures are synthetic,
+so everyone can work on the same failure without waiting for a model to make
+a particular mistake. Model choices and drafts can differ. Compare the draft
+with its source logs before accepting its claims.
 
-## Choose your starting point
+The shared exercise is being integrated and rehearsed. The [setup page](setup.md)
+explains which commands run the existing example today.
 
-| If you want to... | Start here |
+## Choose what to work on next
+
+After we compare our results, choose a contribution with a maintainer.
+
+| What interests you? | What you can work on |
 | --- | --- |
-| Learn how agent workflows run | Follow the live example and read its history with a maintainer. |
-| Make your own agent recover | Bring one small, shareable workflow and choose one call or wait to examine. |
-| Contribute to Cadence | Choose an approved Issue and agree its scope and validation with the maintainer. |
+| More AI examples | Extend Incident Triage or another sample with a useful change and a result someone can check. |
+| Your own agent workflow | Bring a small, shareable example and work on one call or wait that needs to survive failure. |
+| Another part of Cadence | Ask about an available, approved Issue that fits your interests. |
 
-Most work is in Cadence AI samples. Ask about another Cadence Issue if it fits
-your interests. Coding agents are optional; you own the design and checks.
-
-## A proposed next exercise
-
-We are preparing a focused retry exercise: a temporary log-service failure
-stops a starter, you change its policy, and Cadence retries that lookup while
-keeping completed work. A separate missing-resource check should catch a
-policy that retries everything. This documentation change does not add that
-exercise. Its commands and availability depend on integration and rehearsal.
-
-Until then, the existing live walkthrough below is the available starting point.
-The [task list](shortlist.md) distinguishes running an example from claiming an
-upstream contribution.
+Most work will be in Cadence AI samples. You can work by hand or use a coding
+agent; you own the design and checks either way. If setup blocks you, pair on
+a working laptop so you can stay with the shared exercise.
 
 ## Get ready
 
-- [Set up your laptop and run Incident Triage](setup.md).
-- [Choose a task or bring a workflow](shortlist.md).
-- [See the proposed session outline](agenda.md).
+- [Set up your laptop](setup.md).
+- [Find your next contribution](shortlist.md).
+- [See the session outline](agenda.md).
 - Follow the [participant guide](../../CONTRIBFEST.md) for claims, DCO and review.
 
-A finished exercise, useful test, draft pull request or clear handoff is a
-good outcome. You do not need to complete a migration or merge in the room.
-Save what you tried, what happened and the next step.
+A useful recipe, test, draft pull request or clear handoff is a good outcome.
+Save what you tried, what happened and what the next contributor needs to know.

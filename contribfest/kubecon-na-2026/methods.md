@@ -4,7 +4,18 @@ Choose small, useful work from the actual repository. Read the code and run
 the task before offering it. The [participant guide](../../CONTRIBFEST.md)
 remains authoritative for claims, sign-off, validation and review.
 
-## Start with a result someone can see
+## Start with one shared repair
+
+Everyone makes the retry-policy fix together before choosing separate work.
+Measure that opening in a human rehearsal, including pairing, history inspection
+and regrouping. Do not substitute a passive demonstration to preserve an
+unmeasured agenda. Record who helps with setup and who guides the room.
+
+One repeatable exercise supports many learners but counts as one teaching
+asset. Keep it separate from the pool of independent upstream contributions.
+The current documentation patch does not integrate the exercise runtime.
+
+## Choose a result someone can see
 
 A learner should be able to name the starting behavior, the change they make
 and the evidence that it worked. For the proposed retry exercise, that means

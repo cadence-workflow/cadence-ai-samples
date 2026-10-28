@@ -12,21 +12,34 @@ Agent Examples** during KubeCon + CloudNativeCon North America 2026.
 - **Event work:** [ContribFest
   milestone](https://github.com/cadence-workflow/cadence-ai-samples/milestone/2)
 
-## Goal
+## Start together with Incident Triage
 
-Working session on Cadence's AI-agent path: examples, docs, and starter Issues
-for long-running agentic workflows as durable workflows.
+We'll begin with an AI agent investigating a fictional checkout failure.
+A log lookup has an intentional rate-limit failure. Together, we'll inspect
+it in Cadence Web and change the lookup's retry policy so it can recover.
+In the repaired run, check that the graph is fetched once while the failed
+lookup retries, then follow the real model's investigation to a draft for review.
 
-In this session you can:
+The shared retry exercise is being integrated and rehearsed. The
+[setup page](contribfest/kubecon-na-2026/setup.md) distinguishes the existing
+live example from the exercise still being prepared.
 
-1. **Learn Cadence on agent workloads.** Run a prepared example, hit a familiar
-   failure (lost progress, bad retries, stalled approval), and see the durable
-   path recover. Inspect which calls repeat and which completed results are reused.
-2. **Build on the AI samples.** Add or polish a recipe in
-   [`cadence-ai-samples`](https://github.com/cadence-workflow/cadence-ai-samples).
-3. **Ship a concrete contribution.** Validate the local quickstart, clarify
-   retries/timeouts/idempotent-activity docs, or triage an Issue with
-   maintainers.
+Work in pairs and take turns explaining what happened. Everyone starts with
+the same problem, including experienced contributors. After we compare our
+results, choose what to work on next with a maintainer: extend an AI sample,
+make one part of your own workflow durable, or take another approved Cadence
+Issue. Most work will be in this repository.
+
+## Plan your session
+
+- [What we'll build together](contribfest/kubecon-na-2026/README.md)
+- [Set up your laptop](contribfest/kubecon-na-2026/setup.md)
+- [Choose your next contribution](contribfest/kubecon-na-2026/shortlist.md)
+- [Session outline](contribfest/kubecon-na-2026/agenda.md)
+
+The shared exercise is repeatable learning work. You do not need to claim a
+separate Issue to try it. Claim an upstream contribution through the process
+below before starting that work.
 
 ## Find a ContribFest Issue
 
@@ -44,22 +57,9 @@ Choose a difficulty that matches your time and energy:
 | **Mid-level** | Harden a real durability gap with a bit more surface area |
 | **High-level / stretch** | Take on deeper multi-step durability work; still scaffolded, with a clear 45-minute stopping point if you cannot finish |
 
-Pick the path that fits you. Excited contributors should feel empowered to claim
+After the shared exercise, pick the task that fits you. Excited contributors should feel empowered to claim
 a stretch Issue; maintainers are in the room to help. Claim through the
 coordinator path below; do not open competing branches for the same Issue.
-
-## Plan your session
-
-Start by running the existing live Incident Triage example. Inspect which
-model and tool calls completed and where the workflow waits for review. Then
-work with a maintainer on one small change and check what the workflow records.
-
-- [What you will do](contribfest/kubecon-na-2026/README.md)
-- [Set up and run the example](contribfest/kubecon-na-2026/setup.md)
-- [Choose a task](contribfest/kubecon-na-2026/shortlist.md)
-- [Proposed agenda](contribfest/kubecon-na-2026/agenda.md)
-
-The participant and claim rules below still apply.
 
 ## Participant guide
 
@@ -160,9 +160,9 @@ the normal abandonment workflow only after preserving the current state.
 - **A local service is not ready:** Re-run the health or minimal-prompt check
   linked in the setup table. Share the command and exact output with event
   staff. Do not paste credentials.
-- **Setup is consuming the work session:** Ask for a candidate with fewer local
-  requirements. A smaller completed proof is better than spending the session
-  debugging one machine.
+- **Setup is consuming the shared exercise:** Pair on a working laptop and
+  take turns driving and explaining. A helper can investigate setup while you
+  stay with the group. Choose another task after the shared exercise.
 - **You cannot claim an Issue:** Post the documented claim request and ask event
   staff to record ownership and update the lifecycle label.
 - **GitHub Actions is waiting for approval:** Stop and ask a maintainer to

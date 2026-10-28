@@ -1,41 +1,59 @@
-# Proposed session outline
+# Session outline
 
-The listing is November 11, 2:20 to 3:40 PM MST. This working outline uses a
-75-minute core within that slot; final pacing remains for the hosts to confirm.
+The listed session is November 11, 2:20 to 3:40 PM MST. We are planning a
+75-minute core within that slot. The sequence below is proposed; the shared
+exercise still needs a timed human rehearsal before we set the minute splits.
 
-| Time from the start | What we do | What you can see |
+| Part | What we do together | What to check |
 | --- | --- | --- |
-| 0 to 10 minutes | Watch a short Incident Triage demonstration | A model request, a tool result, review and the work Cadence records. |
-| 10 to 25 minutes | Check setup and choose a task | A running baseline, a pairing plan or a confirmed Issue. |
-| 25 to 65 minutes | Work with maintainers | One change, its validation and an explanation of what now works. |
-| 65 to 75 minutes | Save progress and share what changed | An exercise result, test, draft pull request or clear handoff. |
+| Meet and pair up | Introduce the fictional checkout incident and open Cadence Web. | Find the Workflow ID, Activity history and current state. |
+| Make the retry fix | Run the prepared failure, edit one lookup policy and try again. | In the repaired run, the temporary error recovers and the graph is fetched once. The permanent-resource check stops once. |
+| Compare our results | Take turns showing the lookup, a real model decision and the first review wait. | Explain what Cadence retried and why the model's draft still needs a person to review it. |
+| Choose a contribution | Extend an AI sample, bring a small workflow or claim another approved Cadence Issue. | Agree one change and how to check it with a maintainer. |
+| Save and share | Show what changed and leave a useful next step. | Keep the commands, actual results and a review owner. |
 
-## Watch the boundaries
+## Help each other through the first fix
 
-The presenter identifies synthetic data, real model calls and deliberately
-introduced failures. When a reviewer sends a Signal, watch its payload and
-then the state that follows. If the demonstration uses recorder automation,
-name that role instead of describing it as a person rehearsing.
+Everyone starts with the retry exercise. Pair on a working laptop if yours
+is not ready. Take turns editing and explaining; a helper can investigate
+setup without taking you out of the shared activity. If your pair finishes
+early, help a neighbor reach the same result before choosing the next task.
 
-For a Worker-loss demonstration, keep Cadence running. Compare the Workflow
-and Run IDs and actual model receipts before and after replacement. Reusing
-a recorded model Activity result is different from calling the model again.
-A model call whose completion was not recorded can be retried.
+The policy edit is tested in a new Workflow. It does not resume the finished
+starter run. Within that new run, only the log lookup retries; the graph is
+fetched once.
 
-## Work and ask for help
+The retry happens at the log lookup, before the model starts investigating.
+Real inference follows the repaired lookup. This exercise demonstrates the
+retry boundary; it does not establish model-token savings.
 
-Use the [task list](shortlist.md) and [setup instructions](setup.md). Ask for a
-smaller task when setup or scope blocks progress. Before editing, describe the
-failure, the change and what you expect to see afterward. Keep the evidence
-even if the change does not work yet.
+## Pause at the first review
 
-If the live demonstration cannot run, use a local recording and identify it
-as a recording. A scripted check is useful for its own purpose; say clearly
-when it does not call a model. Internet access and local model readiness are
-different dependencies.
+Show the model's returned action and the lookup that the Worker actually
+executed. Compare a draft claim with the logs. The first draft waits in
+`AWAITING_GUIDANCE`, before final approval. Explain what input it needs next.
+Close the bounded exercise with its explicit rejection step; this does not
+approve or upload a report.
+
+Sending guidance to the Workflow is a separate reviewer action. Cadence calls
+this a Signal. If you continue into the full review flow, read the payload
+together, send it, then inspect the state change. Do not describe an automated
+test action as a person rehearsing.
+
+## If live execution is unavailable
+
+First try pairing on a prepared machine. If the room cannot run the example,
+inspect a clearly labeled recording and history together. Ask each pair to
+identify the failed lookup and explain the retry decision. That keeps the
+discussion shared, but it does not establish a working participant runtime.
+
+Internet access and local model readiness are different dependencies. The
+offline path requires downloaded packages, container images and model weights,
+plus a full rehearsal with networking disabled.
 
 ## Save the next step
 
-Show one thing you learned or changed. Use the normal guide to hand off your
-branch, commands, actual results and remaining questions. Agree a review owner
-and follow-up date rather than assuming unfinished work will be picked up.
+Use the [task list](shortlist.md) and [participant guide](../../CONTRIBFEST.md)
+when moving from the exercise to upstream work. Agree a review owner and
+follow-up date. Keep unfinished work understandable rather than rushing to
+finish a pull request in the room.
