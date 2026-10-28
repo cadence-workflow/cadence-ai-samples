@@ -1,54 +1,25 @@
-# How maintainers choose tasks
+# How we choose ContribFest work
 
-Choose small, useful work from the actual repository. Read the code and run
-the task before offering it. The [participant guide](../../CONTRIBFEST.md)
-remains authoritative for claims, sign-off, validation and review.
+We look for useful changes to Cadence AI samples that contributors can work
+on with maintainers during the session.
 
-## Start with one shared repair
+A suitable task has a clear problem, a small scope and a result someone can
+check. It should improve a recipe, test or explanation that future users will
+need. Larger tasks need a useful stopping point and enough context for someone
+to continue afterward.
 
-Everyone makes the retry-policy fix together before choosing separate work.
-Measure that opening in a human rehearsal, including pairing, history inspection
-and regrouping. Do not substitute a passive demonstration to preserve an
-unmeasured agenda. Record who helps with setup and who guides the room.
+## Before adding a task
 
-One repeatable exercise supports many learners but counts as one teaching
-asset. Keep it separate from the pool of independent upstream contributions.
-The current documentation patch does not integrate the exercise runtime.
+Read the relevant code and try the instructions. Include prerequisites, files
+to change, validation commands and the expected result. Say whether the task
+uses a real model or synthetic responses, and keep untested behavior clear.
 
-## Choose a result someone can see
+Check for existing assignees and pull requests. An open PR may need review
+rather than another implementation. Use the repository's Issue status and
+[claim process](../../CONTRIBFEST.md#2-claim-one-issue) for ownership.
 
-A learner should be able to name the starting behavior, the change they make
-and the evidence that it worked. For the proposed retry exercise, that means
-a failed lookup, a bounded policy edit and a recovered lookup that preserves
-completed work. A permanent-error case should catch an overbroad retry policy.
-That exercise needs separate integration and rehearsal; this PR adds pages.
+## Keep the list useful
 
-Use the selection approach in
-[cert-manager's ContribFest methods](https://github.com/cert-manager/website/blob/master/content/docs/contributing/contribfest-kubecon-eu-2026/methods.md)
-to ask whether the scope fits the session, the instructions are clear and the
-result rewards the contributor while helping the project. Write Cadence's
-tasks from its actual code and needs.
-
-## Verify the offered path
-
-For each task, keep the source revision, prerequisites, commands, expected
-result, stopping point and cleanup. Check the application outcome as well as
-service completion. A handled unavailable input can complete a workflow
-without completing an investigation.
-
-A real-model path needs actual returned responses and usage. Mock tests and
-the scripted comparison have different evidence. Human rehearsal means a
-person follows the Issue alone; record coaching as a finding. Downloading a
-source archive is not a full disconnected rehearsal.
-
-## Keep one source for ownership
-
-Use upstream Issues and PRs for readiness and claims. Recheck open PRs and
-assignees before listing work, and recheck availability on the session day.
-Do not maintain another authoritative queue in this page. Count a repeatable
-exercise once as a teaching asset, separately from independent contributions.
-
-The November 4 pool freeze should confirm tested tasks and reviewers. If the
-target exceeds ready work, resolve the target with maintainers instead of
-counting duplicate or untested tasks. Agree who reviews unfinished work and
-when to follow up. Record actual event findings afterward.
+Recheck availability before the session. Count the introductory retry exercise
+once as a learning activity, separately from independent contributions. Agree
+who will review unfinished work and how contributors can follow up.

@@ -1,24 +1,8 @@
-# Choose what to work on next
+# Find something to work on
 
-First, everyone makes the Incident Triage retry fix together. We'll compare
-the results before choosing separate contributions, so you can start the next
-task with someone who has worked through the same problem.
-
-## Finish the shared exercise
-
-With your partner, show the failed lookup, your policy edit and the recovered
-result. Explain why the permanently missing resource should stop once. Find
-one real model decision and its executed lookup, then compare the draft with
-the logs at the first review wait. Take turns explaining what happened.
-
-The first wait is `AWAITING_GUIDANCE`, before final approval. Follow the
-exercise's explicit rejection step when you finish this bounded activity.
-Many people can run the same exercise. It is one teaching asset, not a new
-upstream Issue for each participant.
-
-The retry exercise still needs integration and human rehearsal. The
-[setup page](setup.md) identifies the existing live example and the remaining
-exercise work. Do not assume an unmerged exercise command is available.
+After the Incident Triage introduction, choose a task with a maintainer.
+Most contributions will be in AI samples, but you're welcome to bring a small
+workflow or ask about another Cadence Issue.
 
 ## Make an upstream contribution
 

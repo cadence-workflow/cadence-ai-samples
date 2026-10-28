@@ -12,34 +12,25 @@ Agent Examples** during KubeCon + CloudNativeCon North America 2026.
 - **Event work:** [ContribFest
   milestone](https://github.com/cadence-workflow/cadence-ai-samples/milestone/2)
 
-## Start together with Incident Triage
+## Build durable AI examples
 
-We'll begin with an AI agent investigating a fictional checkout failure.
-A log lookup has an intentional rate-limit failure. Together, we'll inspect
-it in Cadence Web and change the lookup's retry policy so it can recover.
-In the repaired run, check that the graph is fetched once while the failed
-lookup retries, then follow the real model's investigation to a draft for review.
+Start with Incident Triage to get familiar with the agent and Cadence. Inspect
+an intentional lookup failure in Cadence Web, adjust its retry policy and
+follow the agent as it continues with a real model.
 
-The shared retry exercise is being integrated and rehearsed. The
-[setup page](contribfest/kubecon-na-2026/setup.md) distinguishes the existing
-live example from the exercise still being prepared.
-
-Work in pairs and take turns explaining what happened. Everyone starts with
-the same problem, including experienced contributors. After we compare our
-results, choose what to work on next with a maintainer: extend an AI sample,
-make one part of your own workflow durable, or take another approved Cadence
-Issue. Most work will be in this repository.
+Then work with a maintainer on an AI sample, a small workflow of your own or
+another approved Cadence Issue. Most work will be in this repository. Leave
+a useful change or a clear next step for the next contributor.
 
 ## Plan your session
 
-- [What we'll build together](contribfest/kubecon-na-2026/README.md)
+- [What you'll work on](contribfest/kubecon-na-2026/README.md)
 - [Set up your laptop](contribfest/kubecon-na-2026/setup.md)
 - [Choose your next contribution](contribfest/kubecon-na-2026/shortlist.md)
 - [Session outline](contribfest/kubecon-na-2026/agenda.md)
 
-The shared exercise is repeatable learning work. You do not need to claim a
-separate Issue to try it. Claim an upstream contribution through the process
-below before starting that work.
+You do not need to claim an Issue to try the introductory exercise. Use the
+claim process below when choosing an upstream contribution.
 
 ## Find a ContribFest Issue
 
@@ -57,7 +48,7 @@ Choose a difficulty that matches your time and energy:
 | **Mid-level** | Harden a real durability gap with a bit more surface area |
 | **High-level / stretch** | Take on deeper multi-step durability work; still scaffolded, with a clear 45-minute stopping point if you cannot finish |
 
-After the shared exercise, pick the task that fits you. Excited contributors should feel empowered to claim
+Pick the task that fits you. Excited contributors should feel empowered to claim
 a stretch Issue; maintainers are in the room to help. Claim through the
 coordinator path below; do not open competing branches for the same Issue.
 
@@ -160,9 +151,8 @@ the normal abandonment workflow only after preserving the current state.
 - **A local service is not ready:** Re-run the health or minimal-prompt check
   linked in the setup table. Share the command and exact output with event
   staff. Do not paste credentials.
-- **Setup is consuming the shared exercise:** Pair on a working laptop and
-  take turns driving and explaining. A helper can investigate setup while you
-  stay with the group. Choose another task after the shared exercise.
+- **Setup is taking too long:** Ask a helper. You can pair on a working laptop
+  or choose work with fewer local requirements.
 - **You cannot claim an Issue:** Post the documented claim request and ask event
   staff to record ownership and update the lifecycle label.
 - **GitHub Actions is waiting for approval:** Stop and ask a maintainer to

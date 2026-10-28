@@ -27,18 +27,12 @@ The tests use fixtures. Passing them checks the code setup; it does not mean
 you have called a real model. Keep installation and model download separate
 from the time needed to run an already prepared example.
 
-## Prepare for the shared retry fix
+## The introductory retry exercise
 
-Everyone will make the retry fix together before choosing another task. The
-exercise is a separate integration change and is not included in this
-documentation patch. Its final instructions must include the permitted policy
-edit, temporary and permanent failure checks, real-model run and cleanup.
-
-The commands below run the existing example. They let you check Cadence and
-the model now; they do not introduce the intentional retry failure. The hosts
-will link the integrated exercise here after a person has rehearsed it from
-the instructions alone. If you cannot run locally, arrange to pair on a
-prepared laptop for the shared activity.
+The retry exercise is still being integrated. The commands below run the
+existing live example so you can check your setup now. They do not include
+the intentional rate-limit failure. Exercise instructions will be linked here
+when available.
 
 ## Run the existing live example
 
@@ -72,10 +66,8 @@ state and result after each action; receiving a Signal is separate from applying
 
 ## If setup or internet access fails
 
-Tell a helper which command failed and keep its output. Pair on a working
-laptop and take turns driving and explaining so you can stay with the shared
-exercise. A helper can investigate your setup separately. Do not assume every
-laptop can run the model.
+Tell a helper which command failed and keep its output. You can pair on a
+working laptop if useful. Not every laptop can run the model.
 
 A source archive does not contain installed Python packages, container images
 or model weights. Download them before travel. Before relying on disconnected
@@ -84,5 +76,5 @@ available. Claim upstream work while online; after reconnecting, confirm
 ownership before pushing. A repeatable walkthrough needs no Issue claim.
 
 Save commands, IDs, model receipts, changed files and the next step. Stop only
-services and Workers you started. After the shared exercise and regroup, use
-the [task list](shortlist.md) to choose your next contribution.
+services and Workers you started. Use the [task list](shortlist.md) to choose
+your next contribution.
