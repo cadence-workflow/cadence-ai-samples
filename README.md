@@ -116,21 +116,22 @@ Start with `llama3.2-local`, the model installed above. `qwen2.5-local`
 
 | Recipe | `llama3.2-local` | `qwen2.5-local` |
 | --- | --- | --- |
-| Agent Handoffs, live mode | Passes | Passes |
+| Agent Handoffs, live mode | Fails | Not reliable |
 | Auto Research, both frameworks | Passes | Passes |
 | Human in the Loop | Passes | Passes |
-| Incident Triage, live mode | Fails | Fails |
+| Incident Triage, live mode | Passes | Passes |
 | Recurring AI Watch, both frameworks | Passes | Passes |
 
-Agent Handoffs passed its strict live check with both models on both
-frameworks; the recipe README has the run counts.
+Agent Handoffs passed 1 of 3 runs with `qwen2.5-local` on OpenAI Agents and
+none on Google ADK. Use mock mode.
 
 Results come from live runs on Linux with CPU-only Ollama 0.40.13, 3 per model
 unless a note gives other counts. Each recipe README shows how to select a
 model.
 
-Incident Triage live mode stops when the model's plan fails the recipe's
-service-name check. Use mock mode.
+Incident Triage live mode completed 5 of 5 runs per model, through guidance and
+approval. `qwen2.5-local` found the intended root cause in all 5;
+`llama3.2-local` found it in 1, so review its drafts closely.
 
 ## Why Cadence for AI workflows
 
