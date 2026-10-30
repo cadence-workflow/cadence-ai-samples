@@ -4,7 +4,11 @@ Start with the [retry-policy exercise](../../recipes/incident-triage/python/bare
 Then [bring your own workflow](#bring-your-own-workflow), or take a ContribFest
 Issue below if you didn't bring one.
 
+Notes: Please **first comment** on the issue and then assign yourself to the issue you want to take on.
+
 ## ContribFest Issues
+
+Find all issues using [this filter](https://github.com/cadence-workflow/cadence-ai-samples/issues?q=is%3Aissue+state%3Aopen+label%3Aevent%3Acontribfest+no%3Aassignee)
 
 | Issue | What you'll do | Cadence idea | Level | Needs |
 | --- | --- | --- | --- | --- |
