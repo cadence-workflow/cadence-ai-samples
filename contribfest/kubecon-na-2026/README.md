@@ -15,12 +15,14 @@ as a Cadence Workflow and survives the failure you're most worried about.
 **1. Warm up together (about 20 minutes).** Incident Triage is an AI agent
 investigating a fictional checkout outage with a real local model.
 
-- **First win:** a log lookup gets an HTTP 429 rate limit. With a Cadence
-  retry policy it waits, retries and the agent carries on. No retry loop in
+- **See it fail:** a log lookup gets an HTTP 429 rate limit, and with no retry
+  policy the agent stops before it starts reasoning.
+- **First win:** you write your first Cadence retry policy, in one file. Run it
+  again: the lookup waits, retries and the agent carries on. No retry loop in
   your code.
 - **Block the reverse:** a 404 means the resource is gone, so retrying it only
-  wastes time. You make that error stop after one attempt, then check both
-  outcomes in Cadence Web.
+  wastes time. Your policy must stop it after one attempt. Check both outcomes
+  in Cadence Web.
 
 Instructions:
 [retry-policy exercise](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md).
