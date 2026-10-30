@@ -42,16 +42,9 @@ workflow, so someone can continue it if you don't finish. Steps are in
 **Want to explore first?** [#119](https://github.com/cadence-workflow/cadence-ai-samples/issues/119): break a running agent on purpose
 (stop the worker, send a Signal mid-run) and file what surprised you.
 
-**Didn't bring one?** Take a ContribFest Issue:
-
-| Issue | What you'll do | Level | Needs a model |
-| --- | --- | --- | --- |
-| [#110](https://github.com/cadence-workflow/cadence-ai-samples/issues/110) | Prove `revise` reuses evidence and `guidance` investigates again | low | no |
-| [#112](https://github.com/cadence-workflow/cadence-ai-samples/issues/112) | Make the recipe's clean-copy check pass | low | no |
-| [#121](https://github.com/cadence-workflow/cadence-ai-samples/issues/121) | Prove a lost reply doesn't save the conclusion twice | low | no |
-| [#111](https://github.com/cadence-workflow/cadence-ai-samples/issues/111) | Show a model call recovering from a rate limit | mid | yes |
-| [#120](https://github.com/cadence-workflow/cadence-ai-samples/issues/120) | Let an unanswered approval expire on a durable timer | mid | yes |
-| [#109](https://github.com/cadence-workflow/cadence-ai-samples/issues/109) | Help a small local model name the root cause | mid | yes |
+**Didn't bring one?** Choose a task from the
+[ContribFest issue pool](shortlist.md#choose-a-contribfest-issue). Check its
+setup requirements and leave a claim request before starting.
 
 A merged fix, a draft pull request or a written next step are all good
 outcomes. You can work by hand or with a coding agent.
@@ -59,6 +52,7 @@ outcomes. You can work by hand or with a coding agent.
 ## Get ready
 
 - [Set up your laptop](setup.md).
+- [Join CNCF Slack](https://slack.cncf.io/) before the session.
 - [Find something to work on](shortlist.md).
 - [See the session outline](agenda.md).
 
