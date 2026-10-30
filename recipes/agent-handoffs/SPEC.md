@@ -35,9 +35,10 @@ agent delegates to:
 - a long-trip specialist that books a synthetic flight and synthetic rides
   connecting local addresses to airports.
 
-Mock mode uses deterministic parsing and routing. Live mode uses the same trip
-intent with the selected framework's native handoff primitive. All receipts are
-labeled synthetic.
+Mock mode uses deterministic parsing and routing. Live mode parses the same
+trip intent in Workflow code, offers only the matching specialist through the
+selected framework's native handoff primitive, and binds booking details in
+the specialist's tools. All receipts are labeled synthetic.
 
 ## Repository implementation profile
 
@@ -65,10 +66,15 @@ defined by the
 ## Workflow architecture
 
 Mock mode schedules `agent-handoffs.mock-route`, then books through typed
-Activities based on the returned route. Live mode runs a coordinator with
-handoffs to short- and long-trip specialists. OpenAI Agents uses `handoffs`;
-Google ADK uses `sub_agents` and its injected `transfer_to_agent` tool. Both map
-specialist tools to the same booking Activity names on separate task lists.
+Activities based on the returned route. Live mode runs a coordinator whose only
+handoff is the specialist for the parsed route. OpenAI Agents uses `handoffs`;
+Google ADK uses `sub_agents` and its injected `transfer_to_agent` tool. The
+short-trip specialist has `book_ride` and the long-trip specialist has
+`book_long_trip`; neither tool takes model arguments. Both map to the same
+booking Activity names on separate task lists, and `book_long_trip` schedules
+one flight and two ride Activities. A second booking call fails. OpenAI Agents
+hides the transfer call from the specialist and re-prompts the specialist once
+when it ends without booking.
 
 The Workflow records mode, route, and completion state. Replay reads completed
 Activity results from history, so finished route, model, and booking Activities
@@ -120,11 +126,9 @@ Invalid or unparseable requests fail before booking Activities run.
   Ollama modes.
 
 Catalog entries compatible with the live Worker include `gemini-flash-lite`,
-`llama3.2-local`, and `openai-nano`. Successful specialist handoffs and booking
-tool calls with a real model are not proven for this recipe until
+`llama3.2-local`, `qwen2.5-local`, and `openai-nano`. Local Ollama evidence is
+listed under live behavior below. Remote models remain unproven until
 [Issue #47](https://github.com/cadence-workflow/cadence-ai-samples/issues/47).
-Evaluation of alternate local Ollama models is tracked in
-[Issue #48](https://github.com/cadence-workflow/cadence-ai-samples/issues/48).
 
 ## Failure behavior
 
@@ -154,8 +158,8 @@ three attempts with exponential backoff starting at one second.
 - Offline tests exercise the real ADK runner and built-in transfer machinery
   with controlled model Activity responses. They cover successful short and
   long transfers, missing and incorrect transfers, missing and duplicate tool
-  calls, invalid arguments, typed receipts, Worker-local configuration, and
-  exact booking Activity counts.
+  calls, ignored model-supplied arguments, typed receipts, Worker-local
+  configuration, and exact booking Activity counts.
 - `python/google-adk/tests/local_cadence_checks.py` demonstrates mock short and
   long runs and Worker restart/replay when local Cadence is available.
 - `python/google-adk/tests/live_ollama_validation.py` is strict: it succeeds only
@@ -165,43 +169,32 @@ three attempts with exponential backoff starting at one second.
 
 ### Live behavior and known limitations
 
-- Live mode is implemented with OpenAI Agents handoffs and Activity-backed
-  model and booking tools. Live `RecipeResult` values include the specialist
-  name and typed receipts only when the model completes booking tool Activities.
-  The Workflow does not schedule deterministic booking fallback when a live model
-  omits handoffs or tools.
+- Live `RecipeResult` values include the specialist name and typed receipts
+  only when the model completes booking tool Activities. The Workflow does not
+  schedule deterministic booking fallback when a live model omits the handoff
+  or the tool call.
+- Workflow code chooses the specialist from the parsed trip, so the model no
+  longer decides the route. The handoff is still the framework's own primitive
+  and is still made by the model.
 - `python tests/live_ollama_validation.py` remains strict: it passes only when
   the short-trip specialist schedules one `book-ride` (no `book-flight`), or the
   long-trip specialist schedules one `book-flight` and two `book-ride` Activities,
-  each with typed receipts in `RecipeResult`.
-- **Documented capability gap:** with catalog ID `llama3.2-local`, the Worker
-  reaches Ollama and `OpenAIActivities.invoke_model` runs, but `llama3.2:latest`
-  did not perform specialist handoffs or booking tool calls in acceptance runs.
-  Do not treat `llama3.2-local` as a working live model for this recipe.
-- Successful real-model handoffs and tool-backed bookings are deferred to
-  [Issue #47](https://github.com/cadence-workflow/cadence-ai-samples/issues/47).
-  Alternate local Ollama model evaluation is tracked in
-  [Issue #48](https://github.com/cadence-workflow/cadence-ai-samples/issues/48).
-- Google ADK live mode derives route and specialist from
-  `event.actions.transfer_to_agent`, then validates the tool receipts returned by
-  the selected specialist. Deterministic parsing checks that the model selected
-  the correct specialist, but never substitutes a transfer or schedules fallback
+  each with typed receipts in `RecipeResult`. `--model-id` selects the catalog
+  entry; the default is `llama3.2-local`.
+- Google ADK live mode derives the specialist from
+  `event.actions.transfer_to_agent`, then validates the tool receipts against
+  the parsed trip. It never substitutes a transfer or schedules fallback
   bookings.
-- Real-model Google ADK success is recorded separately from OpenAI Agents
-  evidence. An unavailable or incapable local model is not replaced with remote
-  inference.
-- **Google ADK capability gap:** after the Worker-side runtime-model correction,
-  the Issue #54 local `llama3.2-local` acceptance run reached Ollama and booking
-  Activities for both routes. The short route scheduled two model Activities
-  and one ride before failing without a final valid result. The long route
-  scheduled three model Activities and one ride, but no flight, before strict
-  schema validation failed. The strict script exited nonzero and retained both
-  histories; this is model-capability evidence, not a provider-resolution
-  failure.
+- **Local Ollama evidence** (CPU-only Ollama 0.40.13 on Linux, strict check):
+  OpenAI Agents passed 5 of 5 runs with `llama3.2-local` and 5 of 5 with
+  `qwen2.5-local`. Google ADK passed 5 of 5 with `llama3.2-local` and 9 of 10
+  with `qwen2.5-local`; the failure was a model Activity timeout while other
+  live jobs shared the CPU.
+- Real-model results are recorded per implementation. An unavailable or
+  incapable local model is not replaced with remote inference.
 
 ### Non-goals for this closure
 
 - Proving live handoffs with remote or paid catalog models (Issue #47).
-- Selecting a replacement local Ollama model (Issue #48).
 
 The recipe imports neither templates nor another recipe.
