@@ -41,8 +41,8 @@ async def run(args):
         client = await stack.enter_async_context(Client(domain="cadence-ai-samples",
             target="localhost:7833", data_converter=PydanticDataConverter()))
         if args.local_ollama:
-            if args.model_id != "llama3.2-local":
-                raise ValueError("--local-ollama is restricted to llama3.2-local")
+            if selection.model.provider != "ollama":
+                raise ValueError("--local-ollama requires an Ollama catalog entry")
             import os
             from unittest.mock import patch
             from inference import build_model_activities
