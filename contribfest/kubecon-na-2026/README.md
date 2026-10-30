@@ -8,38 +8,45 @@ CloudNativeCon North America 2026.
 
 ## What you'll do
 
-**1. Fix an AI agent's retry policy (everyone, about 25 minutes).** Incident
-Triage is an AI agent investigating a fictional checkout failure with a real
-local model. You'll watch it look up logs service by service in Cadence Web.
-Then a log lookup fails with HTTP 429 and the agent stops before it starts
-reasoning. You fix that by editing one file, the lookup's retry policy, and run
-it again: the 429 recovers, a permanent 404 still stops, and the agent reaches
-a draft for you to review. The incident and API failures are synthetic; the
-model calls are real. Instructions:
+**Bring your own workflow and make it durable.** Bring an agent or script you
+already run that makes at least one model or tool call. By the end, it runs
+as a Cadence Workflow and survives the failure you're most worried about.
+
+**1. Warm up together (about 20 minutes).** Incident Triage is an AI agent
+investigating a fictional checkout outage with a real local model.
+
+- **First win:** a log lookup gets an HTTP 429 rate limit. With a Cadence
+  retry policy it waits, retries and the agent carries on. No retry loop in
+  your code.
+- **Block the reverse:** a 404 means the resource is gone, so retrying it only
+  wastes time. You make that error stop after one attempt, then check both
+  outcomes in Cadence Web.
+
+Instructions:
 [retry-policy exercise](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md).
 
-**2. Take one ContribFest Issue (the rest of the session).** Each one builds on
-the exercise and has a command that shows the problem, the file to change and
-how to check your fix:
+**2. Make your own workflow durable (the rest of the session).**
+
+1. Wrap: run your agent inside one Cadence Activity, started by a Workflow.
+   Every run, input, result and retry shows up in Cadence Web.
+2. Split: move the model call and each tool call into their own Activities,
+   so each one retries on its own and finished work isn't redone.
+3. Steer (stretch): add a Signal so a person can approve or redirect.
+
+Stop at any depth. Steps and examples are in
+[Find something to work on](shortlist.md#bring-your-own-workflow).
+
+**Didn't bring one?** Take a ContribFest Issue:
 
 | Issue | What you'll do | Level | Needs a model |
 | --- | --- | --- | --- |
-| [#110](https://github.com/cadence-workflow/cadence-ai-samples/issues/110) | Write a test proving `revise` reuses evidence and `guidance` investigates again | low | no |
-| [#112](https://github.com/cadence-workflow/cadence-ai-samples/issues/112) | Make the recipe's clean-copy check pass, so one recipe can be copied on its own | low | no |
-| [#111](https://github.com/cadence-workflow/cadence-ai-samples/issues/111) | Show a model call recovering from a rate limit through its Cadence retry policy | mid | yes |
-| [#109](https://github.com/cadence-workflow/cadence-ai-samples/issues/109) | Help the smaller llama3.2 model name the root cause, not the symptom | mid | yes |
+| [#110](https://github.com/cadence-workflow/cadence-ai-samples/issues/110) | Prove `revise` reuses evidence and `guidance` investigates again | low | no |
+| [#112](https://github.com/cadence-workflow/cadence-ai-samples/issues/112) | Make the recipe's clean-copy check pass | low | no |
+| [#111](https://github.com/cadence-workflow/cadence-ai-samples/issues/111) | Show a model call recovering from a rate limit | mid | yes |
+| [#109](https://github.com/cadence-workflow/cadence-ai-samples/issues/109) | Help a small local model name the root cause | mid | yes |
 
-The full list is the
-[ContribFest milestone](https://github.com/cadence-workflow/cadence-ai-samples/milestone/2).
-Claim an Issue before you start: see [Find something to work on](shortlist.md).
-
-**Or bring your own agent.** If you have a small agent or workflow that's safe
-to share, we'll find its model calls and tool calls with you, pick the one most
-likely to fail, and give it a Cadence retry policy, a timeout or a human
-approval step.
-
-You can work by hand or with a coding agent. A merged fix, a draft pull request
-or a clear handoff are all good outcomes.
+A merged fix, a draft pull request or a written next step are all good
+outcomes. You can work by hand or with a coding agent.
 
 ## Get ready
 
