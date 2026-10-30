@@ -109,6 +109,29 @@ Ollama listens on `localhost:11434`, which matches `llama3.2-local` in
 [models.yaml](models.yaml). After installation, the Explorer can explicitly
 warm selected local services without starting or downloading them.
 
+### Choosing a local model
+
+Start with `llama3.2-local`, the model installed above. `qwen2.5-local`
+(`ollama pull qwen2.5:7b`) is larger and slower, and passes the same recipes.
+
+| Recipe | `llama3.2-local` | `qwen2.5-local` |
+| --- | --- | --- |
+| Agent Handoffs, live mode | Fails | Not reliable |
+| Auto Research, both frameworks | Passes | Passes |
+| Human in the Loop | Passes | Passes |
+| Incident Triage, live mode | Fails | Fails |
+| Recurring AI Watch, both frameworks | Passes | Passes |
+
+Agent Handoffs passed 1 of 3 runs with `qwen2.5-local` on OpenAI Agents and
+none on Google ADK. Use mock mode.
+
+Results come from live runs on Linux with CPU-only Ollama 0.40.13, 3 per model
+unless a note gives other counts. Each recipe README shows how to select a
+model.
+
+Incident Triage live mode stops when the model's plan fails the recipe's
+service-name check. Use mock mode.
+
 ## Why Cadence for AI workflows
 
 Cadence preserves workflow state and provides durable retries, timers, and
