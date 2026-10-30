@@ -10,11 +10,13 @@ Issue below if you didn't bring one.
 | --- | --- | --- | --- | --- |
 | [#110](https://github.com/cadence-workflow/cadence-ai-samples/issues/110) | Prove `revise` reuses evidence and `guidance` investigates again | Signals, Queries, Workflow tests | low | Python only |
 | [#112](https://github.com/cadence-workflow/cadence-ai-samples/issues/112) | Make the Incident Triage clean-copy check pass | Self-contained samples | low | Python only |
+| [#121](https://github.com/cadence-workflow/cadence-ai-samples/issues/121) | Prove a lost reply doesn't save the conclusion twice | Idempotent writes | low | Python only |
 | [#111](https://github.com/cadence-workflow/cadence-ai-samples/issues/111) | Show a model call recovering from a rate limit | Activity retry policy | mid | Cadence, Ollama, `qwen2.5:7b` |
+| [#120](https://github.com/cadence-workflow/cadence-ai-samples/issues/120) | Let an unanswered approval expire | Durable timers | mid | Cadence, Ollama, `qwen2.5:7b` |
 | [#109](https://github.com/cadence-workflow/cadence-ai-samples/issues/109) | Help a small local model name the root cause | Human review of agent output | mid | Cadence, Ollama, `llama3.2` and `qwen2.5:7b` |
 
 Each Issue explains the problem, shows the command that reproduces it, names the
-file to change and says how to check the fix. Issues #109 and #111 need the
+file to change and says how to check the fix. Issues #109, #111 and #120 need the
 exercise merged first; the Issue says so at the top.
 
 To claim one:
@@ -40,6 +42,10 @@ request.
 
 ## Bring your own workflow
 
+Start from [#118](https://github.com/cadence-workflow/cadence-ai-samples/issues/118). Open your own Issue titled
+`<Example> Make <your agent> durable`, so it can be claimed, reviewed and
+continued by someone else.
+
 Bring a small agent or script that's safe to share and makes at least one
 model or tool call. Work through as many depths as you have time for:
 
@@ -58,6 +64,12 @@ non-retryable errors and review Signals. Copy from it.
 
 If you don't finish, write down the commands, what works and the next step,
 and open an Issue so someone can continue.
+
+## Explore and file what you find
+
+[#119](https://github.com/cadence-workflow/cadence-ai-samples/issues/119): run Incident Triage in mock mode, stop the worker mid-run,
+send Signals, run two at once. Open a `<Finding>` Issue for anything that
+surprised you. No model needed.
 
 ## Leave a useful result
 
