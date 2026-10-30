@@ -78,6 +78,7 @@ Prepare only the local services named by your Issue:
 | --- | --- | --- |
 | Cadence | Run and inspect the workflow | [Ticket Routing requirements](recipes/ticket-routing/README.md#requirements) |
 | Laya | Local classification | [Install Laya](README.md#install-laya) |
+| Ollama with `qwen2.5:7b` | Incident Triage exercise (everyone) | [Exercise setup](recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md#prepare-before-the-session) |
 | Ollama with `llama3.2` | Local model inference | [Install Ollama and llama3.2](README.md#install-ollama-and-llama32) |
 | Full local example | Exercise Laya and `llama3.2` together | [Recurring AI Watch setup](recipes/recurring-ai-watch/README.md#setup) |
 

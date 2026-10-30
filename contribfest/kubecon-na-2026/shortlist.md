@@ -4,6 +4,16 @@ After the Incident Triage introduction, choose a task with a maintainer.
 Most contributions will be in AI samples, but you're welcome to bring a small
 workflow or ask about another Cadence Issue.
 
+## Extend a recipe
+
+Start from what you just ran. The exercise runner's scenarios are in
+[`run_exercise.py`](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/run_exercise.py);
+a new failure or review case is a scenario plus its checks. To see the
+commands and Signals for every recipe, run the
+[Local Samples Explorer](../../tools/explorer/README.md) with
+`./scripts/explore.sh` from the repository root. Pick one change with a visible
+result and agree it with a maintainer before you start.
+
 ## Make an upstream contribution
 
 Use the [ContribFest milestone](https://github.com/cadence-workflow/cadence-ai-samples/milestone/2)
