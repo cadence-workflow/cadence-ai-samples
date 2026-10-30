@@ -1,48 +1,55 @@
 # Find something to work on
 
-After the Incident Triage introduction, choose a task with a maintainer.
-Most contributions will be in AI samples, but you're welcome to bring a small
-workflow or ask about another Cadence Issue.
+Do the [retry-policy exercise](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md)
+first. Every Issue below starts from it.
 
-## Extend a recipe
+## ContribFest Issues
 
-Start from what you just ran. The exercise runner's scenarios are in
-[`run_exercise.py`](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/run_exercise.py);
-a new failure or review case is a scenario plus its checks. To see the
-commands and Signals for every recipe, run the
-[Local Samples Explorer](../../tools/explorer/README.md) with
-`./scripts/explore.sh` from the repository root. Pick one change with a visible
-result and agree it with a maintainer before you start.
+| Issue | What you'll do | Cadence idea | Level | Needs |
+| --- | --- | --- | --- | --- |
+| [#110](https://github.com/cadence-workflow/cadence-ai-samples/issues/110) | Test that `revise` reuses evidence and `guidance` investigates again | Signals, Queries, Workflow tests | low | Python only |
+| [#112](https://github.com/cadence-workflow/cadence-ai-samples/issues/112) | Make the Incident Triage clean-copy check pass | Self-contained samples | low | Python only |
+| [#111](https://github.com/cadence-workflow/cadence-ai-samples/issues/111) | Show a model call recovering from a rate limit | Activity retry policy | mid | Cadence, Ollama, `qwen2.5:7b` |
+| [#109](https://github.com/cadence-workflow/cadence-ai-samples/issues/109) | Help llama3.2 name the root cause, not the symptom | Human review of agent output | mid | Cadence, Ollama, `llama3.2` and `qwen2.5:7b` |
 
-## Make an upstream contribution
+Each Issue explains the problem, shows the command that reproduces it, names the
+file to change and says how to check the fix. Issues #109 and #111 need the
+exercise merged first; the Issue says so at the top.
 
-Use the [ContribFest milestone](https://github.com/cadence-workflow/cadence-ai-samples/milestone/2)
-and the guide's [Issue selection and claim process](../../CONTRIBFEST.md#2-claim-one-issue).
-Only open, unassigned `status:ready` work is available. Check linked pull
-requests and wait for the required ownership record before starting a branch.
+To claim one:
 
-Ask a maintainer to help choose one change with a visible result. A test might
-show that an existing protection survives a lost reply. A documentation change
-might let someone run the recipe without an explanation from its author.
-Those examples are directions to discuss, not claims that such Issues are ready.
+1. Check it is open, unassigned and labeled `status:ready`, with no linked pull request.
+2. Comment on the Issue with your GitHub username and your branch name, `issue-N-short-slug`.
+3. Wait for the claim coordinator to assign you and change the label to `status:in-progress`.
+4. Create the branch in your fork, commit with `git commit -s`, and open a pull request against `main`.
 
-An existing PR may need review rather than another implementation. Ask about
-another Cadence repository if its work fits you better. The same ownership,
-validation and review rules apply whether you code by hand or use an agent.
+The full process is in [CONTRIBFEST.md](../../CONTRIBFEST.md#2-claim-one-issue).
+The [ContribFest milestone](https://github.com/cadence-workflow/cadence-ai-samples/milestone/2)
+has the current list.
 
-## Bring a workflow of your own
+## Extend the exercise
 
-Bring a small example that is safe to share. With a maintainer, identify the
-model requests, tools, reads and writes that reach outside the process. Choose
-one failure to handle: which result should survive, which call is safe to
-repeat, and where should a person decide what happens next?
+Every scenario in
+[`run_exercise.py`](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/run_exercise.py)
+is a prepared failure plus the checks that prove Cadence handled it. To add one,
+for example an approval that never arrives (a durable timer) or a write whose
+reply is lost (an idempotency key), copy the `rate-limit` scenario, change the
+failure, and write its checks. Open an Issue describing it before the pull
+request.
 
-Turn one answer into a runnable step, test or design note. A complete migration
-may need more time than this session. Save what you learned and the next
-decision so the work can continue.
+## Bring your own agent
+
+Bring a small agent or workflow that's safe to share. With a maintainer:
+
+1. List every model call and tool call that leaves the process.
+2. Pick the one most likely to fail, and decide whether a retry is safe.
+3. Make it a Cadence Activity with a retry policy and a timeout, or add a
+   Signal where a person should approve.
+4. Run it, break that call on purpose, and check the result in Cadence Web.
+
+If it doesn't finish in the session, write down the commands, what works and
+the next step, and open an Issue so someone can continue.
 
 ## Leave a useful result
 
 Follow the [finish or hand off instructions](../../CONTRIBFEST.md#4-finish-or-hand-off).
-Keep exact commands and results, untested behavior and the next action. Ask who
-will review it. A clear handoff is useful even when the work is unfinished.
