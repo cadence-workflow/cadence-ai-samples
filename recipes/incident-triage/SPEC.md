@@ -53,7 +53,12 @@ Generated from the `python/bare` profile defined by the
 - **Mock and live behavior:** Mock runs the scripted planner, including the
   inventory wrong turn modeled on the real run. Live reads `models.yaml` and
   calls that model from the plan and revise activities. The default live model
-  is `llama3.2-local`. Start does not select a model.
+  is `llama3.2-local`. Start does not select a model. Ollama requests carry a
+  JSON schema that allows only the fixture's services and bounded text,
+  requires a lookup before the first draft, excludes services already looked
+  up, and blocks drafting while an ERROR line names an unfetched downstream.
+  Output tokens are capped. Remote providers receive the same prompts without
+  a schema.
 - **Runtime catalog use:** Only the live Worker reads repository-root
   `models.yaml`.
 - **Workflow ID reuse:** `start` uses the stable demo Workflow ID

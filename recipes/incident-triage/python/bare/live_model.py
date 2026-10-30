@@ -26,6 +26,7 @@ ALLOWED_SERVICES = (
     "ledger",
 )
 DEFAULT_MODEL_ID = "llama3.2-local"
+MAX_OUTPUT_TOKENS = 800
 _LOCK = threading.Lock()
 Transport = Callable[[str, dict[str, Any], dict[str, str]], dict[str, Any]]
 
@@ -73,15 +74,24 @@ def prepare() -> ModelConfig:
 
 def plan(context: dict[str, Any], transport: Transport | None = None) -> dict[str, Any]:
     selection = load_selection()
+    force_draft = bool(context.get("force_draft"))
     system = (
         "You investigate one synthetic checkout failure. Reply with one JSON "
         "object only. Keys are tool, args, hypothesis, and conclusion. tool is "
         "get_logs_by_trace_id or draft. get_logs_by_trace_id args are "
         '{"service": one of api-gateway, checkout, inventory, payments, ledger}. '
         "draft args are {} and conclusion has call_path, root_cause, confidence, "
-        "and summary. Use only the evidence in the user message. If hops is "
-        "empty, request logs for the start service before drafting. If "
-        "force_draft is true, tool must be draft."
+        "and summary. call_path is a list of service names in call order. "
+        'A lookup looks like {"tool": "get_logs_by_trace_id", "args": '
+        '{"service": "checkout"}, "hypothesis": "..."}. A draft looks like '
+        '{"tool": "draft", "args": {}, "hypothesis": "...", "conclusion": '
+        '{"call_path": ["api-gateway", "checkout"], "root_cause": "...", '
+        '"confidence": "low", "summary": "..."}}. '
+        "Use only the evidence in the user message. If hops is "
+        "empty, request logs for the start service before drafting. Each hop "
+        "is a lookup that already completed: do not request a service already "
+        "in hops. Follow the downstream service named in ERROR lines, then "
+        "draft when the chain ends. If force_draft is true, tool must be draft."
     )
     content, usage = _complete(
         selection,
@@ -89,10 +99,11 @@ def plan(context: dict[str, Any], transport: Transport | None = None) -> dict[st
         {
             "start": context.get("start"),
             "guidance": context.get("guidance") or [],
-            "force_draft": bool(context.get("force_draft")),
+            "force_draft": force_draft,
             "hops": _compact_hops(context.get("hops") or []),
         },
         transport,
+        _plan_schema(force_draft, context.get("start"), context.get("hops") or []),
     )
     note_spend("plan_next", usage)
     return _validate_plan(
@@ -111,8 +122,9 @@ def revise(
         "Revise this synthetic incident draft so it satisfies the review "
         "request. Reply with one JSON object only. Keys are call_path, "
         "root_cause, confidence, summary, and errors_per_hop. Ground every "
-        "claim in the hop lines. call_path may contain only api-gateway, "
-        "checkout, inventory, payments, and ledger."
+        "claim in the hop lines. call_path is a list of service names in call "
+        "order and may contain only api-gateway, checkout, inventory, "
+        "payments, and ledger. errors_per_hop is a list of text."
     )
     content, usage = _complete(
         selection,
@@ -123,6 +135,7 @@ def revise(
             "hops": _compact_hops(hops),
         },
         transport,
+        _revision_schema(),
     )
     note_spend("revise_draft", usage)
     return _validate_revision(_parse_object(content), request)
@@ -197,12 +210,13 @@ def _complete(
     system: str,
     payload: dict[str, Any],
     transport: Transport | None,
+    schema: dict[str, Any] | None = None,
 ) -> tuple[str, Usage]:
     key = _api_key(selection)
     headers = {"content-type": "application/json"}
     if key:
         headers["authorization"] = f"Bearer {key}"
-    body = {
+    body: dict[str, Any] = {
         "model": selection.model,
         "temperature": 0,
         "messages": [
@@ -210,6 +224,17 @@ def _complete(
             {"role": "user", "content": json.dumps(payload, sort_keys=True)},
         ],
     }
+    # Small local models follow the prompt's shape unreliably, so Ollama
+    # constrains decoding to the schema. Remote providers keep plain JSON
+    # prompting because their strict-schema rules differ. The token cap stops
+    # a constrained decode that never closes its JSON from holding the Activity
+    # until its timeout.
+    if schema is not None and selection.provider == "ollama":
+        body["max_tokens"] = MAX_OUTPUT_TOKENS
+        body["response_format"] = {
+            "type": "json_schema",
+            "json_schema": {"name": "incident_triage", "schema": schema},
+        }
     caller = transport or _post_json
     try:
         response = caller(_chat_url(selection), body, headers)
@@ -281,6 +306,97 @@ def _parse_object(content: str) -> dict[str, Any]:
     if not isinstance(parsed, dict):
         raise ModelDecisionError("model decision was not a JSON object")
     return parsed
+
+
+def _text(max_length: int) -> dict[str, Any]:
+    return {"type": "string", "minLength": 1, "maxLength": max_length}
+
+
+def _conclusion_schema() -> dict[str, Any]:
+    return {
+        "type": "object",
+        "properties": {
+            "call_path": {
+                "type": "array",
+                "items": {"type": "string", "enum": list(ALLOWED_SERVICES)},
+                "minItems": 1,
+            },
+            "root_cause": _text(200),
+            "confidence": _text(20),
+            "summary": _text(600),
+        },
+        "required": ["call_path", "root_cause", "confidence", "summary"],
+        "additionalProperties": False,
+    }
+
+
+def _plan_schema(
+    force_draft: bool, start: Any, hops: list[dict[str, Any]]
+) -> dict[str, Any]:
+    draft = {
+        "type": "object",
+        "properties": {
+            "tool": {"type": "string", "enum": ["draft"]},
+            "args": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": False,
+            },
+            "hypothesis": _text(300),
+            "conclusion": _conclusion_schema(),
+        },
+        "required": ["tool", "args", "hypothesis", "conclusion"],
+        "additionalProperties": False,
+    }
+    if force_draft:
+        return draft
+    fetched = {hop.get("service") for hop in hops if isinstance(hop, dict)}
+    if not hops and start in ALLOWED_SERVICES:
+        services = [start]
+    else:
+        services = [name for name in ALLOWED_SERVICES if name not in fetched]
+    if not services:
+        return draft
+    lookup = {
+        "type": "object",
+        "properties": {
+            "tool": {"type": "string", "enum": ["get_logs_by_trace_id"]},
+            "args": {
+                "type": "object",
+                "properties": {
+                    "service": {"type": "string", "enum": services}
+                },
+                "required": ["service"],
+                "additionalProperties": False,
+            },
+            "hypothesis": _text(300),
+        },
+        "required": ["tool", "args", "hypothesis"],
+        "additionalProperties": False,
+    }
+    if not hops or _open_error_leads(hops, fetched):
+        return lookup
+    return {"anyOf": [lookup, draft]}
+
+
+def _open_error_leads(hops: list[dict[str, Any]], fetched: set[Any]) -> set[str]:
+    leads = {
+        line.get("downstream")
+        for hop in hops
+        if isinstance(hop, dict)
+        for line in hop.get("lines") or []
+        if isinstance(line, dict) and line.get("level") == "ERROR"
+    }
+    return {lead for lead in leads if lead in ALLOWED_SERVICES} - fetched
+
+
+def _revision_schema() -> dict[str, Any]:
+    schema = _conclusion_schema()
+    schema["properties"]["errors_per_hop"] = {
+        "type": "array",
+        "items": _text(300),
+    }
+    return schema
 
 
 def _validate_plan(decision: dict[str, Any], force_draft: bool) -> dict[str, Any]:

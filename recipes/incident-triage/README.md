@@ -55,7 +55,13 @@ Terminal 2:
 
 `mock` keeps the scripted planner. `live` calls catalog model `llama3.2-local`
 from the plan and revise activities. Ollama must be running at
-`http://localhost:11434` with `llama3.2:latest` pulled. Each model activity
+`http://localhost:11434` with `llama3.2:latest` pulled. Set
+`INCIDENT_TRIAGE_MODEL_ID` on the Worker to select another catalog model. With
+Ollama, each request carries a JSON schema that allows only the fixture's
+services and bounded text. It also requires a lookup before the first draft,
+skips services already looked up, and blocks drafting while an ERROR line
+names a service nobody has looked at. The model still chooses which service to
+check next. Each model activity
 prints one `SPEND` line: reported input and output tokens, a running total, and
 an external API charge of $0. Local compute is unpriced. A missing token count
 stays unavailable.
