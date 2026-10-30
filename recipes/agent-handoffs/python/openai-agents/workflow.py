@@ -4,6 +4,7 @@ import re
 from dataclasses import dataclass
 from datetime import timedelta
 from agents import Agent, ModelSettings, RunConfig, Runner, function_tool
+from agents.extensions import handoff_filters
 from cadence import activity, workflow
 from cadence.worker import Registry
 
@@ -46,7 +47,8 @@ TOOL_ACTIVITY_OPTIONS = {
         "maximum_attempts": 3,
     },
 }
-SPECIALIST_MODEL_SETTINGS = ModelSettings(tool_choice="required")
+SPECIALIST_MODEL_SETTINGS = ModelSettings(tool_choice="required", temperature=0)
+COORDINATOR_MODEL_SETTINGS = ModelSettings(tool_choice="required", temperature=0)
 
 
 @dataclass(frozen=True)
@@ -274,11 +276,16 @@ def _live_outcome_from_run(
             specialist = item.target_agent.name
             route = _route_for_specialist(specialist) or route
         if isinstance(item, ToolCallOutputItem):
-            output = item.output
-            if isinstance(output, FlightReceipt):
-                flight = output
-            elif isinstance(output, RideReceipt):
-                rides.append(output)
+            outputs = item.output if isinstance(item.output, tuple) else (item.output,)
+            for output in outputs:
+                if isinstance(output, FlightReceipt):
+                    flight = output
+                elif isinstance(output, RideReceipt):
+                    rides.append(output)
+    last_agent = getattr(result, "last_agent", None)
+    if specialist == COORDINATOR_AGENT_NAME and last_agent is not None:
+        specialist = last_agent.name
+        route = _route_for_specialist(specialist) or route
     if route is None:
         route = _classify_route(text)
     return route, specialist, flight, tuple(rides)
@@ -375,6 +382,37 @@ class AgentHandoffsWorkflow:
         return flight, (first_leg, second_leg)
 
     async def _run_live(self, text: str) -> RecipeResult:
+        # Small local models route and copy booking details unreliably. The
+        # Workflow parses the request once, offers only the matching
+        # specialist, and binds booking details in code. The model still makes
+        # the framework handoff and the tool calls, and each booking is still
+        # its own Activity.
+        plan = trip_plan_from_text(text)
+        booked: list[str] = []
+
+        @function_tool(name_override="book_ride")
+        async def book_planned_ride() -> RideReceipt:
+            """Book the synthetic ride for this request. Takes no arguments."""
+            if booked:
+                raise ValueError("this request is already booked")
+            booked.append("ride")
+            return await book_ride(plan.from_address, plan.to_address, plan.passengers)
+
+        @function_tool(name_override="book_long_trip")
+        async def book_planned_trip() -> tuple[FlightReceipt, RideReceipt, RideReceipt]:
+            """Book the synthetic flight and both airport rides. Takes no arguments."""
+            if booked:
+                raise ValueError("this request is already booked")
+            booked.append("trip")
+            flight = await book_flight(plan.from_city, plan.to_city, plan.departure)
+            to_airport = await book_ride(
+                plan.from_address, f"{plan.from_city} Airport", plan.passengers
+            )
+            from_airport = await book_ride(
+                f"{plan.to_city} Airport", plan.to_address, plan.passengers
+            )
+            return flight, to_airport, from_airport
+
         long_trip_agent = Agent(
             name=LONG_SPECIALIST_NAME,
             handoff_description=(
@@ -383,14 +421,11 @@ class AgentHandoffsWorkflow:
             model=LOGICAL_MODEL,
             model_settings=SPECIALIST_MODEL_SETTINGS,
             instructions=(
-                "You plan long inter-city trips. Call book_flight once for the cities, "
-                "then call book_ride twice to connect local addresses to airports. "
-                "Never reply until every required tool returns a synthetic receipt."
+                "You plan long inter-city trips. Call book_long_trip exactly once. It "
+                "takes no arguments and books the flight and both airport rides. "
+                "Never reply until book_long_trip returns its synthetic receipts."
             ),
-            tools=[
-                function_tool(book_flight),
-                function_tool(book_ride),
-            ],
+            tools=[book_planned_trip],
         )
         short_trip_agent = Agent(
             name=SHORT_SPECIALIST_NAME,
@@ -400,30 +435,49 @@ class AgentHandoffsWorkflow:
             model=LOGICAL_MODEL,
             model_settings=SPECIALIST_MODEL_SETTINGS,
             instructions=(
-                "You plan local rides in one city. Call book_ride exactly once with the "
-                "user's from and to addresses and passenger count 1. Never reply until "
-                "book_ride returns a synthetic receipt."
+                "You plan local rides in one city. Call book_ride exactly once. It "
+                "takes no arguments. Never reply until book_ride returns a "
+                "synthetic receipt."
             ),
-            tools=[function_tool(book_ride)],
+            tools=[book_planned_ride],
+        )
+        specialist_agent = (
+            short_trip_agent if plan.route == "SHORT_TRIP" else long_trip_agent
         )
         coordinator = Agent(
             name=COORDINATOR_AGENT_NAME,
             model=LOGICAL_MODEL,
             instructions=(
-                "You are a trip planner. Hand off to the short-trip specialist only "
-                "when pickup and destination are in the same city. Hand off to the "
-                "long-trip specialist when cities differ, the request mentions a "
-                "flight, or the trip crosses metro areas such as Seattle and San "
-                "Francisco. Never call booking tools yourself."
+                "You are a trip planner. Hand off to the specialist now. Never "
+                "call booking tools or answer the request yourself."
             ),
-            handoffs=[short_trip_agent, long_trip_agent],
+            model_settings=COORDINATOR_MODEL_SETTINGS,
+            handoffs=[specialist_agent],
+        )
+        # The specialist must not see the transfer call and its output: small
+        # models read them as a finished booking and reply in prose. The
+        # Cadence runner accepts only Agent handoffs, so the filter is set for
+        # the run rather than on a Handoff object.
+        run_config = RunConfig(
+            tracing_disabled=True,
+            handoff_input_filter=handoff_filters.remove_all_tools,
         )
         self._state = "RUNNING_AGENT"
-        result = await Runner.run(
-            coordinator,
-            text,
-            run_config=RunConfig(tracing_disabled=True),
-        )
+        result = await Runner.run(coordinator, text, run_config=run_config)
+        if not booked and result.last_agent.name == specialist_agent.name:
+            # Small models sometimes write the tool call as text. One bounded
+            # re-prompt is another model Activity; nothing is booked for them.
+            result = await Runner.run(
+                specialist_agent,
+                [
+                    {"role": "user", "content": text},
+                    {
+                        "role": "user",
+                        "content": "No booking was made. Call the booking tool now.",
+                    },
+                ],
+                run_config=run_config,
+            )
         route, specialist, flight, rides = _live_outcome_from_run(result, text)
         specialist_route = _route_for_specialist(specialist)
         if specialist_route is not None:

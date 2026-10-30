@@ -1,11 +1,14 @@
-"""Live llama3.2-local validation: python tests/live_ollama_validation.py.
+"""Live local Ollama validation: python tests/live_ollama_validation.py.
 
-Requires Cadence at localhost:7833, domain cadence-ai-samples, and Ollama serving
-llama3.2:latest at localhost:11434. No API key is required for local Ollama.
+Requires Cadence at localhost:7833, domain cadence-ai-samples, and Ollama at
+localhost:11434 serving the selected model. The default is llama3.2-local; pass
+--model-id to select another Ollama entry from models.yaml. No API key is
+required for local Ollama.
 """
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 import os
 import sys
@@ -194,14 +197,14 @@ def assert_long_live(
         )
 
 
-async def main() -> None:
+async def main(model_id: str) -> None:
     client = Client(
         domain="cadence-ai-samples",
         target="localhost:7833",
         data_converter=PydanticDataConverter(),
     )
     task_list = "handoffs-live-ollama-" + uuid.uuid4().hex
-    selection = load_model(ROOT, "llama3.2-local")
+    selection = load_model(ROOT, model_id)
     registry = build_registry(live_model_activities(selection, os.environ))
 
     failures: list[str] = []
@@ -231,7 +234,7 @@ async def main() -> None:
 
     if failures:
         message = (
-            "llama3.2-local could not satisfy Issue #16 live handoff requirements "
+            f"{model_id} could not satisfy Issue #16 live handoff requirements "
             "(specialist handoff plus tool-backed booking Activities). "
             + " | ".join(failures)
         )
@@ -253,4 +256,6 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model-id", default="llama3.2-local")
+    asyncio.run(main(parser.parse_args().model_id))

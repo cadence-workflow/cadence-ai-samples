@@ -116,14 +116,14 @@ Start with `llama3.2-local`, the model installed above. `qwen2.5-local`
 
 | Recipe | `llama3.2-local` | `qwen2.5-local` |
 | --- | --- | --- |
-| Agent Handoffs, live mode | Fails | Not reliable |
+| Agent Handoffs, live mode | Passes | Passes |
 | Auto Research, both frameworks | Passes | Passes |
 | Human in the Loop | Passes | Passes |
 | Incident Triage, live mode | Fails | Fails |
 | Recurring AI Watch, both frameworks | Passes | Passes |
 
-Agent Handoffs passed 1 of 3 runs with `qwen2.5-local` on OpenAI Agents and
-none on Google ADK. Use mock mode.
+Agent Handoffs passed its strict live check with both models on both
+frameworks; the recipe README has the run counts.
 
 Results come from live runs on Linux with CPU-only Ollama 0.40.13, 3 per model
 unless a note gives other counts. Each recipe README shows how to select a

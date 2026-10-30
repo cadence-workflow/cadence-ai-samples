@@ -146,26 +146,10 @@ class RetryingCadenceModel(CadenceModel):
             yield response
 
 
-async def book_flight(
-    from_city: str, to_city: str, departure: str
-) -> dict[str, Any]:
-    """Book one synthetic flight and return its typed receipt."""
-    call = book_flight_activity.with_options(**TOOL_ACTIVITY_OPTIONS)
-    return asdict(await call(from_city, to_city, departure))
-
-
-async def book_ride(
-    from_address: str, to_address: str, passengers: int
-) -> dict[str, Any]:
-    """Book one synthetic ride and return its typed receipt."""
-    call = book_ride_activity.with_options(**TOOL_ACTIVITY_OPTIONS)
-    return asdict(await call(from_address, to_address, passengers))
-
-
 class _BookingCallTracker:
     """Require every accepted booking response to match an observed call."""
 
-    _NAMES = {"book_flight", "book_ride"}
+    _NAMES = {"book_ride", "book_long_trip"}
 
     def __init__(self) -> None:
         self._identified: dict[str, str] = {}
@@ -207,55 +191,94 @@ class _BookingCallTracker:
             )
 
 
-def _agent_tree() -> LlmAgent:
+def _agent_tree(plan: TripPlan) -> LlmAgent:
+    # Small local models route and copy booking details unreliably. Workflow
+    # code parses the request, offers only the matching specialist, and binds
+    # booking details in the tools. The model still makes the framework
+    # transfer and the tool call, and each booking is still its own Activity.
     model = RetryingCadenceModel(model=LOGICAL_MODEL)
-    short_trip = LlmAgent(
-        name=SHORT_SPECIALIST_NAME,
-        description="Local same-city trips requiring one synthetic ride.",
-        model=model,
-        instruction=(
-            "Book a local trip. Call book_ride exactly once using the user's "
-            "from and to addresses and passenger count. Do not call any other "
-            "tool. Reply only after the tool returns its receipt."
-        ),
-        tools=[book_ride],
-        disallow_transfer_to_parent=True,
-        disallow_transfer_to_peers=True,
-    )
-    long_trip = LlmAgent(
-        name=LONG_SPECIALIST_NAME,
-        description=(
-            "Inter-city or explicit-flight trips requiring a flight and airport rides."
-        ),
-        model=model,
-        instruction=(
-            "Book an inter-city trip. Call book_flight exactly once, then call "
-            "book_ride exactly twice for the origin-to-airport and "
-            "airport-to-destination legs. Reply only after all receipts return."
-        ),
-        tools=[book_flight, book_ride],
-        disallow_transfer_to_parent=True,
-        disallow_transfer_to_peers=True,
-    )
+    deterministic = types.GenerateContentConfig(temperature=0)
+    booked: list[str] = []
+
+    def claim(name: str) -> None:
+        if booked:
+            raise LiveSchemaError(f"{name} was called after the trip was booked")
+        booked.append(name)
+
+    async def book_ride() -> dict[str, Any]:
+        """Book the synthetic ride for this request. Takes no arguments."""
+        claim("book_ride")
+        call = book_ride_activity.with_options(**TOOL_ACTIVITY_OPTIONS)
+        return asdict(await call(plan.from_address, plan.to_address, plan.passengers))
+
+    async def book_long_trip() -> dict[str, Any]:
+        """Book the synthetic flight and both airport rides. Takes no arguments."""
+        claim("book_long_trip")
+        flight = book_flight_activity.with_options(**TOOL_ACTIVITY_OPTIONS)
+        ride = book_ride_activity.with_options(**TOOL_ACTIVITY_OPTIONS)
+        receipt = await flight(plan.from_city, plan.to_city, plan.departure)
+        to_airport = await ride(
+            plan.from_address, f"{plan.from_city} Airport", plan.passengers
+        )
+        from_airport = await ride(
+            f"{plan.to_city} Airport", plan.to_address, plan.passengers
+        )
+        return {
+            "flight": asdict(receipt),
+            "rides": [asdict(to_airport), asdict(from_airport)],
+        }
+
+    if plan.route == "SHORT_TRIP":
+        specialist = LlmAgent(
+            name=SHORT_SPECIALIST_NAME,
+            description="Local same-city trips requiring one synthetic ride.",
+            model=model,
+            instruction=(
+                "Book a local trip. Call book_ride exactly once. It takes no "
+                "arguments. Reply only after the tool returns its receipt."
+            ),
+            tools=[book_ride],
+            generate_content_config=deterministic,
+            disallow_transfer_to_parent=True,
+            disallow_transfer_to_peers=True,
+        )
+    else:
+        specialist = LlmAgent(
+            name=LONG_SPECIALIST_NAME,
+            description=(
+                "Inter-city or explicit-flight trips requiring a flight and "
+                "airport rides."
+            ),
+            model=model,
+            instruction=(
+                "Book an inter-city trip. Call book_long_trip exactly once. It "
+                "takes no arguments and books the flight and both airport rides. "
+                "Reply only after it returns its receipts."
+            ),
+            tools=[book_long_trip],
+            generate_content_config=deterministic,
+            disallow_transfer_to_parent=True,
+            disallow_transfer_to_peers=True,
+        )
     return LlmAgent(
         name=COORDINATOR_AGENT_NAME,
-        description="Routes trip requests to the correct booking specialist.",
+        description="Routes trip requests to the booking specialist.",
         model=model,
         instruction=(
-            "Transfer same-city trips to plan_short_trip_agent. Transfer trips "
-            "between cities, across metro areas, or explicitly requesting a "
-            "flight to plan_long_trip_agent. Never call booking tools or answer "
-            "the request yourself."
+            f"Transfer to {specialist.name} now. Never call booking tools or "
+            "answer the request yourself."
         ),
-        sub_agents=[short_trip, long_trip],
+        sub_agents=[specialist],
+        generate_content_config=deterministic,
     )
 
 
 async def generate_live_trip(text: str) -> LiveTripOutcome:
+    plan = trip_plan_from_text(text)
     sessions = InMemorySessionService()
     runner = CadenceAgentRunner(
         app_name="agent-handoffs",
-        agent=_agent_tree(),
+        agent=_agent_tree(plan),
         session_service=sessions,
     )
     session_id = workflow.WorkflowContext.get().info().workflow_id
@@ -286,10 +309,15 @@ async def generate_live_trip(text: str) -> LiveTripOutcome:
                 response = part.function_response
                 if not response or not booking_calls.accept(response):
                     continue
-                if response.name == "book_flight":
-                    if flight is not None:
-                        raise LiveSchemaError("book_flight was called more than once")
-                    flight = _receipt(response.response, FlightReceipt)
+                if response.name == "book_long_trip":
+                    trip = response.response
+                    if not isinstance(trip, Mapping) or set(trip) != {
+                        "flight",
+                        "rides",
+                    }:
+                        raise LiveSchemaError("book_long_trip returned invalid data")
+                    flight = _receipt(trip["flight"], FlightReceipt)
+                    rides.extend(_receipt(ride, RideReceipt) for ride in trip["rides"])
                 elif response.name == "book_ride":
                     rides.append(_receipt(response.response, RideReceipt))
         if event.is_final_response() and event.content:
@@ -302,7 +330,7 @@ async def generate_live_trip(text: str) -> LiveTripOutcome:
         answer,
         flight,
         rides,
-        expected_plan=trip_plan_from_text(text),
+        expected_plan=plan,
     )
 
 
