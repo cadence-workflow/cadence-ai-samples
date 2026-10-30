@@ -1,7 +1,12 @@
-"""Strict full-state-machine validation against local llama3.2-local."""
+"""Strict full-state-machine validation against a local Ollama model.
+
+The default is llama3.2-local; pass --model-id to select another Ollama entry
+from models.yaml.
+"""
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 import logging
 import os
@@ -47,18 +52,18 @@ ROOT = next(
 logging.disable(logging.CRITICAL)
 
 
-def require_ollama() -> None:
-    selection = load_model(ROOT, "llama3.2-local")
+def require_ollama(model_id: str) -> None:
+    selection = load_model(ROOT, model_id)
     request = Request(selection.endpoint.rstrip("/") + "/api/tags")
     try:
         with urlopen(request, timeout=5) as response:
             body = response.read().decode("utf-8")
     except Exception as error:
         raise RuntimeError(
-            "Ollama is unavailable at the llama3.2-local catalog endpoint"
+            f"Ollama is unavailable at the {model_id} catalog endpoint"
         ) from error
-    if '"name":"llama3.2:latest"' not in body.replace(" ", ""):
-        raise RuntimeError("Ollama does not have llama3.2:latest")
+    if f'"name":"{selection.model}"' not in body.replace(" ", ""):
+        raise RuntimeError(f"Ollama does not have {selection.model}")
 
 
 async def history(client: Client, execution: object) -> list[object]:
@@ -127,9 +132,9 @@ def counts(events: list[object]) -> Counter[str]:
     )
 
 
-async def main() -> None:
-    require_ollama()
-    selection = load_model(ROOT, "llama3.2-local")
+async def main(model_id: str) -> None:
+    require_ollama(model_id)
+    selection = load_model(ROOT, model_id)
     client = Client(
         domain="cadence-ai-samples",
         target="localhost:7833",
@@ -209,4 +214,6 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model-id", default="llama3.2-local")
+    asyncio.run(main(parser.parse_args().model_id))
