@@ -142,6 +142,92 @@ class LiveModelTests(unittest.TestCase):
                 live_model.plan({"start": "checkout", "hops": []}, transport)
             self.assertIn("input_tokens=3", live_model.spend_text())
 
+    def test_ollama_requests_are_constrained_to_known_services(self) -> None:
+        requests: list[dict] = []
+
+        def transport(url, payload, headers):
+            requests.append(payload)
+            revising = payload["messages"][0]["content"].startswith("Revise")
+            return ollama_response(DRAFT["conclusion"] if revising else DRAFT, 3, 1)
+
+        with tempfile.TemporaryDirectory() as directory, patch.dict(
+            os.environ, {"INCIDENT_TRIAGE_STATE": directory}
+        ):
+            checkout = story.logs_for("checkout", "4bf92f3577b34da6")
+            live_model.plan(
+                {"start": "checkout", "hops": [], "force_draft": False}, transport
+            )
+            payments = story.logs_for("payments", "4bf92f3577b34da6")
+            ledger = story.logs_for("ledger", "4bf92f3577b34da6")
+            live_model.plan(
+                {"start": "checkout", "hops": [checkout], "force_draft": False},
+                transport,
+            )
+            live_model.plan(
+                {
+                    "start": "checkout",
+                    "hops": [checkout, payments, ledger],
+                    "force_draft": False,
+                },
+                transport,
+            )
+            live_model.plan(
+                {"start": "checkout", "hops": [], "force_draft": True}, transport
+            )
+            live_model.revise(DRAFT["conclusion"], "Name the pool size.", [], transport)
+
+        schemas = [
+            request["response_format"]["json_schema"]["schema"]
+            for request in requests
+        ]
+
+        def services(lookup: dict) -> list:
+            return lookup["properties"]["args"]["properties"]["service"]["enum"]
+
+        self.assertEqual(
+            schemas[0]["properties"]["tool"]["enum"], ["get_logs_by_trace_id"]
+        )
+        self.assertEqual(services(schemas[0]), ["checkout"])
+        self.assertNotIn("anyOf", schemas[1])
+        self.assertEqual(
+            services(schemas[1]),
+            [name for name in live_model.ALLOWED_SERVICES if name != "checkout"],
+        )
+        lookup, draft = schemas[2]["anyOf"]
+        self.assertEqual(
+            services(lookup), ["api-gateway", "inventory"]
+        )
+        self.assertEqual(
+            draft["properties"]["conclusion"]["properties"]["call_path"]["items"][
+                "enum"
+            ],
+            list(live_model.ALLOWED_SERVICES),
+        )
+        self.assertEqual(schemas[3]["properties"]["tool"]["enum"], ["draft"])
+        self.assertIn("errors_per_hop", schemas[4]["properties"])
+        for request in requests:
+            self.assertEqual(request["max_tokens"], live_model.MAX_OUTPUT_TOKENS)
+
+    def test_remote_providers_are_not_sent_a_schema(self) -> None:
+        requests: list[dict] = []
+
+        def transport(url, payload, headers):
+            requests.append(payload)
+            return ollama_response(DRAFT, 3, 1)
+
+        with tempfile.TemporaryDirectory() as directory, patch.dict(
+            os.environ,
+            {
+                "INCIDENT_TRIAGE_STATE": directory,
+                "INCIDENT_TRIAGE_MODEL_ID": "openai-nano",
+                "MODEL_AI_KEY": "test-key",
+            },
+        ):
+            live_model.plan({"start": "checkout", "hops": []}, transport)
+
+        self.assertNotIn("response_format", requests[0])
+        self.assertNotIn("max_tokens", requests[0])
+
     def test_scripted_mode_keeps_the_inventory_wrong_turn(self) -> None:
         with patch.dict(os.environ, {"INCIDENT_TRIAGE_MODEL": "scripted"}):
             self.assertFalse(live_model.enabled())

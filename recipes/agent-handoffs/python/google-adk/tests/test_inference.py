@@ -1,3 +1,4 @@
+import inspect
 import unittest
 from dataclasses import asdict
 
@@ -24,6 +25,7 @@ from workflow import (
     book_flight,
     book_ride,
     build_registry,
+    trip_plan_from_text,
 )
 
 
@@ -71,21 +73,22 @@ def returned_ride(call_id: str | None) -> types.Part:
 
 
 class AgentTreeTests(unittest.TestCase):
-    def test_tree_uses_native_sub_agents_and_activity_tools(self) -> None:
-        coordinator = _agent_tree()
-        self.assertEqual(coordinator.name, "book_trip_agent")
-        self.assertEqual(
-            [agent.name for agent in coordinator.sub_agents],
-            [SHORT_SPECIALIST_NAME, LONG_SPECIALIST_NAME],
-        )
-        self.assertEqual(
-            [tool.__name__ for tool in coordinator.sub_agents[0].tools],
-            ["book_ride"],
-        )
-        self.assertEqual(
-            [tool.__name__ for tool in coordinator.sub_agents[1].tools],
-            ["book_flight", "book_ride"],
-        )
+    def test_tree_offers_only_the_planned_specialist(self) -> None:
+        for text, specialist, tool in (
+            (SHORT_TEXT, SHORT_SPECIALIST_NAME, "book_ride"),
+            (LONG_TEXT, LONG_SPECIALIST_NAME, "book_long_trip"),
+        ):
+            with self.subTest(specialist=specialist):
+                coordinator = _agent_tree(trip_plan_from_text(text))
+                self.assertEqual(coordinator.name, "book_trip_agent")
+                self.assertEqual(
+                    [agent.name for agent in coordinator.sub_agents], [specialist]
+                )
+                (booking_tool,) = coordinator.sub_agents[0].tools
+                self.assertEqual(booking_tool.__name__, tool)
+                self.assertEqual(
+                    inspect.signature(booking_tool).parameters, {}
+                )
 
     def test_model_and_booking_activities_have_bounded_retries(self) -> None:
         for options in (AI_ACTIVITY_OPTIONS, TOOL_ACTIVITY_OPTIONS):
@@ -195,14 +198,7 @@ class LiveRunnerTests(unittest.IsolatedAsyncioTestCase):
             response(
                 call("transfer_to_agent", agent_name=SHORT_SPECIALIST_NAME)
             ),
-            response(
-                call(
-                    "book_ride",
-                    from_address="123 Market Street",
-                    to_address="1 Ferry Building in San Francisco",
-                    passengers=1,
-                )
-            ),
+            response(call("book_ride")),
             response(final()),
         ]
         result, error, bookings = await self._run(SHORT_TEXT, scripted)
@@ -218,26 +214,7 @@ class LiveRunnerTests(unittest.IsolatedAsyncioTestCase):
             response(
                 call("transfer_to_agent", agent_name=LONG_SPECIALIST_NAME)
             ),
-            response(
-                call(
-                    "book_flight",
-                    from_city="Seattle",
-                    to_city="San Francisco",
-                    departure="2026-10-14T10:00:00",
-                ),
-                call(
-                    "book_ride",
-                    from_address="Uber Seattle Office",
-                    to_address="Seattle Airport",
-                    passengers=1,
-                ),
-                call(
-                    "book_ride",
-                    from_address="San Francisco Airport",
-                    to_address="Uber San Francisco Office",
-                    passengers=1,
-                ),
-            ),
+            response(call("book_long_trip")),
             response(final()),
         ]
         result, error, bookings = await self._run(LONG_TEXT, scripted)
@@ -250,7 +227,14 @@ class LiveRunnerTests(unittest.IsolatedAsyncioTestCase):
             [BOOK_FLIGHT_ACTIVITY, BOOK_RIDE_ACTIVITY, BOOK_RIDE_ACTIVITY],
         )
         self.assertIsInstance(result.flight, FlightReceipt)
-        self.assertEqual(len(result.rides), 2)
+        self.assertEqual(result.flight.departure, "2026-10-14T10:00:00")
+        self.assertEqual(
+            [(ride.from_address, ride.to_address) for ride in result.rides],
+            [
+                ("Uber Seattle Office", "Seattle Airport"),
+                ("San Francisco Airport", "Uber San Francisco Office"),
+            ],
+        )
 
     async def test_missing_transfer_fails_without_booking_fallback(self) -> None:
         result, error, bookings = await self._run(
@@ -265,20 +249,11 @@ class LiveRunnerTests(unittest.IsolatedAsyncioTestCase):
             response(
                 call("transfer_to_agent", agent_name=SHORT_SPECIALIST_NAME)
             ),
-            response(
-                call(
-                    "book_ride",
-                    from_address="Uber Seattle Office",
-                    to_address="Uber San Francisco Office",
-                    passengers=1,
-                )
-            ),
-            response(final()),
         ]
         result, error, bookings = await self._run(LONG_TEXT, scripted)
         self.assertIsNone(result)
         self.assertIsNotNone(error)
-        self.assertEqual(bookings, [BOOK_RIDE_ACTIVITY])
+        self.assertEqual(bookings, [])
 
     async def test_missing_and_duplicate_tools_fail_strict_validation(self) -> None:
         missing = [
@@ -296,16 +271,12 @@ class LiveRunnerTests(unittest.IsolatedAsyncioTestCase):
             response(
                 call("transfer_to_agent", agent_name=SHORT_SPECIALIST_NAME)
             ),
-            response(
-                call("book_ride", from_address="A", to_address="B", passengers=1),
-                call("book_ride", from_address="A", to_address="B", passengers=1),
-            ),
-            response(final()),
+            response(call("book_ride"), call("book_ride")),
         ]
         result, error, bookings = await self._run(SHORT_TEXT, duplicate)
         self.assertIsNone(result)
         self.assertIsNotNone(error)
-        self.assertEqual(bookings.count(BOOK_RIDE_ACTIVITY), 2)
+        self.assertEqual(bookings, [BOOK_RIDE_ACTIVITY])
 
     async def test_unmatched_function_responses_are_not_completed_bookings(
         self,
@@ -328,21 +299,7 @@ class LiveRunnerTests(unittest.IsolatedAsyncioTestCase):
                 self.assertIsNotNone(error)
                 self.assertEqual(bookings, [])
 
-    async def test_invalid_tool_arguments_do_not_create_typed_receipt(self) -> None:
-        scripted = [
-            response(
-                call("transfer_to_agent", agent_name=SHORT_SPECIALIST_NAME)
-            ),
-            response(
-                call("book_ride", from_address="A", to_address="B", passengers=0)
-            ),
-        ]
-        result, error, bookings = await self._run(SHORT_TEXT, scripted)
-        self.assertIsNone(result)
-        self.assertIsNotNone(error)
-        self.assertEqual(bookings, [BOOK_RIDE_ACTIVITY])
-
-    async def test_schema_valid_wrong_booking_arguments_fail(self) -> None:
+    async def test_model_supplied_booking_arguments_are_not_used(self) -> None:
         scripted = [
             response(
                 call("transfer_to_agent", agent_name=SHORT_SPECIALIST_NAME)
@@ -352,15 +309,19 @@ class LiveRunnerTests(unittest.IsolatedAsyncioTestCase):
                     "book_ride",
                     from_address="Wrong origin",
                     to_address="Wrong destination",
-                    passengers=1,
+                    passengers="4",
                 )
             ),
             response(final()),
         ]
         result, error, bookings = await self._run(SHORT_TEXT, scripted)
-        self.assertIsNone(result)
-        self.assertIsNotNone(error)
+        self.assertIsNone(error)
+        assert result is not None
         self.assertEqual(bookings, [BOOK_RIDE_ACTIVITY])
+        self.assertEqual(
+            (result.rides[0].from_address, result.rides[0].passengers),
+            ("123 Market Street", 1),
+        )
 
     def test_receipts_remain_typed_and_serializable(self) -> None:
         receipt = RideReceipt(

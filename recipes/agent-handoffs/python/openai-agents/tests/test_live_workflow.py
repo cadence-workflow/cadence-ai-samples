@@ -85,7 +85,11 @@ def _handoff_run(
                 output=flight,
             )
         )
-    return SimpleNamespace(final_output=answer, new_items=items)
+    return SimpleNamespace(
+        final_output=answer,
+        new_items=items,
+        last_agent=specialist,
+    )
 
 
 class LiveOutcomeTests(unittest.TestCase):
@@ -223,8 +227,9 @@ class LiveWorkflowTests(unittest.IsolatedAsyncioTestCase):
             rides=(),
             answer="Handoff complete.",
         )
+        runner = AsyncMock(return_value=run)
         with (
-            patch("workflow.Runner.run", new=AsyncMock(return_value=run)),
+            patch("workflow.Runner.run", new=runner),
             TestWorkflowEnvironment(
                 build_registry(), data_converter=PydanticDataConverter()
             ) as environment,
@@ -238,10 +243,47 @@ class LiveWorkflowTests(unittest.IsolatedAsyncioTestCase):
             result = environment.get_workflow_result(
                 RecipeResult, execution.workflow_id, execution.run_id
             )
+        self.assertEqual(runner.await_count, 2)
+        retry_agent, retry_input = runner.await_args_list[1].args
+        self.assertEqual(retry_agent.name, SHORT_SPECIALIST_NAME)
+        self.assertEqual(retry_input[0]["content"], SHORT_TRIP_TEXT)
+        self.assertIn("No booking was made", retry_input[-1]["content"])
         self.assertEqual(result.mode, "live")
         self.assertEqual(result.specialist, SHORT_SPECIALIST_NAME)
         self.assertEqual(result.rides, ())
         self.assertIsNone(result.flight)
+
+    async def test_live_offers_only_the_planned_specialist(self) -> None:
+        for text, specialist_name, tool_name in (
+            (SHORT_TRIP_TEXT, SHORT_SPECIALIST_NAME, "book_ride"),
+            (LONG_TRIP_TEXT, LONG_SPECIALIST_NAME, "book_long_trip"),
+        ):
+            run = _handoff_run(
+                specialist_name=specialist_name, flight=None, rides=()
+            )
+            runner = AsyncMock(return_value=run)
+            with (
+                patch("workflow.Runner.run", new=runner),
+                TestWorkflowEnvironment(
+                    build_registry(), data_converter=PydanticDataConverter()
+                ) as environment,
+            ):
+                execution = await environment.client.start_workflow(
+                    WORKFLOW,
+                    RecipeInput(text, "live"),
+                    workflow_id=f"live-planned-{tool_name}",
+                    task_list="test-task-list",
+                )
+                environment.get_workflow_result(
+                    RecipeResult, execution.workflow_id, execution.run_id
+                )
+            coordinator = runner.await_args_list[0].args[0]
+            self.assertEqual(
+                [agent.name for agent in coordinator.handoffs], [specialist_name]
+            )
+            (tool,) = coordinator.handoffs[0].tools
+            self.assertEqual(tool.name, tool_name)
+            self.assertEqual(tool.params_json_schema["properties"], {})
 
     async def test_booking_activity_failure_fails_mock_workflow(self) -> None:
         async def failing_ride(*args: object) -> None:

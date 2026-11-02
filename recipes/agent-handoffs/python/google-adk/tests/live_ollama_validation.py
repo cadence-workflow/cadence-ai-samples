@@ -1,5 +1,10 @@
-"""Strict local Ollama validation. Requires Cadence and llama3.2:latest."""
+"""Strict local Ollama validation. Requires Cadence and a local Ollama model.
 
+The default model is llama3.2-local; pass --model-id to select another
+Ollama entry from models.yaml.
+"""
+
+import argparse
 import asyncio
 import logging
 import os
@@ -76,7 +81,8 @@ async def completed(
                         event.workflow_execution_failed_event_attributes.failure
                     )
                     raise AssertionError(
-                        f"Workflow failed with {failure.reason}"
+                        f"Workflow failed with {failure.reason}: "
+                        f"{failure_message(failure.details)}"
                     )
                 if event.HasField("workflow_execution_completed_event_attributes"):
                     payload = (
@@ -87,6 +93,15 @@ async def completed(
                     )[0]
                     return result, events
             await asyncio.sleep(0.5)
+
+
+def failure_message(details: bytes) -> str:
+    lines = [
+        line.strip()
+        for line in details.decode("utf-8", "replace").splitlines()
+        if line.strip()
+    ]
+    return lines[-1][:300] if lines else "no failure details"
 
 
 def activity_counts(events: list[object]) -> Counter[str]:
@@ -194,14 +209,14 @@ async def run_case(
         raise
 
 
-async def main() -> None:
+async def main(model_id: str) -> None:
     client = Client(
         domain="cadence-ai-samples",
         target="localhost:7833",
         data_converter=PydanticDataConverter(),
     )
     task_list = "handoffs-google-adk-ollama-" + uuid.uuid4().hex
-    selection = load_model(ROOT, "llama3.2-local")
+    selection = load_model(ROOT, model_id)
     registry = build_registry(live_model_activities(selection, os.environ))
     results: list[tuple[str, tuple[object, RecipeResult, Counter[str]]]] = []
     failures: list[str] = []
@@ -223,7 +238,7 @@ async def main() -> None:
         )
     if failures:
         print(
-            "llama3.2-local did not satisfy strict Google ADK handoffs: "
+            f"{model_id} did not satisfy strict Google ADK handoffs: "
             + " | ".join(failures),
             file=sys.stderr,
         )
@@ -231,4 +246,6 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model-id", default="llama3.2-local")
+    asyncio.run(main(parser.parse_args().model_id))

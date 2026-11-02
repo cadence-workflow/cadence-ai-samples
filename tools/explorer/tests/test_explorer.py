@@ -24,7 +24,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT/'tools/explorer'))
-from explorer import Explorer
+from explorer import Explorer, evidence
 from server import ExplorerHTTPServer, Handler
 from signal_metadata import (MAX_METADATA_BYTES, MAX_OBJECT_FIELDS, MAX_SIGNALS,
                              SignalMetadataError, metadata_revision,
@@ -336,6 +336,7 @@ echo "Dependencies prepared."
 
     def test_every_watch_combination_and_actual_cli_parser(self):
         accepted=blocked=evidenced=commands=0
+        recorded={(r['framework'],r['model_id']) for r in evidence(self.root/'recipes/recurring-ai-watch')}
         for framework in ('google-adk','openai-agents'):
             parser=self.real_parser(framework)
             for model in self.explorer.snapshot()['models']:
@@ -349,7 +350,8 @@ echo "Dependencies prepared."
                             result=self.watch(framework,model=model['id'],classifier=classifier['id'],mode=mode)
                             accepted+=1
                             if result['evidence']:evidenced+=1
-                            self.assertEqual(result['evidence'] is not None,mode=='live' and classifier['id']=='jev-default')
+                            self.assertEqual(result['evidence'] is not None,mode=='live' and classifier['id']=='jev-default'
+                                             and (framework,model['id']) in recorded)
                             if model['provider']=='ollama' and classifier['provider']=='laya':self.assertEqual(result['credentials'],[])
                             parsed=[]
                             for line in [result['worker']]+result['client'].splitlines():
@@ -365,7 +367,7 @@ echo "Dependencies prepared."
                                     self.assertEqual(args.classifier_id,classifier['id'])
                                     self.assertEqual(args.task_list,result['task_list'])
                             self.assertEqual(parsed[0].confirm_live,mode=='live')
-        self.assertEqual((accepted,blocked,evidenced,commands),(24,0,6,120))
+        self.assertEqual((accepted,blocked,evidenced,commands),(32,0,6,160))
 
     def test_refresh_reads_catalog_edits_and_new_models(self):
         self.assertEqual(self.watch(model='llama3.2-local')['model']['model'],'llama3.2:latest')
@@ -377,7 +379,7 @@ echo "Dependencies prepared."
         self.assertIn('11435',result['local'][0]['warmup'])
         self.assertIn('another-local',result['worker'])
         self.assertIsNone(result['evidence'])
-        self.assertEqual(len(self.explorer.snapshot()['models']),4)
+        self.assertEqual(len(self.explorer.snapshot()['models']),5)
 
     def test_modes_and_flags_follow_source_edits(self):
         path=self.root/'recipes/recurring-ai-watch/python/google-adk/main.py'
@@ -1617,7 +1619,7 @@ while :; do sleep 1; done
             self.assertIn(b'window.ExplorerTheme',response.read())
             connection.request('GET','/api/state');response=connection.getresponse()
             self.assertEqual(response.status,200);self.assertEqual(response.getheader('Cache-Control'),'no-store')
-            state=json.loads(response.read());self.assertEqual(len(state['models']),3)
+            state=json.loads(response.read());self.assertEqual(len(state['models']),4)
             self.assertTrue(state['terminal_handoff'])
             path=self.root/'models.yaml';path.write_text(path.read_text().replace('llama3.2:latest','new-model'))
             connection.request('GET','/api/state');response=connection.getresponse()
