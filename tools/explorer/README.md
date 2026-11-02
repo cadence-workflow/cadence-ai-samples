@@ -254,3 +254,14 @@ to a typed Python Signal handler and that a query observes both fields:
 recipes/human-in-the-loop/python/openai-agents/.venv/bin/python \
   tools/explorer/tests/local_structured_signal_check.py
 ```
+
+## Reading local documentation
+
+**Open recipe README** uses an escaped Markdown reader with local images, tables
+and code blocks. The header's **ContribFest** link opens the event pages. Relative
+links open allow-listed documents in the reader, supported CLI files in the source
+view, or external HTTP(S) pages in a new tab. Unsupported links appear as text.
+The reader uses the Explorer's saved dark or light theme. It is a small Markdown
+subset; raw HTML is displayed as text and remote images are not loaded.
+
+Reader previews with the Incident Triage walkthrough: [dark](docs/images/reader-dark.png), [light](docs/images/reader-light.png).

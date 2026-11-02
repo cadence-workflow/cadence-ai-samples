@@ -446,3 +446,11 @@ ownership. This section preserves requirements and historical delivered scope.
 
 Milestones motivating later prioritization: Seattle tech talk in approximately
 2–3 weeks and November Contribfest, where contributors have about 60 minutes.
+
+## Local documentation reader
+
+Recipe README links and the ContribFest header entry open an escaped Markdown
+reader. It allows only root README/CONTRIBFEST, recipe-root READMEs, event Markdown
+pages, and recipe/event image directories. It rejects traversal, symlinks, hidden
+and excluded paths, rewrites supported local links, and keeps the plain source
+view for CLI files. SVG responses are sandboxed. Existing themes apply.
