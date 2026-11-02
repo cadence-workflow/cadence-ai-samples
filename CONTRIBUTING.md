@@ -16,7 +16,7 @@ which service needs attention; mock mode needs no inference service.*
 
 | What you want to do | How the Explorer helps |
 | --- | --- |
-| Try an agent workflow | Pick a recipe, language and framework; use mock mode before downloading a model. |
+| Try an agent workflow | Pick a recipe and language, then a framework if one is offered. Use mock mode before downloading a model. |
 | Get it running locally | Prepare dependencies, check services and copy matching Worker and Workflow commands. |
 | Understand a Run | Open Cadence Web history and Queries; send supported review Signals with confirmation. |
 
@@ -30,10 +30,11 @@ Browsing needs Python 3.10+ with venv support. The first launch downloads PyYAML
 and opens `http://127.0.0.1:8765/`. You can browse before installing Cadence or a
 model. Running a recipe needs the runtime and services listed in its README.
 
-1. **Choose a recipe.** Select its language, framework and mock or live mode.
-   Start with **Incident Triage, Python, bare, mock** for scripted responses
-   without a model download or API key. Preparing that recipe needs Python
-   3.12 or 3.13; running it also needs Cadence.
+1. **Choose a recipe.** Select its language, then a framework if one is offered,
+   and mock or live mode. Start with **Incident Triage**, **python**, **mock**;
+   this recipe has no framework selector. That path uses scripted responses
+   without a model download or API key. Preparing it needs Python 3.12 or 3.13;
+   running it also needs Cadence.
 2. **Prepare and check setup.** Use **Prepare recipe dependencies**, then
    **Refresh and check services**. For supported local live selections,
    **Warm up selected local services** sends a small request. It does not
@@ -46,8 +47,9 @@ model. Running a recipe needs the runtime and services listed in its README.
    **Open queries**. These links open Cadence Web. Queries need a running
    Worker. Resolve again after Continue-As-New to follow the new Run.
 5. **Send review input.** Where the recipe offers Signal controls, enter the
-   fields, review the payload and confirm. Check a Query or history afterward
-   to see how the Workflow handled it. Ticket Routing uses the
+   fields, select **Send …**, then **Confirm …**. The Explorer does not show a
+   raw payload. Check a Query or history afterward to see how the Workflow
+   handled it. Ticket Routing uses the
    [Acknowledge Ticket control](recipes/ticket-routing/README.md#cadence-web-cwc)
    in Cadence Web.
 
@@ -311,8 +313,9 @@ The SDK testing guides cover
   Check Signal tests when adding an approval deadline.
 - Python `non_retryable_error_reasons` matches the exception class name.
   Set `backoff_coefficient` explicitly, following the recipe's existing policy.
-- Incident Triage's `durability-lines.json` pins Workflow line numbers. If your
-  change moves those lines, update the manifest and run its checks too.
+- Incident Triage's `durability-lines.json` pins line ranges in `workflow.py`
+  and `raw_agent.py`. If your change moves those lines, update the manifest and
+  run `.venv/bin/python durability_manifest.py` from the implementation directory.
 - Mock state can persist in `.state/`. Use fresh state for independent tests;
   preserve it when testing recovery or duplicate writes.
 
@@ -322,6 +325,12 @@ commands, inspect Runs and send supported Signals. On a shared Cadence server,
 use your own task list for both the Worker and Workflow start.
 
 ### Run your own Worker
+
+A [Worker](https://cadenceworkflow.io/docs/python-client/workers/) is the
+process that runs your Workflow and Activity code. Cadence only gives work to
+Workers polling the task list the Workflow was started on. The
+[Go client](https://cadenceworkflow.io/docs/go-client/workers/) uses the same
+idea. If the Worker stops, the Workflow stays stuck, and a Query can time out.
 
 Use the same task list when starting the Worker and Workflow. On a shared
 server, choose a name unique to you. In the Python recipes, global flags go
@@ -347,17 +356,26 @@ Cadence accepted it; inspect history or the resulting state to check processing.
 ### Cadence CLI
 
 The [Cadence CLI](https://cadenceworkflow.io/docs/cli/) can describe a Run and
-export its history. If your local server container is named `cadence`, use its
-bundled CLI:
+export its history. The documented local setup already installs that CLI on
+the host. Use it directly:
 
 ```bash
-docker exec cadence cadence --address cadence:7933 --domain cadence-ai-samples workflow describe -w <workflow-id>
-docker exec cadence cadence --address cadence:7933 --domain cadence-ai-samples workflow show -w <workflow-id> --of /tmp/history.json
-docker cp cadence:/tmp/history.json ./history.json
+cadence --domain cadence-ai-samples workflow describe -w <workflow-id>
+cadence --domain cadence-ai-samples workflow show -w <workflow-id> --of history.json
 ```
 
-The export path is inside the container. Copy the file out before using it
-locally. Use your actual container name, address and domain if they differ.
+`workflow show` writes `history.json` in the current directory. There is no
+container copy step.
+
+The Cadence compose file does not set `container_name`, so the server container
+is usually `docker-cadence-1`, not `cadence`. `docker exec cadence` then fails
+with "No such container: cadence". If you need the CLI inside the container,
+find the name first:
+
+```bash
+docker ps --format '{{.Names}}'
+docker exec <container-name> cadence --address cadence:7933 --domain cadence-ai-samples workflow describe -w <workflow-id>
+```
 
 ## DCO and licensing
 
