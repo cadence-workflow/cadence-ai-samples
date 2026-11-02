@@ -44,8 +44,9 @@ chose. When the agent drafts a report, the runner prints it and waits for
 review. Type `reject` to finish without saving a report.
 
 If something is not set up, the runner stops with `SETUP FAILED` and the fix.
-A model error prints `MODEL CALL FAILED` for every attempt, and the run ends
-`FAILED` in Cadence. There is no scripted fallback.
+A model error during planning or revision prints `MODEL CALL FAILED` for
+every attempt, and the run ends `FAILED` in Cadence. There is no scripted
+fallback.
 
 ## 2. Fix the retry policy
 

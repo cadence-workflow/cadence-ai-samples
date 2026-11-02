@@ -119,6 +119,55 @@ def check_ollama(selection: Any) -> str:
     )
 
 
+def report_model_failure(
+    state: Path,
+    error: BaseException,
+    *,
+    attempt: int,
+    step: Any = None,
+    call: str | None = None,
+) -> None:
+    """Print and record one failed model attempt. Extra spend from that attempt stays."""
+    entry: dict[str, Any] = {
+        "attempt": attempt,
+        "error": f"{type(error).__name__}: {error}",
+    }
+    if step is not None:
+        entry["step"] = step
+    if call is not None:
+        entry["call"] = call
+    append_line(state / "model-errors.jsonl", entry)
+    where = (
+        f"revise attempt {attempt}"
+        if call == "revise_draft"
+        else f"step {step} attempt {attempt}"
+    )
+    print(
+        f"MODEL CALL FAILED {where}: {type(error).__name__}: {error}",
+        flush=True,
+    )
+
+
+def model_was_used(
+    receipts: dict[str, Any], calls: list[Any], conclusion: Any
+) -> bool:
+    """True when each planning decision has a receipt and tokens were reported.
+
+    Spend is recorded before response validation. A rejected attempt can leave
+    a plan receipt with no decision, then a retry adds the decision. Receipts
+    may therefore exceed decisions. A missing decision still fails the check.
+    """
+    return (
+        receipts["model_responses"] > 0
+        and receipts["plan_decisions"] > 0
+        and receipts["plan_receipts"] >= receipts["plan_decisions"]
+        and (receipts["input_tokens"] or 0) > 0
+        and (receipts["output_tokens"] or 0) > 0
+        and bool(calls)
+        and bool(conclusion)
+    )
+
+
 def model_receipts(state: Path) -> dict[str, Any]:
     spend = read_lines(state / "model-spend.jsonl")
     decisions = read_lines(state / "decisions.jsonl")
@@ -269,15 +318,7 @@ async def run(args: argparse.Namespace) -> int:
         try:
             action = original_plan(context, transport)
         except Exception as error:
-            append_line(
-                state / "model-errors.jsonl",
-                {"step": step, "attempt": info.attempt, "error": f"{type(error).__name__}: {error}"},
-            )
-            print(
-                f"MODEL CALL FAILED step {step} attempt {info.attempt}: "
-                f"{type(error).__name__}: {error}",
-                flush=True,
-            )
+            report_model_failure(state, error, step=step, attempt=info.attempt)
             raise
         append_line(
             state / "decisions.jsonl",
@@ -291,6 +332,26 @@ async def run(args: argparse.Namespace) -> int:
         return action
 
     live_model.plan = recorded_plan
+    original_revise = live_model.revise
+
+    def recorded_revise(
+        conclusion: dict[str, Any],
+        request: str,
+        hops: list[dict[str, Any]],
+        transport: Any = None,
+    ) -> dict[str, Any]:
+        """Record a failed revision the same way as a failed planning call."""
+        info = activity.info()
+        state = Path(os.environ["INCIDENT_TRIAGE_STATE"])
+        try:
+            return original_revise(conclusion, request, hops, transport)
+        except Exception as error:
+            report_model_failure(
+                state, error, attempt=info.attempt, call="revise_draft"
+            )
+            raise
+
+    live_model.revise = recorded_revise
 
     async def close_status(workflow_id: str, run_id: str) -> int:
         description = await client.workflow_stub.DescribeWorkflowExecution(
@@ -504,13 +565,8 @@ async def run(args: argparse.Namespace) -> int:
             uploads = len(ledger(state, "upload_conclusion"))
             calls = checkpoint.get("calls", [])
             reviewed = checkpoint.get("phase") == "AWAITING_GUIDANCE"
-            used_model = (
-                receipts["model_responses"] > 0
-                and receipts["plan_receipts"] == receipts["plan_decisions"]
-                and (receipts["input_tokens"] or 0) > 0
-                and (receipts["output_tokens"] or 0) > 0
-                and bool(calls)
-                and bool(checkpoint.get("conclusion"))
+            used_model = model_was_used(
+                receipts, calls, checkpoint.get("conclusion")
             )
             checks: dict[str, bool] = {
                 "service status COMPLETED": closed == WORKFLOW_EXECUTION_CLOSE_STATUS_COMPLETED,
