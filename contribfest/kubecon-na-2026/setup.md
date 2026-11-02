@@ -4,7 +4,7 @@ Download the dependencies before the session so you can spend the time working
 with the model and Cadence. The selected recipe's README is authoritative for
 versions, services and commands. Prepare only what your task needs.
 
-Everyone starts with the same Incident Triage exercise. It needs Python 3.12
+The opening Incident Triage exercise needs Python 3.12
 or 3.13, local Cadence in domain `cadence-ai-samples` (see the
 [Cadence requirements](../../recipes/ticket-routing/README.md#requirements)),
 and [Ollama](https://ollama.com/download) with `qwen2.5:7b`. The model is a
@@ -14,7 +14,9 @@ and [Ollama](https://ollama.com/download) with `qwen2.5:7b`. The model is a
 ollama pull qwen2.5:7b
 ```
 
-A coding agent is separate from the model used by the running example.
+Tasks marked **Python only** in the [shortlist](shortlist.md) can be worked on
+without Ollama. A coding agent is optional and is separate from the model used
+by the running example.
 
 ## Get the code and check setup
 
@@ -34,6 +36,7 @@ from the time needed to run an already prepared example.
 
 ## Check that a real model answers
 
+This step needs [the retry exercise in PR #116](https://github.com/cadence-workflow/cadence-ai-samples/pull/116).
 With Cadence and Ollama running, from the same recipe directory:
 
 ```bash
@@ -69,7 +72,10 @@ work on their own. Its service checks are advice, not proof that a Worker is rea
 
 ## The introductory retry exercise
 
-Follow the [exercise README](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md).
+The exercise is being prepared in [PR #116](https://github.com/cadence-workflow/cadence-ai-samples/pull/116).
+The commands above that use `exercises/retry_policy_live/` need that PR merged.
+Read [Activity retries](https://cadenceworkflow.io/docs/python-client/retries/),
+then follow the exercise README once it is available.
 You edit one file to make a temporary 429 recover and a permanent 404 stop,
 then see the repeated-call guard and how `revise` and `guidance` differ.
 

@@ -1,7 +1,7 @@
 # Find something to work on
 
-Start with the [retry-policy exercise](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md).
-Then [bring your own workflow](#bring-your-own-workflow), or take a ContribFest
+The opening [retry-policy exercise](https://github.com/cadence-workflow/cadence-ai-samples/pull/116)
+is being prepared in PR #116. For your contribution, [bring your own workflow](#bring-your-own-workflow), or take a ContribFest
 Issue below if you didn't bring one.
 
 Comment on the Issue you want to take; a helper will assign you as described below.
@@ -36,11 +36,14 @@ has the current list.
 
 ## Extend the exercise
 
-Every scenario in
-[`run_exercise.py`](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/run_exercise.py)
+Once [PR #116](https://github.com/cadence-workflow/cadence-ai-samples/pull/116)
+is merged, each scenario in
+`exercises/retry_policy_live/run_exercise.py` in the Incident Triage recipe
 is a prepared failure plus the checks that prove Cadence handled it. To add one,
-for example an approval that never arrives (a durable timer) or a write whose
-reply is lost (an idempotency key), copy the `rate-limit` scenario, change the
+for example an approval that never arrives
+([durable timers](https://cadenceworkflow.io/docs/concepts/timers/)) or a write
+whose reply is lost
+([Activity execution](https://cadenceworkflow.io/docs/concepts/activities/)), copy the `rate-limit` scenario, change the
 failure, and write its checks. Open an Issue describing it before the pull
 request.
 
@@ -58,8 +61,11 @@ model or tool call. Work through as many depths as you have time for:
 2. **Break it.** Pick the call most likely to fail (a rate-limited API, a slow
    model, a flaky tool). Make it fail on purpose and watch what happens.
 3. **Make it durable.** Move that call into its own Activity with a retry
-   policy and a timeout. Mark errors a retry can't fix as non-retryable.
-4. **Steer (stretch).** Add a Signal so a person approves before the agent
+   policy and a timeout. Read the retry guides for
+   [Python](https://cadenceworkflow.io/docs/python-client/retries/) or
+   [Go](https://cadenceworkflow.io/docs/go-client/retries/), then mark permanent
+   errors as non-retryable.
+4. **Steer (stretch).** Add a [Signal](https://cadenceworkflow.io/docs/python-client/signals/) so a person approves before the agent
    acts.
 
 The [Incident Triage recipe](../../recipes/incident-triage/python/bare/workflow.py)

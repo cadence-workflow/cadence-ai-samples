@@ -17,23 +17,23 @@ investigating a fictional checkout outage with a real local model.
 
 - **See it fail:** a log lookup gets an HTTP 429 rate limit, and with no retry
   policy the agent stops before it starts reasoning.
-- **First win:** you write your first Cadence retry policy, in one file. Run it
+- **First win:** you add a [Cadence Activity retry policy](https://cadenceworkflow.io/docs/python-client/retries/), in one file. Run it
   again: the lookup waits, retries and the agent carries on. No retry loop in
   your code.
-- **Block the reverse:** a 404 means the resource is gone, so retrying it only
+- **Handle a permanent failure:** in this exercise, a 404 is non-retryable, so retrying it only
   wastes time. Your policy must stop it after one attempt. Check both outcomes
   in Cadence Web.
 
 Instructions:
-[retry-policy exercise](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md).
+[retry-policy exercise (PR #116)](https://github.com/cadence-workflow/cadence-ai-samples/pull/116).
 
 **2. Make your own workflow durable (the rest of the session).**
 
-1. Wrap: run your agent inside one Cadence Activity, started by a Workflow.
+1. Wrap: run your agent inside one [Activity](https://cadenceworkflow.io/docs/concepts/activities/), started by a [Workflow](https://cadenceworkflow.io/docs/concepts/workflows/).
    Every run, input, result and retry shows up in Cadence Web.
 2. Split: move the model call and each tool call into their own Activities,
    so each one retries on its own and finished work isn't redone.
-3. Steer (stretch): add a Signal so a person can approve or redirect.
+3. Steer (stretch): add a [Signal](https://cadenceworkflow.io/docs/python-client/signals/) so a person can approve or redirect.
 
 Stop at any depth. Start from [#118](https://github.com/cadence-workflow/cadence-ai-samples/issues/118): open your own Issue for your
 workflow, so someone can continue it if you don't finish. Steps are in
