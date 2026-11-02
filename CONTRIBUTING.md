@@ -2,6 +2,79 @@
 
 Start a contribution with a specific problem or use case, not a library feature.
 
+## Explore the recipes in your browser
+
+Building with agents? Use the [Samples Explorer](tools/explorer/README.md) to
+find a working example, get matching commands and see what happens when it runs.
+It reads your checkout, including local edits, so you can explore the recipe
+while changing its code.
+
+![Incident Triage selected in the Explorer, with separate connection checks for Cadence and Cadence Web](tools/explorer/docs/images/explorer-start.png)
+
+*Mock selection before the Cadence services are started. Connection checks show
+which service needs attention; mock mode needs no inference service.*
+
+| What you want to do | How the Explorer helps |
+| --- | --- |
+| Try an agent workflow | Pick a recipe, language and framework; use mock mode before downloading a model. |
+| Get it running locally | Prepare dependencies, check services and copy matching Worker and Workflow commands. |
+| Understand a Run | Open Cadence Web history and Queries; send supported review Signals with confirmation. |
+
+From the repository root:
+
+```bash
+./scripts/explore.sh
+```
+
+Browsing needs Python 3.10+ with venv support. The first launch downloads PyYAML
+and opens `http://127.0.0.1:8765/`. You can browse before installing Cadence or a
+model. Running a recipe needs the runtime and services listed in its README.
+
+1. **Choose a recipe.** Select its language, framework and mock or live mode.
+   Start with **Incident Triage, Python, bare, mock** for scripted responses
+   without a model download or API key. Preparing that recipe needs Python
+   3.12 or 3.13; running it also needs Cadence.
+2. **Prepare and check setup.** Use **Prepare recipe dependencies**, then
+   **Refresh and check services**. For supported local live selections,
+   **Warm up selected local services** sends a small request. It does not
+   start services or download a missing model. Check the recipe README if a
+   service or model is unavailable.
+3. **Start your example.** Copy the generated Worker and Workflow commands
+   into separate terminals. On macOS, **Open in Terminal** pastes a command
+   for you to review and run. You start the services, Worker and Workflow.
+4. **Follow the Run.** Use **Resolve latest run**, then **Open history** or
+   **Open queries**. These links open Cadence Web. Queries need a running
+   Worker. Resolve again after Continue-As-New to follow the new Run.
+5. **Send review input.** Where the recipe offers Signal controls, enter the
+   fields, review the payload and confirm. Check a Query or history afterward
+   to see how the Workflow handled it. Ticket Routing uses the
+   [Acknowledge Ticket control](recipes/ticket-routing/README.md#cadence-web-cwc)
+   in Cadence Web.
+
+**Using a shared Cadence server?** Give your Worker and Workflow matching,
+unique task-list names and choose your own Workflow ID. The Explorer's
+**Resolve** and **Signal** controls follow only the Workflow ID it generates;
+changing the copied command does not retarget those controls. Use Cadence Web
+or the recipe CLI for a custom Workflow ID.
+
+Stop the Explorer with Ctrl+C. If its port is busy, use
+`./scripts/explore.sh --port 0`. The
+[Explorer runbook](tools/explorer/README.md) covers its controls and limitations.
+For ContribFest, continue with [laptop setup](contribfest/kubecon-na-2026/setup.md)
+and [available tasks](contribfest/kubecon-na-2026/shortlist.md).
+
+### If a connection check fails
+
+| What you see | What to check next |
+| --- | --- |
+| Cadence or Cadence Web is unreachable | Start Docker if your setup uses it. Check `docker ps` for the containers and published ports, then follow the recipe's service setup. Refresh the checks afterward. |
+| Cadence is reachable but the Workflow does not progress | Confirm the domain exists and a Worker is polling the same task list. A successful connection check does not verify either. |
+| A local model request fails | Check the selected model is installed with `ollama list` and use its documented `ollama pull` command if missing. Warm-up does not download models; some recipe selections have no model health check. |
+| A Query times out | Check the Worker is running and that Cadence Web points to the correct domain and Workflow. |
+
+The Explorer helps you locate the problem; the
+[recipe runbook](README.md#run-a-recipe) supplies the service setup and commands.
+
 ## First-time contributor path
 
 Your fork and the canonical repository have different roles:
@@ -247,6 +320,44 @@ For a running example, follow the recipe README. The
 [Samples Explorer](tools/explorer/README.md) helps you browse recipes, prepare
 commands, inspect Runs and send supported Signals. On a shared Cadence server,
 use your own task list for both the Worker and Workflow start.
+
+### Run your own Worker
+
+Use the same task list when starting the Worker and Workflow. On a shared
+server, choose a name unique to you. In the Python recipes, global flags go
+**before** the subcommand:
+
+```bash
+./run.sh --task-list <you>-triage worker --mode mock
+./run.sh --task-list <you>-triage --workflow-id <you>-1 start --mode mock
+```
+
+Run these in separate terminals from the implementation directory. Go recipes
+put flags **after** the subcommand instead; follow their README.
+
+### Find your Run in Cadence Web
+
+For a local server, open
+`http://localhost:8088/domains/cadence-ai-samples/cluster0/workflows/<workflow-id>`.
+The recipe prints its Workflow ID. Select the Run to inspect its history.
+Use the **Queries** tab to run the recipe's status Query. Queries need a running
+Worker, including while a Workflow waits for approval. A recorded Signal means
+Cadence accepted it; inspect history or the resulting state to check processing.
+
+### Cadence CLI
+
+The [Cadence CLI](https://cadenceworkflow.io/docs/cli/) can describe a Run and
+export its history. If your local server container is named `cadence`, use its
+bundled CLI:
+
+```bash
+docker exec cadence cadence --address cadence:7933 --domain cadence-ai-samples workflow describe -w <workflow-id>
+docker exec cadence cadence --address cadence:7933 --domain cadence-ai-samples workflow show -w <workflow-id> --of /tmp/history.json
+docker cp cadence:/tmp/history.json ./history.json
+```
+
+The export path is inside the container. Copy the file out before using it
+locally. Use your actual container name, address and domain if they differ.
 
 ## DCO and licensing
 
