@@ -12,6 +12,30 @@ Agent Examples** during KubeCon + CloudNativeCon North America 2026.
 - **Event work:** [ContribFest
   milestone](https://github.com/cadence-workflow/cadence-ai-samples/milestone/2)
 
+## Samples Explorer
+
+Choose an agent recipe, get matching commands and see its execution in
+Cadence Web. The Explorer reads your local checkout, including your edits.
+
+![Samples Explorer with Incident Triage selected and local service checks](contribfest/kubecon-na-2026/images/explorer-start.png)
+
+| Start here when you want to | Use the Explorer to |
+| --- | --- |
+| Find an example to build on | Choose a recipe, language, framework and mock or live mode. |
+| Get past local setup | Prepare dependencies and check which services respond. |
+| Understand an agent Run | Open history and Queries, then send supported review Signals. |
+
+From the repository root, launch the local browser tool:
+
+```bash
+./scripts/explore.sh
+```
+
+Browsing needs Python 3.10+ with venv support; the first launch downloads a
+Python dependency. Each recipe has its own runtime and service requirements.
+See [the Explorer walkthrough](contribfest/kubecon-na-2026/setup.md#explore-the-samples-in-your-browser)
+for selection, setup, Run links and review Signals.
+
 ## Build durable AI examples
 
 Start with Incident Triage to get familiar with the agent and Cadence. Inspect

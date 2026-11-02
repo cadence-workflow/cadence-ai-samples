@@ -4,7 +4,8 @@ The opening [retry-policy exercise](https://github.com/cadence-workflow/cadence-
 is being prepared in PR #116. For your contribution, [bring your own workflow](#bring-your-own-workflow), or take a ContribFest
 Issue below if you didn't bring one.
 
-Comment on the Issue you want to take; a helper will assign you as described below.
+Comment on the Issue you want to take. A helper will record your claim and
+update its label and assignment. You do not need label or assignment permissions.
 
 ## ContribFest Issues
 

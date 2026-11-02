@@ -4,6 +4,75 @@ Download the dependencies before the session so you can spend the time working
 with the model and Cadence. The selected recipe's README is authoritative for
 versions, services and commands. Prepare only what your task needs.
 
+<a id="optional-explore-the-samples-in-your-browser"></a>
+
+## Explore the samples in your browser
+
+The [Samples Explorer](../../tools/explorer/README.md) lets you browse recipes,
+prepare dependencies, generate commands and open the running Workflow in
+Cadence Web. You can use it during ContribFest or try the samples afterward.
+
+Browsing needs Python 3.10+ with venv support. The first launch installs PyYAML
+and needs internet access. You do not need Docker, Cadence, a model or provider
+credentials just to browse. Each recipe has its own requirements to run.
+
+From the repository root:
+
+```bash
+./scripts/explore.sh
+```
+
+The launcher opens `http://127.0.0.1:8765/`. If that port is in use, launch with
+`./scripts/explore.sh --port 0` to choose an available port. Stop the Explorer
+with Ctrl+C.
+
+1. **Choose an example.** Select the recipe, language and framework. Choose
+   mock mode for scripted responses or live mode to call the selected model.
+   Start with Incident Triage, Python, bare, mock if you want to explore without
+   downloading a model. Preparing this implementation needs Python 3.12 or
+   3.13; browsing the Explorer itself needs only Python 3.10+.
+2. **Prepare the recipe.** Install the language runtime named in its README,
+   then click **Prepare recipe dependencies**. This runs the recipe's
+   `./run.sh setup`; the same command is available to copy and run yourself.
+3. **Check services.** Start the services the recipe needs, then click
+   **Refresh and check services**. In local live mode,
+   **Warm up selected local services** sends a small request to the selected
+   Ollama or Laya service. It does not start services or download models.
+4. **Start the Worker and Workflow.** Copy the generated commands into
+   separate terminals. On macOS, **Open in Terminal** pastes the command into
+   a new Terminal window. Review it and press Enter to run it. If macOS blocks
+   the paste, use Cmd+V or copy the command manually.
+5. **Inspect your Run.** Click **Resolve latest run**, then **Open history**
+   or **Open queries**. Queries need a running Worker.
+   Resolve again after Continue-As-New to follow the new Run.
+6. **Try a Signal.** Where the recipe provides controls, enter the requested
+   fields and review the payload before sending. Confirm when prompted.
+   Acceptance means Cadence received the request; check a Query or history
+   to see what the Workflow did. For Ticket Routing, use the
+   [Acknowledge Ticket control in Cadence Web](../../recipes/ticket-routing/README.md#cadence-web-cwc).
+
+On a shared Cadence server, use a task list and Workflow ID unique to you in
+both generated commands. The Explorer's example names are fixed. Its
+**Resolve** and **Signal** controls follow only the Workflow ID it generates;
+changing a copied command does not retarget them. For your own Workflow ID,
+use Cadence Web or the recipe CLI.
+
+The [Explorer documentation](../../tools/explorer/README.md) covers service
+checks, preparation, local warm-up and Run controls. Its checks are advice:
+a reachable service does not prove that your domain or Worker is ready. You
+can also run every exercise directly from the terminal and Cadence Web.
+
+### Troubleshoot local connections
+
+| Symptom | Next step |
+| --- | --- |
+| Cadence or Cadence Web is unreachable | If you use Docker, start it and check `docker ps` for the containers and published ports. Follow the recipe's setup instructions, then refresh the checks. |
+| Cadence is reachable but nothing runs | Check the domain and Worker task list. The connection check does not verify that the Worker is ready. |
+| Ollama warm-up fails | Check `ollama list` for the selected model. Download a missing model with its documented `ollama pull` command. Warm-up cannot download it for you. |
+| A Query times out | Start the matching Worker and check the domain and Workflow ID. |
+
+## Prepare the live Incident Triage exercise
+
 The opening Incident Triage exercise needs Python 3.12
 or 3.13, local Cadence in domain `cadence-ai-samples` (see the
 [Cadence requirements](../../recipes/ticket-routing/README.md#requirements)),
@@ -57,60 +126,6 @@ Keep that output and show a helper.
 `--model-id` picks another entry from the repository's
 [`models.yaml`](../../models.yaml). `llama3.2-local` is smaller but often
 drafts the wrong cause. Paid providers need `MODEL_AI_KEY`.
-
-<a id="optional-explore-the-samples-in-your-browser"></a>
-
-## Explore the samples in your browser
-
-The [Samples Explorer](../../tools/explorer/README.md) lets you browse recipes,
-prepare dependencies, generate commands and open the running Workflow in
-Cadence Web. You can use it during ContribFest or try the samples afterward.
-
-Browsing needs Python 3.10+ with venv support. The first launch installs PyYAML
-and needs internet access. You do not need Docker, Cadence, a model or provider
-credentials just to browse. Each recipe has its own requirements to run.
-
-From the repository root:
-
-```bash
-./scripts/explore.sh
-```
-
-The launcher opens `http://127.0.0.1:8765/`. If that port is in use, launch with
-`./scripts/explore.sh --port 0` to choose an available port. Stop the Explorer
-with Ctrl+C.
-
-1. **Choose an example.** Select the recipe, language and framework. Choose
-   mock mode for scripted responses or live mode to call the selected model.
-   Start with Incident Triage, Python, bare, mock if you want to explore without
-   downloading a model.
-2. **Prepare the recipe.** Install the language runtime named in its README,
-   then click **Prepare recipe dependencies**. This runs the recipe's
-   `./run.sh setup`; the same command is available to copy and run yourself.
-3. **Check services.** Start the services the recipe needs, then click
-   **Refresh and check services**. In local live mode,
-   **Warm up selected local services** sends a small request to the selected
-   Ollama or Laya service. It does not start services or download models.
-4. **Start the Worker and Workflow.** Copy the generated commands into
-   separate terminals. On macOS, **Open in Terminal** pastes the command into
-   a new Terminal window. Review it and press Enter to run it. If macOS blocks
-   the paste, use Cmd+V or copy the command manually.
-5. **Inspect your Run.** Click **Resolve latest run**, then **Open history**
-   or **Open queries**. If asked, enter the Workflow ID printed by the recipe.
-   Resolve again after Continue-As-New to follow the new Run.
-6. **Try a Signal.** Where the recipe provides controls, enter the requested
-   fields and review the payload before sending. Confirm when prompted.
-   Acceptance means Cadence received the request; check a Query or history
-   to see what the Workflow did. For Ticket Routing, use the
-   [Acknowledge Ticket control in Cadence Web](../../recipes/ticket-routing/README.md#cadence-web-cwc).
-
-On a shared Cadence server, use a task list and Workflow ID unique to you in
-both generated commands. The Explorer's example names are fixed.
-
-The [Explorer documentation](../../tools/explorer/README.md) covers service
-checks, preparation, local warm-up and Run controls. Its checks are advice:
-a reachable service does not prove that your domain or Worker is ready. You
-can also run every exercise directly from the terminal and Cadence Web.
 
 ## The introductory retry exercise
 
