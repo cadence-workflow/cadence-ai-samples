@@ -61,7 +61,6 @@ centralize documentation.
 
 - [Project README](../README.md)
 - [Contributing](../CONTRIBUTING.md)
-- [ContribFest Issue guide](../contribfest/kubecon-na-2026/issue-guide.md)
 - [Contribution workflow cheat sheet](../WORKFLOW.md)
 - [KubeCon NA 2026 ContribFest participant guide](../CONTRIBFEST.md)
 - [KubeCon NA 2026 setup, tasks and agenda](../contribfest/kubecon-na-2026/README.md)

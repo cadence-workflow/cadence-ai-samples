@@ -190,6 +190,64 @@ These checks do not:
 - make themselves required checks or change branch rules. That policy work is
   tracked in [Issue #78](https://github.com/cadence-workflow/cadence-ai-samples/issues/78).
 
+## Testing a recipe
+
+Start with the recipe README and run its documented tests before changing code.
+Root pull-request checks do not run the recipe suites. For ContribFest, the
+[Issue](contribfest/kubecon-na-2026/shortlist.md) names the implementation and
+required services; use [event setup](contribfest/kubecon-na-2026/setup.md) for
+local Cadence and models. Unit-test tasks may need neither service.
+
+Add a regression test that fails on the original behavior and passes with your
+change. Keep both results for the PR. For a test-only task, temporarily introduce
+the bug the test should catch, run the test, then undo that temporary change.
+Do not include the deliberate bug in your PR.
+
+### Cadence references
+
+Read the relevant concept, then use the recipe to check the behavior:
+
+- **Retries:** [Python](https://cadenceworkflow.io/docs/python-client/retries/)
+  and [Go](https://cadenceworkflow.io/docs/go-client/retries/). Check that a
+  temporary error can recover and a permanent error stops. The application
+  classifies its errors; the Activity retry policy uses that classification.
+- **Signals:** [Python](https://cadenceworkflow.io/docs/python-client/signals/)
+  and [Go](https://cadenceworkflow.io/docs/go-client/signals/). Send review or
+  guidance to a running Workflow and check its resulting state.
+- **[Queries](https://cadenceworkflow.io/docs/concepts/queries/):** inspect
+  Workflow state without changing it. Queries need a running Worker.
+- **[Timers](https://cadenceworkflow.io/docs/concepts/timers/):** test both an
+  on-time approval and expiry when no approval arrives.
+- **[Activities](https://cadenceworkflow.io/docs/concepts/activities/):** for a
+  write with a lost reply, check that repeating the call does not repeat the
+  side effect.
+- **[Go replay](https://cadenceworkflow.io/docs/codelabs/workflow-tests-go-replayer-shadower/):**
+  replay a recorded history to check Workflow compatibility. A mocked Workflow
+  test alone does not establish replay compatibility.
+
+### Test environment details
+
+The SDK testing guides cover
+[Python](https://cadenceworkflow.io/docs/python-client/testing/) and
+[Go](https://cadenceworkflow.io/docs/go-client/workflow-testing/). In these recipes:
+
+- Python's `TestWorkflowEnvironment` does not retry Activities. Assert the
+  configured retry options in unit tests; use local Cadence to count attempts.
+  Go's `testsuite` does apply the retry policy.
+- Python virtual time can advance to a pending timer when the Workflow blocks.
+  Check Signal tests when adding an approval deadline.
+- Python `non_retryable_error_reasons` matches the exception class name.
+  Set `backoff_coefficient` explicitly, following the recipe's existing policy.
+- Incident Triage's `durability-lines.json` pins Workflow line numbers. If your
+  change moves those lines, update the manifest and run its checks too.
+- Mock state can persist in `.state/`. Use fresh state for independent tests;
+  preserve it when testing recovery or duplicate writes.
+
+For a running example, follow the recipe README. The
+[Samples Explorer](tools/explorer/README.md) helps you browse recipes, prepare
+commands, inspect Runs and send supported Signals. On a shared Cadence server,
+use your own task list for both the Worker and Workflow start.
+
 ## DCO and licensing
 
 The required lowercase `git commit -s` sign-off certifies that the contributor
