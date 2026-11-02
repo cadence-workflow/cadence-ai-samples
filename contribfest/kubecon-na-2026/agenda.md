@@ -1,7 +1,8 @@
 # Session outline
 
 1. **Welcome and setup check.** Make sure Cadence, Ollama and `qwen2.5:7b` are
-   running. [Join CNCF Slack](https://slack.cncf.io/) for follow-up questions.
+   running. [Join CNCF Slack](https://slack.cncf.io/) and use
+   `#cadence-contributors` for follow-up questions.
    If your laptop can't run the model, pair with someone.
 2. **Warm-up, everyone together.** See a rate-limited lookup fail, write a
    retry policy so it recovers, and make sure a 404 isn't retried. Check both in Cadence Web.

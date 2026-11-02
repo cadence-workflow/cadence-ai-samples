@@ -52,7 +52,8 @@ outcomes. You can work by hand or with a coding agent.
 ## Get ready
 
 - [Set up your laptop](setup.md).
-- [Join CNCF Slack](https://slack.cncf.io/) before the session.
+- [Join CNCF Slack](https://slack.cncf.io/) and use `#cadence-contributors`
+  before the session.
 - [Find something to work on](shortlist.md).
 - [See the session outline](agenda.md).
 
