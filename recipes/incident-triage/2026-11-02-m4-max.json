@@ -1,0 +1,900 @@
+{
+  "source_commit": "336a5d8e6e102affcca212acf2d3115d401d5fc4",
+  "machine": {
+    "chip": "Apple M4 Max",
+    "memory_bytes": "68719476736",
+    "logical_cpus": "16",
+    "macos": "ProductName:\t\tmacOS\nProductVersion:\t\t26.7.1\nBuildVersion:\t\t25G241",
+    "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=35651683)\t99%; finishing charge; 0:13 remaining present: true",
+    "method": "Foreground local benchmark, AC power. Existing Docker/Kubernetes workloads remain running; no other apps were stopped."
+  },
+  "models": [
+    {
+      "name": "llama3.2:latest",
+      "model": "llama3.2:latest",
+      "modified_at": "2026-11-02T02:03:13.258472017-08:00",
+      "size": 2019393189,
+      "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "llama",
+        "families": [
+          "llama"
+        ],
+        "parameter_size": "3.2B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 131072,
+        "embedding_length": 3072,
+        "runner": "ggml"
+      },
+      "capabilities": [
+        "completion",
+        "tools"
+      ]
+    },
+    {
+      "name": "qwen2.5:7b",
+      "model": "qwen2.5:7b",
+      "modified_at": "2026-11-02T02:00:36.957759378-08:00",
+      "size": 4683087332,
+      "digest": "845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen2",
+        "families": [
+          "qwen2"
+        ],
+        "parameter_size": "7.6B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 32768,
+        "embedding_length": 3584,
+        "runner": "ggml"
+      },
+      "capabilities": [
+        "completion",
+        "tools"
+      ]
+    }
+  ],
+  "results": [
+    {
+      "model": "llama3.2-local",
+      "variant": "pr116",
+      "repeat": 1,
+      "scenario": "baseline",
+      "cold_model_start": true,
+      "elapsed_seconds": 8.6,
+      "passed": true,
+      "model_responses": 6,
+      "input_tokens": 3646,
+      "output_tokens": 482,
+      "max_model_size_bytes": 17761556233,
+      "max_model_vram_bytes": 17761556233,
+      "context_lengths": [
+        131072
+      ],
+      "revisions": []
+    },
+    {
+      "model": "llama3.2-local",
+      "variant": "pr116",
+      "repeat": 1,
+      "scenario": "missing-resource",
+      "cold_model_start": false,
+      "elapsed_seconds": 0.2,
+      "passed": true,
+      "model_responses": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "max_model_size_bytes": 17761556233,
+      "max_model_vram_bytes": 17761556233,
+      "context_lengths": [
+        131072
+      ],
+      "revisions": []
+    },
+    {
+      "model": "llama3.2-local",
+      "variant": "pr116",
+      "repeat": 1,
+      "scenario": "rate-limit",
+      "cold_model_start": false,
+      "elapsed_seconds": 12.1,
+      "passed": true,
+      "model_responses": 6,
+      "input_tokens": 3646,
+      "output_tokens": 482,
+      "max_model_size_bytes": 17761556233,
+      "max_model_vram_bytes": 17761556233,
+      "context_lengths": [
+        131072
+      ],
+      "revisions": []
+    },
+    {
+      "model": "llama3.2-local",
+      "variant": "pr116",
+      "repeat": 1,
+      "scenario": "repeat-guard",
+      "cold_model_start": false,
+      "elapsed_seconds": 3.1,
+      "passed": true,
+      "model_responses": 2,
+      "input_tokens": 940,
+      "output_tokens": 146,
+      "max_model_size_bytes": 17761556233,
+      "max_model_vram_bytes": 17761556233,
+      "context_lengths": [
+        131072
+      ],
+      "revisions": []
+    },
+    {
+      "model": "llama3.2-local",
+      "variant": "pr116",
+      "repeat": 1,
+      "scenario": "review",
+      "cold_model_start": false,
+      "elapsed_seconds": 27.5,
+      "passed": true,
+      "model_responses": 14,
+      "input_tokens": 8785,
+      "output_tokens": 1159,
+      "max_model_size_bytes": 17761556233,
+      "max_model_vram_bytes": 17761556233,
+      "context_lengths": [
+        131072
+      ],
+      "revisions": [
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 2.6779088973999023,
+          "started_to_end_seconds": 2.667620897293091,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "30s",
+            "heartbeat_timeout": "30s"
+          }
+        },
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 2.9164698123931885,
+          "started_to_end_seconds": 2.904963970184326,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "180s",
+            "heartbeat_timeout": "180s"
+          }
+        }
+      ]
+    },
+    {
+      "model": "llama3.2-local",
+      "variant": "pr116",
+      "repeat": 2,
+      "scenario": "baseline",
+      "cold_model_start": false,
+      "elapsed_seconds": 11.2,
+      "passed": true,
+      "model_responses": 6,
+      "input_tokens": 3646,
+      "output_tokens": 482,
+      "max_model_size_bytes": 17761556233,
+      "max_model_vram_bytes": 17761556233,
+      "context_lengths": [
+        131072
+      ],
+      "revisions": []
+    },
+    {
+      "model": "llama3.2-local",
+      "variant": "pr116",
+      "repeat": 2,
+      "scenario": "missing-resource",
+      "cold_model_start": false,
+      "elapsed_seconds": 0.3,
+      "passed": true,
+      "model_responses": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "max_model_size_bytes": 17761556233,
+      "max_model_vram_bytes": 17761556233,
+      "context_lengths": [
+        131072
+      ],
+      "revisions": []
+    },
+    {
+      "model": "llama3.2-local",
+      "variant": "pr116",
+      "repeat": 2,
+      "scenario": "rate-limit",
+      "cold_model_start": false,
+      "elapsed_seconds": 11.0,
+      "passed": true,
+      "model_responses": 6,
+      "input_tokens": 3646,
+      "output_tokens": 482,
+      "max_model_size_bytes": 17761556233,
+      "max_model_vram_bytes": 17761556233,
+      "context_lengths": [
+        131072
+      ],
+      "revisions": []
+    },
+    {
+      "model": "llama3.2-local",
+      "variant": "pr116",
+      "repeat": 2,
+      "scenario": "repeat-guard",
+      "cold_model_start": false,
+      "elapsed_seconds": 3.2,
+      "passed": true,
+      "model_responses": 2,
+      "input_tokens": 940,
+      "output_tokens": 146,
+      "max_model_size_bytes": 17761556233,
+      "max_model_vram_bytes": 17761556233,
+      "context_lengths": [
+        131072
+      ],
+      "revisions": []
+    },
+    {
+      "model": "llama3.2-local",
+      "variant": "pr116",
+      "repeat": 2,
+      "scenario": "review",
+      "cold_model_start": false,
+      "elapsed_seconds": 24.7,
+      "passed": true,
+      "model_responses": 14,
+      "input_tokens": 8785,
+      "output_tokens": 1159,
+      "max_model_size_bytes": 17761556233,
+      "max_model_vram_bytes": 17761556233,
+      "context_lengths": [
+        131072
+      ],
+      "revisions": [
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 1.7947609424591064,
+          "started_to_end_seconds": 1.7828569412231445,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "30s",
+            "heartbeat_timeout": "30s"
+          }
+        },
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 1.816220998764038,
+          "started_to_end_seconds": 1.8039329051971436,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "180s",
+            "heartbeat_timeout": "180s"
+          }
+        }
+      ]
+    },
+    {
+      "model": "llama3.2-local",
+      "variant": "pr116",
+      "repeat": 3,
+      "scenario": "baseline",
+      "cold_model_start": false,
+      "elapsed_seconds": 10.5,
+      "passed": true,
+      "model_responses": 6,
+      "input_tokens": 3646,
+      "output_tokens": 482,
+      "max_model_size_bytes": 17761556233,
+      "max_model_vram_bytes": 17761556233,
+      "context_lengths": [
+        131072
+      ],
+      "revisions": []
+    },
+    {
+      "model": "llama3.2-local",
+      "variant": "pr116",
+      "repeat": 3,
+      "scenario": "missing-resource",
+      "cold_model_start": false,
+      "elapsed_seconds": 0.3,
+      "passed": true,
+      "model_responses": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "max_model_size_bytes": 17761556233,
+      "max_model_vram_bytes": 17761556233,
+      "context_lengths": [
+        131072
+      ],
+      "revisions": []
+    },
+    {
+      "model": "llama3.2-local",
+      "variant": "pr116",
+      "repeat": 3,
+      "scenario": "rate-limit",
+      "cold_model_start": false,
+      "elapsed_seconds": 11.0,
+      "passed": true,
+      "model_responses": 6,
+      "input_tokens": 3646,
+      "output_tokens": 482,
+      "max_model_size_bytes": 17761556233,
+      "max_model_vram_bytes": 17761556233,
+      "context_lengths": [
+        131072
+      ],
+      "revisions": []
+    },
+    {
+      "model": "llama3.2-local",
+      "variant": "pr116",
+      "repeat": 3,
+      "scenario": "repeat-guard",
+      "cold_model_start": false,
+      "elapsed_seconds": 3.1,
+      "passed": true,
+      "model_responses": 2,
+      "input_tokens": 940,
+      "output_tokens": 146,
+      "max_model_size_bytes": 17761556233,
+      "max_model_vram_bytes": 17761556233,
+      "context_lengths": [
+        131072
+      ],
+      "revisions": []
+    },
+    {
+      "model": "llama3.2-local",
+      "variant": "pr116",
+      "repeat": 3,
+      "scenario": "review",
+      "cold_model_start": false,
+      "elapsed_seconds": 23.9,
+      "passed": true,
+      "model_responses": 14,
+      "input_tokens": 8785,
+      "output_tokens": 1159,
+      "max_model_size_bytes": 17761556233,
+      "max_model_vram_bytes": 17761556233,
+      "context_lengths": [
+        131072
+      ],
+      "revisions": [
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 1.6643729209899902,
+          "started_to_end_seconds": 1.6507389545440674,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "30s",
+            "heartbeat_timeout": "30s"
+          }
+        },
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 1.930657148361206,
+          "started_to_end_seconds": 1.9083991050720215,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "180s",
+            "heartbeat_timeout": "180s"
+          }
+        }
+      ]
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr116",
+      "repeat": 1,
+      "scenario": "baseline",
+      "cold_model_start": true,
+      "elapsed_seconds": 7.6,
+      "passed": true,
+      "model_responses": 4,
+      "input_tokens": 2202,
+      "output_tokens": 261,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": []
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr116",
+      "repeat": 1,
+      "scenario": "missing-resource",
+      "cold_model_start": false,
+      "elapsed_seconds": 0.2,
+      "passed": true,
+      "model_responses": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": []
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr116",
+      "repeat": 1,
+      "scenario": "rate-limit",
+      "cold_model_start": false,
+      "elapsed_seconds": 5.1,
+      "passed": true,
+      "model_responses": 4,
+      "input_tokens": 2202,
+      "output_tokens": 261,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": []
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr116",
+      "repeat": 1,
+      "scenario": "repeat-guard",
+      "cold_model_start": false,
+      "elapsed_seconds": 3.0,
+      "passed": true,
+      "model_responses": 2,
+      "input_tokens": 964,
+      "output_tokens": 146,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": []
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr116",
+      "repeat": 1,
+      "scenario": "review",
+      "cold_model_start": false,
+      "elapsed_seconds": 21.6,
+      "passed": true,
+      "model_responses": 10,
+      "input_tokens": 5833,
+      "output_tokens": 1047,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": [
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 5.700958013534546,
+          "started_to_end_seconds": 5.6981120109558105,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "30s",
+            "heartbeat_timeout": "30s"
+          }
+        },
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 5.367017030715942,
+          "started_to_end_seconds": 5.363871097564697,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "180s",
+            "heartbeat_timeout": "180s"
+          }
+        }
+      ]
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr116",
+      "repeat": 2,
+      "scenario": "baseline",
+      "cold_model_start": false,
+      "elapsed_seconds": 5.6,
+      "passed": true,
+      "model_responses": 4,
+      "input_tokens": 2202,
+      "output_tokens": 261,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": []
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr116",
+      "repeat": 2,
+      "scenario": "missing-resource",
+      "cold_model_start": false,
+      "elapsed_seconds": 0.2,
+      "passed": true,
+      "model_responses": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": []
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr116",
+      "repeat": 2,
+      "scenario": "rate-limit",
+      "cold_model_start": false,
+      "elapsed_seconds": 6.1,
+      "passed": true,
+      "model_responses": 4,
+      "input_tokens": 2202,
+      "output_tokens": 261,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": []
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr116",
+      "repeat": 2,
+      "scenario": "repeat-guard",
+      "cold_model_start": false,
+      "elapsed_seconds": 3.5,
+      "passed": true,
+      "model_responses": 2,
+      "input_tokens": 964,
+      "output_tokens": 146,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": []
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr116",
+      "repeat": 2,
+      "scenario": "review",
+      "cold_model_start": false,
+      "elapsed_seconds": 27.3,
+      "passed": true,
+      "model_responses": 10,
+      "input_tokens": 5833,
+      "output_tokens": 1047,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": [
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 6.510069847106934,
+          "started_to_end_seconds": 6.504549026489258,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "30s",
+            "heartbeat_timeout": "30s"
+          }
+        },
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 6.205802917480469,
+          "started_to_end_seconds": 6.201288938522339,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "180s",
+            "heartbeat_timeout": "180s"
+          }
+        }
+      ]
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr116",
+      "repeat": 3,
+      "scenario": "baseline",
+      "cold_model_start": false,
+      "elapsed_seconds": 8.2,
+      "passed": true,
+      "model_responses": 4,
+      "input_tokens": 2202,
+      "output_tokens": 261,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": []
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr116",
+      "repeat": 3,
+      "scenario": "missing-resource",
+      "cold_model_start": false,
+      "elapsed_seconds": 0.2,
+      "passed": true,
+      "model_responses": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": []
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr116",
+      "repeat": 3,
+      "scenario": "rate-limit",
+      "cold_model_start": false,
+      "elapsed_seconds": 8.1,
+      "passed": true,
+      "model_responses": 4,
+      "input_tokens": 2202,
+      "output_tokens": 261,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": []
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr116",
+      "repeat": 3,
+      "scenario": "repeat-guard",
+      "cold_model_start": false,
+      "elapsed_seconds": 4.0,
+      "passed": true,
+      "model_responses": 2,
+      "input_tokens": 964,
+      "output_tokens": 146,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": []
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr116",
+      "repeat": 3,
+      "scenario": "review",
+      "cold_model_start": false,
+      "elapsed_seconds": 29.3,
+      "passed": true,
+      "model_responses": 10,
+      "input_tokens": 5833,
+      "output_tokens": 1047,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": [
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 6.759243965148926,
+          "started_to_end_seconds": 6.751420974731445,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "30s",
+            "heartbeat_timeout": "30s"
+          }
+        },
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 7.39138388633728,
+          "started_to_end_seconds": 7.380177974700928,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "180s",
+            "heartbeat_timeout": "180s"
+          }
+        }
+      ]
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr117",
+      "repeat": 1,
+      "scenario": "review",
+      "cold_model_start": true,
+      "elapsed_seconds": 37.5,
+      "passed": true,
+      "model_responses": 10,
+      "input_tokens": 5833,
+      "output_tokens": 1047,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": [
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 10.687357187271118,
+          "started_to_end_seconds": 10.679160118103027,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "180s",
+            "heartbeat_timeout": "180s"
+          }
+        },
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 8.982139825820923,
+          "started_to_end_seconds": 8.969374895095825,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "180s",
+            "heartbeat_timeout": "180s"
+          }
+        }
+      ]
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr117",
+      "repeat": 2,
+      "scenario": "review",
+      "cold_model_start": false,
+      "elapsed_seconds": 34.6,
+      "passed": true,
+      "model_responses": 10,
+      "input_tokens": 5833,
+      "output_tokens": 1047,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": [
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 8.611127853393555,
+          "started_to_end_seconds": 8.602942943572998,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "180s",
+            "heartbeat_timeout": "180s"
+          }
+        },
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 7.85260796546936,
+          "started_to_end_seconds": 7.821964979171753,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "180s",
+            "heartbeat_timeout": "180s"
+          }
+        }
+      ]
+    },
+    {
+      "model": "qwen2.5-local",
+      "variant": "pr117",
+      "repeat": 3,
+      "scenario": "review",
+      "cold_model_start": false,
+      "elapsed_seconds": 34.7,
+      "passed": true,
+      "model_responses": 10,
+      "input_tokens": 5833,
+      "output_tokens": 1047,
+      "max_model_size_bytes": 6608251780,
+      "max_model_vram_bytes": 6608251780,
+      "context_lengths": [
+        32768
+      ],
+      "revisions": [
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 8.876476049423218,
+          "started_to_end_seconds": 8.86742091178894,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "180s",
+            "heartbeat_timeout": "180s"
+          }
+        },
+        {
+          "name": "incident-triage.revise-draft",
+          "status": "completed",
+          "attempt": 0,
+          "scheduled_to_end_seconds": 7.3391640186309814,
+          "started_to_end_seconds": 7.332897901535034,
+          "timeouts": {
+            "schedule_to_close_timeout": "720s",
+            "schedule_to_start_timeout": "720s",
+            "start_to_close_timeout": "180s",
+            "heartbeat_timeout": "180s"
+          }
+        }
+      ]
+    }
+  ]
+}
