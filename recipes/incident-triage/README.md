@@ -81,7 +81,10 @@ Local Samples Explorer.
 ## What you'll see
 
 These screenshots come from mock runs against local Cadence and Cadence Web.
-Open a Run from the Workflow ID that `start` prints.
+`./run.sh start --mode mock` prints Workflow ID `incident-triage-demo`. The
+Explorer uses `incident-triage-python-bare-mock-demo` for that same mock
+selection, and **Resolve latest run** follows the Explorer ID. Open the Run
+for the path you started.
 
 **1. The agent goes the wrong way.** On the Run's **Queries** tab, run
 `status`. The scripted planner checked inventory twice. The Workflow's guard
@@ -90,18 +93,21 @@ blocked the repeat, and the draft blames inventory. The phase is
 
 ![status Query while the Workflow waits for guidance](docs/images/2-awaiting-guidance.png)
 
-**2. Send guidance.** You can run `./scripts/explore.sh` from the repository
-root, choose Incident Triage and mock mode, then **Resolve latest run**. The
-optional Signal controls come from `explorer.yaml`; review the payload and
-**Confirm** before sending. Try this guidance:
+**2. Send guidance.** From the repository root, run `./scripts/explore.sh`,
+choose Incident Triage and mock mode. If you started the Worker and Run from
+the commands the Explorer shows, send the Signal there. Enter the fields,
+select **Send Add guidance**, then **Confirm Add guidance**. Try this guidance:
 `Payments deployed v2.14 at 10:02. Check payments.`
 
 ![Local Samples Explorer Signal controls for Incident Triage](docs/images/3-explorer-signals.png)
 
-You can also send the same Signal from the Cadence CLI:
+The approval control in this screenshot is now labeled **Approval decision**.
+
+You can send the same Signal from the Cadence CLI. Use the Workflow ID from
+the path you started:
 
 ```bash
-cadence --domain cadence-ai-samples workflow signal -w incident-triage-demo \
+cadence --domain cadence-ai-samples workflow signal -w <workflow-id> \
   -n guidance -i '"Payments deployed v2.14 at 10:02. Check payments."'
 ```
 
@@ -112,17 +118,25 @@ is `AWAITING_APPROVAL`.
 
 ![status Query after guidance, waiting for approval](docs/images/4-awaiting-approval.png)
 
-**4. Approve.** Send `approve` from the Explorer, or run
-`cadence --domain cadence-ai-samples workflow signal -w incident-triage-demo -n approval -i '"approve"'`.
+**4. Approve.** Send `approve` from the Explorer, or run the CLI with the same
+Workflow ID:
+
+```bash
+cadence --domain cadence-ai-samples workflow signal -w <workflow-id> \
+  -n approval -i '"approve"'
+```
+
 The **Summary** tab shows the Run completed, with one keyed conclusion and its
 receipt.
 
 ![Completed Run with the approved conclusion](docs/images/5-completed.png)
 
 **5. A temporary failure retries by itself.** The durability rehearsal below
-makes the first gateway log lookup return HTTP 429. In the Run's **History**,
-that Activity shows `1 Retry` and then completes. The Activity's retry policy did
-this; the agent code has no retry loop.
+starts its own Run and makes the first gateway log lookup return HTTP 429.
+Find that Workflow ID as `workflow_id` in `.evidence/rehearsal/manifest.json`,
+or open the newest `incident-triage-…` Run in the domain's Workflow list. In
+that Run's **History**, the Activity shows `1 Retry` and then completes. The
+Activity's retry policy did this; the agent code has no retry loop.
 
 ![History with the gateway log lookup retried once after a 429](docs/images/1-retry-429.png)
 
