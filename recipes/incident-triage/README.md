@@ -78,6 +78,54 @@ The Workflow waits first for a `guidance` Signal and later for an `approval`
 Signal. `explorer.yaml` exposes guidance, revision, and approval controls in the
 Local Samples Explorer.
 
+## What you'll see
+
+These screenshots come from mock runs against local Cadence and Cadence Web.
+Open a Run from the Workflow ID that `start` prints.
+
+**1. The agent goes the wrong way.** On the Run's **Queries** tab, run
+`status`. The scripted planner checked inventory twice. The Workflow's guard
+blocked the repeat, and the draft blames inventory. The phase is
+`AWAITING_GUIDANCE`: the Workflow is waiting for a person, and no Worker is busy.
+
+![status Query while the Workflow waits for guidance](docs/images/2-awaiting-guidance.png)
+
+**2. Send guidance.** You can run `./scripts/explore.sh` from the repository
+root, choose Incident Triage and mock mode, then **Resolve latest run**. The
+optional Signal controls come from `explorer.yaml`; review the payload and
+**Confirm** before sending. Try this guidance:
+`Payments deployed v2.14 at 10:02. Check payments.`
+
+![Local Samples Explorer Signal controls for Incident Triage](docs/images/3-explorer-signals.png)
+
+You can also send the same Signal from the Cadence CLI:
+
+```bash
+cadence --domain cadence-ai-samples workflow signal -w incident-triage-demo \
+  -n guidance -i '"Payments deployed v2.14 at 10:02. Check payments."'
+```
+
+**3. The agent follows the evidence.** Run `status` again. The guidance is
+recorded, the new lookups follow checkout, payments, and ledger, and the draft
+names the ledger connection pool. The setup lookups weren't run again. The phase
+is `AWAITING_APPROVAL`.
+
+![status Query after guidance, waiting for approval](docs/images/4-awaiting-approval.png)
+
+**4. Approve.** Send `approve` from the Explorer, or run
+`cadence --domain cadence-ai-samples workflow signal -w incident-triage-demo -n approval -i '"approve"'`.
+The **Summary** tab shows the Run completed, with one keyed conclusion and its
+receipt.
+
+![Completed Run with the approved conclusion](docs/images/5-completed.png)
+
+**5. A temporary failure retries by itself.** The durability rehearsal below
+makes the first gateway log lookup return HTTP 429. In the Run's **History**,
+that Activity shows `1 Retry` and then completes. The Activity's retry policy did
+this; the agent code has no retry loop.
+
+![History with the gateway log lookup retried once after a 429](docs/images/1-retry-429.png)
+
 ## Run the durability rehearsal
 
 ```bash
