@@ -88,18 +88,22 @@ booking provider.
 ## Live mode
 
 Live mode runs the selected framework's native handoffs in Workflow code with
-Activity-backed model and booking tools. Google and OpenAI catalog entries
-require `MODEL_AI_KEY` and an HTTPS endpoint. Evidence is tracked separately for
-each implementation; **successful specialist handoffs with a real model are not
-proven for this recipe** until
-[Issue #47](https://github.com/cadence-workflow/cadence-ai-samples/issues/47).
+Activity-backed model and booking tools. Workflow code parses the request,
+offers the coordinator only the matching specialist, and gives that specialist
+booking tools that take no arguments: `book_ride` for a short trip and
+`book_long_trip` for the flight and both airport rides. The model still makes
+the framework handoff and the tool call, each booking is its own Activity, and
+nothing is booked unless the model calls the tool. When small local models had
+to choose the specialist and copy every booking detail, they routed wrongly and
+invented details.
 
-**Do not use `llama3.2-local` expecting working live handoffs without running the
-strict check for the chosen implementation.** OpenAI Agents acceptance runs
-reached Ollama, but `llama3.2:latest` did not hand off to specialists or call
-booking tools. Google ADK validation is held to the same no-fallback rule.
-Alternate local Ollama models are tracked in
-[Issue #48](https://github.com/cadence-workflow/cadence-ai-samples/issues/48).
+With local Ollama, the strict check below passed 5 of 5 runs for each model on
+OpenAI Agents, and 5 of 5 for `llama3.2-local` on Google ADK. `qwen2.5-local`
+on Google ADK passed 9 of 10; the failure was a model-call timeout while other
+live jobs shared the CPU. These runs used CPU-only Ollama 0.40.13 on Linux.
+Remote catalog entries are not yet proven
+([Issue #47](https://github.com/cadence-workflow/cadence-ai-samples/issues/47)).
+Google and OpenAI catalog entries require `MODEL_AI_KEY` and an HTTPS endpoint.
 
 Example live Worker with a remote catalog entry (requires authorization and a
 key):
@@ -154,21 +158,13 @@ python tests/local_cadence_checks.py
 ## Strict live capability check (optional)
 
 `python tests/live_ollama_validation.py` runs live short and long requests for
-the current implementation against `llama3.2-local` when Ollama serves
-`llama3.2:latest` at `localhost:11434` and Cadence is at `localhost:7833`. The
+the current implementation against `llama3.2-local` when Ollama serves it at
+`localhost:11434` and Cadence is at `localhost:7833`. Pass `--model-id` to
+select another local Ollama entry, for example `--model-id qwen2.5-local`. The
 script **must exit non-zero** when the model omits required specialist handoffs
-or booking tool Activities. Google ADK also requires the actual
+or booking tool Activities, and it prints the decoded failure message with the
+retained Workflow and Run IDs. Google ADK also requires the actual
 `transfer_to_agent` event and exact typed receipts.
-
-The current Google ADK check reaches Ollama after the Worker rewrites the copied
-request's runtime model. In the latest acceptance run, the short route scheduled
-two model Activities and one ride before failing without a final valid result.
-The long route scheduled three model Activities and one ride, but no flight,
-before strict schema validation failed. The script remained nonzero, reported
-both Workflow and Run IDs, and left their histories available for inspection.
-
-Issue #16 closure accepts offline tests and local Cadence mock durability as
-validated; real-model handoffs remain unproven pending Issue #47.
 
 The unit suites are fully offline except for the optional local scripts above.
 The Google ADK suite drives the real `CadenceAgentRunner` and
