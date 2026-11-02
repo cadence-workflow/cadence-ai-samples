@@ -55,6 +55,18 @@ Keep that output and show a helper.
 [`models.yaml`](../../models.yaml). `llama3.2-local` is smaller but often
 drafts the wrong cause. Paid providers need `MODEL_AI_KEY`.
 
+## Optional: explore the samples in your browser
+
+From the repository root, run `./scripts/explore.sh` to open the Samples Explorer.
+It helps you find your way around the recipes and see what a Run is doing while
+you build with Cadence. Choose a recipe and mode, then **Refresh and check
+services**. It prints Worker and start commands to copy into your terminals.
+After you start a Run, **Resolve latest run** links to Cadence Web and shows any
+Signal controls; each Signal asks you to **Confirm** before sending.
+
+You don't need the Explorer for any task. The terminal commands and Cadence Web
+work on their own. Its service checks are advice, not proof that a Worker is ready.
+
 ## The introductory retry exercise
 
 Follow the [exercise README](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md).

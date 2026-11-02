@@ -59,6 +59,7 @@ outcomes. You can work by hand or with a coding agent.
 ## Get ready
 
 - [Set up your laptop](setup.md).
+- Optional: [browse recipes and watch your Runs with the Samples Explorer](setup.md#optional-explore-the-samples-in-your-browser).
 - [Find something to work on](shortlist.md).
 - [See the session outline](agenda.md).
 

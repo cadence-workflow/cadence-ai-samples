@@ -4,7 +4,7 @@ Start with the [retry-policy exercise](../../recipes/incident-triage/python/bare
 Then [bring your own workflow](#bring-your-own-workflow), or take a ContribFest
 Issue below if you didn't bring one.
 
-Notes: Please **first comment** on the issue and then assign yourself to the issue you want to take on.
+Comment on the Issue you want to take; a helper will assign you as described below.
 
 ## ContribFest Issues
 
@@ -74,6 +74,19 @@ and open an Issue so someone can continue.
 [#119](https://github.com/cadence-workflow/cadence-ai-samples/issues/119): run Incident Triage in mock mode, stop the worker mid-run,
 send Signals, run two at once. Open a `<Finding>` Issue for anything that
 surprised you. No model needed.
+
+**If you'd rather click than type (optional):** from the repository root, run
+`./scripts/explore.sh`. Choose Incident Triage, Python / bare, and mock mode.
+
+1. **Refresh and check services**, then copy the Worker and start commands into
+   separate terminals and run them.
+2. **Resolve latest run** to find your Run.
+3. Send guidance, a revision and approval as the recipe walkthrough describes.
+   Review each payload and click **Confirm** before it sends.
+4. **Open history** to see the recorded Activities and Signals in Cadence Web.
+
+The Explorer is a helper for navigation and controls; the terminal path above
+works on its own. More details are in [setup](setup.md#optional-explore-the-samples-in-your-browser).
 
 ## Leave a useful result
 
