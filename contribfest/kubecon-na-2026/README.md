@@ -56,10 +56,48 @@ workflow, so someone can continue it if you don't finish. Steps are in
 A merged fix, a draft pull request or a written next step are all good
 outcomes. You can work by hand or with a coding agent.
 
+## Try the Samples Explorer
+
+The [Samples Explorer](../../tools/explorer/README.md) is a local browser tool
+for choosing a recipe, preparing its dependencies and following a Run in
+Cadence Web. It reads the code in your checkout, including your edits.
+
+From the repository root:
+
+```bash
+./scripts/explore.sh
+```
+
+You can browse with Python 3.10+ and venv support, before installing Cadence or
+a model. The first launch downloads a Python dependency. See
+[setup](setup.md#explore-the-samples-in-your-browser) for requirements.
+
+Use it to:
+
+- **Choose an example.** Select a recipe, language, framework and mock or live
+  mode. The Explorer generates commands for that implementation.
+- **Prepare and check your setup.** Install the recipe's dependencies with
+  **Prepare recipe dependencies**, then use **Refresh and check services**.
+  For a local live model, **Warm up selected local services** checks a small
+  request before you start the Workflow.
+- **Run your code.** Copy the Worker and Workflow commands into separate
+  terminals. On macOS, **Open in Terminal** pastes a command for you to review
+  and run.
+- **Follow a Run.** Use **Resolve latest run**, then **Open history** or
+  **Open queries** to inspect it in Cadence Web.
+- **Send review input.** Recipes with Signal controls let you send guidance,
+  request a revision or approve a result. Check the Run's state afterward to
+  see how it handled your input.
+
+For a first try, choose **Incident Triage → Python → bare → mock** and follow
+the [recipe runbook](../../recipes/incident-triage/README.md). Mock mode uses
+scripted responses and needs no model or API key. Running the Workflow still
+needs Cadence; the Run links need Cadence Web. The Explorer prepares recipe
+dependencies, but you start the services, Worker and Workflow yourself.
+
 ## Get ready
 
 - [Set up your laptop](setup.md).
-- Optional: [browse recipes and watch your Runs with the Samples Explorer](setup.md#optional-explore-the-samples-in-your-browser).
 - [Find something to work on](shortlist.md).
 - [See the session outline](agenda.md).
 

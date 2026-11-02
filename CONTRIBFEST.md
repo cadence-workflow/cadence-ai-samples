@@ -22,6 +22,19 @@ Then work with a maintainer on an AI sample, a small workflow of your own or
 another approved Cadence Issue. Most work will be in this repository. Leave
 a useful change or a clear next step for the next contributor.
 
+## Try the Samples Explorer
+
+Browse recipes, prepare their dependencies and follow a Run from a local browser:
+
+```bash
+./scripts/explore.sh
+```
+
+Start with mock mode if you do not have a model installed. See
+[the Explorer introduction](contribfest/kubecon-na-2026/README.md#try-the-samples-explorer)
+for its features and a first example, or follow the
+[setup steps](contribfest/kubecon-na-2026/setup.md#explore-the-samples-in-your-browser).
+
 ## Plan your session
 
 - [What you'll work on](contribfest/kubecon-na-2026/README.md)
@@ -46,7 +59,7 @@ Choose a difficulty that matches your time and energy:
 | --- | --- |
 | **Low-stakes** | Get a first win: one prepared failure, a small file set, exact commands |
 | **Mid-level** | Harden a real durability gap with a bit more surface area |
-| **High-level / stretch** | Take on deeper multi-step durability work; still scaffolded, with a clear 45-minute stopping point if you cannot finish |
+| **High-level / stretch** | Investigate recovery or replay across several steps |
 
 Pick the task that fits you. Excited contributors should feel empowered to claim
 a stretch Issue; maintainers are in the room to help. Claim through the
@@ -78,7 +91,7 @@ Prepare only the local services named by your Issue:
 | --- | --- | --- |
 | Cadence | Run and inspect the workflow | [Ticket Routing requirements](recipes/ticket-routing/README.md#requirements) |
 | Laya | Local classification | [Install Laya](README.md#install-laya) |
-| Ollama with `qwen2.5:7b` | Incident Triage exercise (everyone) | [Exercise setup](recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md#prepare-before-the-session) |
+| Ollama with `qwen2.5:7b` | Incident Triage live exercise | [Exercise setup, pending PR #116](https://github.com/cadence-workflow/cadence-ai-samples/pull/116) |
 | Ollama with `llama3.2` | Local model inference | [Install Ollama and llama3.2](README.md#install-ollama-and-llama32) |
 | Full local example | Exercise Laya and `llama3.2` together | [Recurring AI Watch setup](recipes/recurring-ai-watch/README.md#setup) |
 
