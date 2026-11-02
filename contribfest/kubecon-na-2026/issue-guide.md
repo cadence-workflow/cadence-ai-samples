@@ -1,23 +1,26 @@
-# Working on a ContribFest Issue
-
-Every ContribFest Issue links here for the parts they share. Read the section
-you need when an Issue points to it.
+# ContribFest development guide
 
 ## Before you start
 
-1. Finish [setup](setup.md) and the
-   [retry-policy exercise](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md).
-   Most Issues build on what you saw there: a 429 retried by Cadence, a 404
-   stopped after one attempt, the repeated-call guard, and the `revise` and
-   `guidance` Signals.
-2. Claim the Issue as [the shortlist](shortlist.md) describes.
-3. Run the recipe's own setup once, from the directory the Issue names:
-   `./run.sh setup` (Python and Go recipes both have it).
+1. [Choose an Issue](shortlist.md) and check its prerequisites. Mock-mode tasks
+   do not need Ollama; some tests do not need a running Cadence server.
+2. Follow [setup](setup.md) for the services your task needs, then run
+   `./run.sh setup` from the recipe directory named in the Issue.
+3. [Claim the Issue](shortlist.md#contribfest-issues) before changing the code.
+
+For an introduction to Activity retries, try the
+[retry-policy exercise](https://github.com/cadence-workflow/cadence-ai-samples/pull/116).
+It uses a temporary HTTP 429 and a permanent 404 to show which failures should
+be retried. The exercise is being prepared in that PR.
 
 ## Run your own Worker
 
-Other people's Workers may be polling the same server. Give your Worker and your
-Runs your own names:
+A [Worker](https://cadenceworkflow.io/docs/python-client/workers/) runs your
+Workflow and Activity code. Cadence sends it work through a
+[task list](https://cadenceworkflow.io/docs/concepts/task-lists/). On a shared
+server, use a task list unique to you so another participant's Worker does not
+pick up your tasks. Use the same name when starting the Workflow.
+Replace `<you>` and `<recipe>` below with your own names:
 
 ```bash
 ./run.sh --task-list <you>-<recipe> worker --mode mock                   # terminal 1
@@ -50,8 +53,10 @@ recipe's Signal buttons. Each Signal asks you to **Confirm** before it sends.
 The Explorer's commands use fixed names (for example
 `--task-list incident-triage-python-bare-mock`). That's fine on your own laptop's
 Cadence. On a shared server, edit the names before you run them, and note that a
-second `start` fails while the demo Run is still open. Ticket Routing has no Signal buttons: acknowledge from the
-parent's `ticket-assignment` Query in Cadence Web instead.
+second `start` fails while the demo Run is still open. Ticket Routing has no
+Explorer Signal buttons. In Cadence Web, run the parent's `ticket-assignment`
+Query and click **Acknowledge Ticket**, as the
+[recipe instructions](../../recipes/ticket-routing/README.md#cadence-web-cwc) describe.
 
 ## Find your Run in Cadence Web
 
@@ -71,38 +76,50 @@ Open `http://localhost:8088/domains/cadence-ai-samples/cluster0/workflows/<workf
 - In the raw history a retried Activity has one scheduled event. The attempt
   number (counting from 0) is on its `ActivityTaskStarted` event.
 
-## Who does what
+## Cadence concepts in the exercises
 
-Issues say which part of the behavior comes from where. Keep the three apart
-when you explain your change:
+The recipes put model and tool calls in
+[Activities](https://cadenceworkflow.io/docs/concepts/activities/), coordinated
+by a [Workflow](https://cadenceworkflow.io/docs/concepts/workflows/). Cadence
+records Activity results so a Workflow can recover after a Worker restart.
+The recipe still defines validation, tool access and how to handle model output.
 
-| Part | Decides | Example |
+Use the documentation for the change you are making:
+
+| If your Issue involves... | Read | Apply it to the recipe |
 | --- | --- | --- |
-| **The model** | What to look up next, what the draft says | qwen2.5 picks `payments` after `checkout` |
-| **Recipe code** | Which tools exist, guards, validation, what's saved | the repeated-call guard, the JSON schema, an idempotency key |
-| **Cadence** | Retries, timeouts, timers, Signal delivery, history, replay after a Worker restart | the 429 retried by the Activity's retry policy |
+| A rate-limited or failing call | Activity retries: [Python](https://cadenceworkflow.io/docs/python-client/retries/), [Go](https://cadenceworkflow.io/docs/go-client/retries/) | Set a retry policy on the Activity. Check that a temporary failure recovers and a permanent error stops. |
+| Approval or new guidance | Signals: [Python](https://cadenceworkflow.io/docs/python-client/signals/), [Go](https://cadenceworkflow.io/docs/go-client/signals/) | Send input to the running Workflow, then check how its state changes. |
+| Inspecting a running agent | [Queries](https://cadenceworkflow.io/docs/concepts/queries/) | Read Workflow state without changing it. Use the Query named in your recipe. |
+| An approval that never arrives | [Durable timers](https://cadenceworkflow.io/docs/concepts/timers/) | Add a deadline to the wait and test both approval and expiry. |
+| A write whose reply is lost | [Activity execution](https://cadenceworkflow.io/docs/concepts/activities/) | Check whether retrying the write repeats its side effect. |
+| A Workflow change that must preserve existing Runs | [Go replay codelab](https://cadenceworkflow.io/docs/codelabs/workflow-tests-go-replayer-shadower/) | Replay a recorded history against the changed Workflow. |
 
 ## Write a check that tells the difference
 
-A good check fails on `main` and passes with your change. Passing the existing
-tests only proves you didn't break them.
+Add a regression test that fails before your fix and passes after it. For example,
+a retry-policy test should distinguish a temporary failure from a permanent one.
+The SDK testing guides show how to mock Activities and test Workflow behavior:
+[Python](https://cadenceworkflow.io/docs/python-client/testing/) and
+[Go](https://cadenceworkflow.io/docs/go-client/workflow-testing/).
 
 1. Write the check before the change, run it, and keep the failing output.
 2. Make the change and run it again.
 3. Optional: undo one line of your change and confirm the check fails again.
 
-Traps we hit while testing these Issues:
+Recipe and SDK details to check when a test behaves unexpectedly:
 
-- **The Python test environment** (`TestWorkflowEnvironment`) doesn't retry
+- **The Python test environment used by these recipes** (`TestWorkflowEnvironment`) doesn't retry
   Activities, so it can't count attempts. Assert on the retry options the
   Workflow passes, or count attempts against local Cadence. The Go `testsuite`
   environment is different: it does apply the retry policy.
 - **The same environment fires a pending timer** as soon as the Workflow would
-  otherwise block. A new deadline must default to "none", or every existing test
-  that waits for a Signal ends as expired.
+  otherwise block. When adding a deadline, check tests that wait for Signals:
+  virtual time may advance to expiry before they send the Signal.
 - **`non_retryable_error_reasons` matches the exception class name**, not its
   message. Use a dedicated exception class.
-- **A retry policy needs `backoff_coefficient`.** With `initial_interval` and no
+- **Set `backoff_coefficient` explicitly with the recipe's Python SDK.** In the
+  tested setup, with `initial_interval` and no
   coefficient, Cadence rejects the decision (`BackoffCoefficient cannot be less
   than 1`). Copy the shape of `QUICK_ACTIVITY` in the recipe's `workflow.py`.
 - **Incident Triage pins line numbers.** `durability-lines.json` lists lines of
@@ -110,20 +127,22 @@ Traps we hit while testing these Issues:
   `test_manifest_is_symmetric_and_has_no_overlaps` fail. Replace lines in
   place, or update the manifest in the same change.
 - **Mock Workers keep state** in the recipe's `.state/` folder across runs.
-  Clear it before you count anything.
+  Use a fresh test state when checking write counts; preserve any state you need
+  for a restart or lost-reply test.
 - **Go replay from a JSON history** has its own traps. See
   [Go replay from JSON](#go-replay-from-json).
 - **Go `-run` is a regular expression** over every test name. Give your test a
   distinctive name, and filter the noisy output:
   `go test ./... -run X -v 2>&1 | grep -E '^\s*(---|FAIL|ok|Error:)'`.
-- **In Go, a plain `error` is retried** (its reason is
+- **With a retry policy in Go, a plain `error` is retryable** (its reason is
   `cadenceInternal:Generic`). `cadence.NewCustomError(reason, details)` has
   `Error()` equal to the reason; read the text with `Details(&s)`.
 
 ## Cadence CLI
 
-The host `cadence` binary needs extra configuration, so use the one in the
-container:
+The [Cadence CLI](https://cadenceworkflow.io/docs/cli/) can describe Runs and
+export history. If your local server container is named `cadence`, you can use
+its bundled CLI:
 
 ```bash
 cadence() { docker exec cadence cadence --address cadence:7933 "$@"; }
@@ -134,6 +153,10 @@ cadence --domain cadence-ai-samples workflow describe -w <workflow-id>
 `docker exec cadence cat /tmp/h.json > h.json`.
 
 ## Go replay from JSON
+
+The [replay codelab](https://cadenceworkflow.io/docs/codelabs/workflow-tests-go-replayer-shadower/)
+explains how a recorded history detects incompatible Workflow changes. The
+following details apply to the Ticket Routing exercise using Go client v1.3.1:
 
 - `ReplayWorkflowHistoryFromJSON` runs under Workflow ID `ReplayId`. Record the
   history under that ID: the ID also sits inside encoded payloads, so editing
@@ -160,19 +183,27 @@ point is to see what a real model does.
   Explorer's live commands) defaults to `llama3.2-local` unless you set
   `INCIDENT_TRIAGE_MODEL_ID=qwen2.5-local`. `llama3.2` is smaller and often
   names the symptom instead of the cause.
-- Requests use temperature 0, so the same input usually gives the same output.
-  Run three times anyway before you trust a result.
+- Requests use temperature 0, which does not guarantee identical output. Keep the model ID
+  and output with a report of model-dependent behavior.
 - Each model call that returns prints a `SPEND` line with the tokens the model
   reported. That's how you measure repeated model work. A failed attempt, or a
   call lost with its Worker, prints none, so `SPEND` lines under-count the work
   the model actually did.
-- **How long it takes without a GPU:** loading a model the first time adds about
-  a minute, and a warm baseline run takes 20–30 s. The `review` scenario can take
-  about four minutes and once hit its 30 s revise timeout under load, so Issues
-  name the scenarios to run instead of `--scenario all`.
 
-## Stuck or out of time
+Model speed depends on your laptop and the scenario. If a call times out, keep
+the error and ask a maintainer to help distinguish a slow model from a Workflow
+or Activity timeout.
 
-Stop at about 45 minutes. Push your branch, then comment on the Issue with the
-branch name, the commands you ran, what works, and the next step. That
-handoff is a useful contribution: the next person starts where you stopped.
+<a id="stuck-or-out-of-time"></a>
+
+## Get help or share your progress
+
+Ask a maintainer if a command fails or the behavior is unclear. Include the
+command, error output and Workflow ID if there is one. Never post API keys or
+private model inputs.
+
+You can open a draft PR for unfinished work. Describe what you tested and what
+still needs work, and link it from the Issue. Follow the
+[contribution instructions](../../CONTRIBFEST.md#4-finish-or-hand-off) for
+sign-off and review. Your fix will help future Cadence users build on these
+samples.
