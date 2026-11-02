@@ -5,10 +5,12 @@ import tempfile
 import threading
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 from urllib.parse import quote
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from explorer import Explorer
+import reader
 from reader import IMAGE_TYPES, local_url, reader_page, reader_path, render_markdown
 from server import ExplorerHTTPServer
 from source import InvalidSelection
@@ -22,7 +24,8 @@ class ReaderTests(unittest.TestCase):
         self.explorer = Explorer(self.root)
         self.addCleanup(self.explorer.close)
         self.doc = 'recipes/demo/README.md'
-        for name in ('README.md', 'CONTRIBFEST.md', self.doc,
+        for name in ('README.md', 'CONTRIBFEST.md', 'CONTRIBUTING.md', 'WORKFLOW.md',
+                     'tools/explorer/README.md', self.doc,
                      'recipes/demo/python/bare/main.py',
                      'contribfest/kubecon-na-2026/setup.md',
                      'contribfest/kubecon-na-2026/README.md',
@@ -39,7 +42,8 @@ class ReaderTests(unittest.TestCase):
         return render_markdown(self.explorer, self.doc, source)
 
     def test_allow_list_and_traversal_symlink_rejections(self):
-        for name in ('README.md', 'CONTRIBFEST.md', self.doc,
+        for name in ('README.md', 'CONTRIBFEST.md', 'CONTRIBUTING.md', 'WORKFLOW.md',
+                     'tools/explorer/README.md', self.doc,
                      'contribfest/kubecon-na-2026/setup.md'):
             self.assertEqual(reader_path(self.explorer, name), self.root / name)
         for name in ('recipes/demo/docs/images/screen.png',
@@ -85,12 +89,45 @@ class ReaderTests(unittest.TestCase):
         self.assertIn('/source?path=recipes%2Fdemo%2Fpython%2Fbare%2Fmain.py', result)
         self.assertIn('target="_blank" rel="noopener noreferrer"', result)
         self.assertIn('src="/image?path=recipes%2Fdemo%2Fdocs%2Fimages%2Fscreen.png"', result)
-        for unsafe in ('javascript:', 'src="https:', 'href="//', 'secret.md'):
+        for unsafe in ('javascript:', 'src="https:', 'href="//'):
             self.assertNotIn(unsafe, result)
+        self.assertIn('<code>recipes/demo/docs/secret.md</code>', result)
+        self.assertNotIn('secret.md"', result)
         self.assertIsNone(local_url(self.explorer, self.doc, '../../../README.md'))
         self.assertIsNone(local_url(self.explorer, self.doc, '%2fetc/passwd'))
         self.assertIsNone(local_url(self.explorer, self.doc, 'README.md?download=1'))
         self.assertIn('href="#heading"', self.render('[jump](#heading)'))
+        ordered = self.render('1. one\n wrapped\n2. two')
+        self.assertEqual(ordered.count('<ol>'), 1)
+        self.assertIn('<li>one\n wrapped</li>', ordered)
+        self.assertIn('<li>two</li>', ordered)
+        bullets = self.render('- item\n more\n- next')
+        self.assertEqual(bullets.count('<ul>'), 1)
+        self.assertIn('<li>item\n more</li>', bullets)
+        local = self.render('See [Local\nservices](../../README.md).')
+        self.assertIn('<a href="/doc?path=README.md">', local)
+        self.assertIn('Local\nservices', local)
+        external = self.render('See [Local\nservices](https://example.com/docs).')
+        self.assertIn('href="https://example.com/docs"', external)
+        self.assertIn('Local\nservices', external)
+        hidden = self.render('See [the contract](../../AGENTS.md).')
+        self.assertNotIn('<a ', hidden)
+        self.assertIn('the contract <code>AGENTS.md</code>', hidden)
+        hostile = self.render(
+            '![x" onerror="alert(1)](docs/images/screen.png) '
+            '[go](https://e.com/"onmouseover="alert(1)) '
+            '[data](data:text/html,hi) [js](JaVaScRiPt:alert(1)) '
+            '[ent](&#106;avascript:alert(1))')
+        self.assertNotIn('onerror="', hostile)
+        self.assertNotIn('onmouseover="', hostile)
+        self.assertNotIn('javascript:', hostile.lower())
+        self.assertIn('&quot;', hostile)
+
+    def test_docs_images_resolve_when_docs_is_skipped(self):
+        with patch('reader.SKIP', set(reader.SKIP) | {'docs'}):
+            self.assertEqual(
+                reader_path(self.explorer, 'recipes/demo/docs/images/screen.png', image=True),
+                self.root / 'recipes/demo/docs/images/screen.png')
 
     def test_http_routes_and_image_content_types_keep_security_headers(self):
         server = ExplorerHTTPServer(('127.0.0.1', 0), self.explorer)
@@ -114,16 +151,21 @@ class ReaderTests(unittest.TestCase):
                 self.assertIn("script-src 'self'", csp)
                 if name.endswith('.svg'):
                     self.assertIn('; sandbox', csp)
+                else:
+                    self.assertNotIn('sandbox', csp)
                 if route == 'doc':
                     self.assertIn('<h1 id="hello">Hello</h1>', body)
                     self.assertIn('/theme.js', body)
                 connection.close()
             connection = http.client.HTTPConnection('127.0.0.1', server.server_port)
-            connection.request('GET', '/doc?path=..%2FREADME.md')
-            response = connection.getresponse()
-            self.assertEqual(response.status, 422)
-            response.read()
-            connection.close()
+            for path in ('/doc?path=..%2FREADME.md', '/image?path=README.md',
+                         '/image?path=..%2Fx.png'):
+                connection = http.client.HTTPConnection('127.0.0.1', server.server_port)
+                connection.request('GET', path)
+                response = connection.getresponse()
+                self.assertEqual(response.status, 422, path)
+                response.read()
+                connection.close()
         finally:
             server.shutdown()
             server.server_close()

@@ -258,9 +258,12 @@ recipes/human-in-the-loop/python/openai-agents/.venv/bin/python \
 ## Reading local documentation
 
 **Open recipe README** uses an escaped Markdown reader with local images, tables
-and code blocks. The header's **ContribFest** link opens the event pages. Relative
-links open allow-listed documents in the reader, supported CLI files in the source
-view, or external HTTP(S) pages in a new tab. Unsupported links appear as text.
+and code blocks. The header's **ContribFest** link opens the event pages in a
+new tab. Relative links open allow-listed documents in the reader, supported
+CLI files in the source view, or external HTTP(S) pages in a new tab. The
+reader opens the root README, CONTRIBFEST, recipe READMEs, the KubeCon event
+pages, CONTRIBUTING.md, WORKFLOW.md, and this README. Other relative links
+show the label and the repository path.
 The reader uses the Explorer's saved dark or light theme. It is a small Markdown
 subset; raw HTML is displayed as text and remote images are not loaded.
 

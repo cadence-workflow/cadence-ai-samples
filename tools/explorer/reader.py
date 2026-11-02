@@ -26,7 +26,10 @@ def reader_path(explorer, relative, *, image=False):
                    len(parts) >= 4 and parts[0] == 'contribfest' and 'images' in parts[2:-1])
         allowed = allowed and Path(relative).suffix.lower() in IMAGE_TYPES
     else:
-        allowed = relative in {'README.md', 'CONTRIBFEST.md'} or (
+        allowed = relative in {
+            'README.md', 'CONTRIBFEST.md', 'CONTRIBUTING.md', 'WORKFLOW.md',
+            'tools/explorer/README.md',
+        } or (
             len(parts) == 3 and parts[0] == 'recipes' and parts[2] == 'README.md') or (
             len(parts) == 3 and parts[:2] == ('contribfest', 'kubecon-na-2026') and
             parts[2].endswith('.md'))
@@ -61,7 +64,7 @@ def local_url(explorer, document, target, *, image=False):
 
 def render_markdown(explorer, document, source):
     """Render the supported subset; source HTML is always escaped."""
-    token = re.compile(r'(`+)(.+?)\1|(!?)\[([^\]\n]*)\]\(([^\s)]+)\)|\*\*([^*]+)\*\*|\*([^*\n]+)\*')
+    token = re.compile(r'(`+)(.+?)\1|(!?)\[([^]]*)\]\(([^\s)]+)\)|\*\*([^*]+)\*\*|\*([^*\n]+)\*')
 
     def inline(text):
         result, end = [], 0
@@ -85,7 +88,20 @@ def render_markdown(explorer, document, source):
                     if external:
                         href = target
                 if href is None:
-                    result.append(label)
+                    shown = label
+                    if not bang:
+                        try:
+                            url = urlsplit(html.unescape(target))
+                            relative = (not url.scheme and not url.netloc and bool(url.path)
+                                        and not url.path.startswith('/') and '\\' not in target
+                                        and not any(ord(c) < 32 for c in target))
+                        except ValueError:
+                            relative = False
+                        if relative:
+                            path = posixpath.normpath(posixpath.join(
+                                posixpath.dirname(document), unquote(url.path)))
+                            shown += ' <code>' + html.escape(path) + '</code>'
+                    result.append(shown)
                 elif bang:
                     result.append(f'<img src="{html.escape(href, quote=True)}" alt="{label}" loading="lazy">')
                 else:
@@ -131,15 +147,26 @@ def render_markdown(explorer, document, source):
                 index += 1
             result.append('</tbody></table></div>')
             continue
-        elif item := re.match(r'^\s*(?:([-+*])|\d+[.)])\s+(.+)', line):
-            tag = 'ul' if item[1] else 'ol'
+        elif re.match(r'^\s*(?:[-+*]|\d+[.)])\s+', line):
+            tag = 'ul' if re.match(r'^\s*[-+*]\s+', line) else 'ol'
             result.append(f'<{tag}>')
             while index < len(lines):
                 item = re.match(r'^\s*(?:([-+*])|\d+[.)])\s+(.+)', lines[index])
                 if not item or ('ul' if item[1] else 'ol') != tag:
                     break
-                result.append('<li>' + inline(item[2]) + '</li>')
+                text = [item[2]]
                 index += 1
+                while index < len(lines) and lines[index].strip():
+                    nxt = lines[index]
+                    if re.match(r'^\s*(?:[-+*]|\d+[.)])\s+', nxt):
+                        break
+                    if re.match(r'^\s*(?:`{3,}|~{3,})', nxt):
+                        break
+                    if not nxt[:1].isspace():
+                        break
+                    text.append(nxt)
+                    index += 1
+                result.append('<li>' + inline('\n'.join(text)) + '</li>')
             result.append(f'</{tag}>')
             continue
         elif line.startswith('> '):
