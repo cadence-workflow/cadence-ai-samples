@@ -126,6 +126,13 @@ this; the agent code has no retry loop.
 
 ![History with the gateway log lookup retried once after a 429](docs/images/1-retry-429.png)
 
+## Retry-policy exercise
+
+[`python/bare/exercises/retry_policy_live`](python/bare/exercises/retry_policy_live/README.md)
+runs this Workflow with a real model and prints each Cadence Web link. It adds
+a temporary 429, a permanent 404, an injected repeated call, and a revise and
+guidance pass. The one edit is the gateway lookup's retry policy.
+
 ## Run the durability rehearsal
 
 ```bash
