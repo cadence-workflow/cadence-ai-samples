@@ -1,0 +1,20 @@
+{"at": 1793604064.619431, "attempt": 0, "tool": "identify_input_params", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604064.6359968, "attempt": 0, "key": "keynote-9cce44f7/1c41e5a8-ae04-4d00-8290-861ebcbbf9b1/input", "path": "traces/api-gateway/post-v1-checkout/4bf92f3577b34da6.json", "tool": "store_trace", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604080.6501498, "attempt": 0, "endpoint": "post-v1-checkout", "status": 200, "tool": "fetch_dependency_graph", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604092.1068292, "attempt": 0, "service": "api-gateway", "status": 429, "tool": "get_logs_by_trace_id", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604114.5828328, "attempt": 1, "service": "api-gateway", "status": 200, "tool": "get_logs_by_trace_id", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604137.886682, "attempt": 0, "forced": false, "step": 1, "tool": "plan_next", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604151.338196, "attempt": 0, "service": "checkout", "status": 200, "tool": "get_logs_by_trace_id", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604163.186912, "attempt": 0, "forced": false, "step": 2, "tool": "plan_next", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604176.335916, "attempt": 0, "service": "inventory", "status": 200, "tool": "get_logs_by_trace_id", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604199.267339, "attempt": 0, "forced": true, "step": 3, "tool": "plan_next", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604234.991071, "attempt": 0, "request": "For each service, quote the ERROR log that supports the report. If a service has only warnings, say so. Do not infer an unobserved cause.", "tool": "revise_draft", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604258.824121, "attempt": 0, "forced": false, "step": 1, "tool": "plan_next", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604271.5271108, "attempt": 0, "service": "checkout", "status": 200, "tool": "get_logs_by_trace_id", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604283.241056, "attempt": 0, "forced": false, "step": 2, "tool": "plan_next", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604296.1055748, "attempt": 0, "service": "payments", "status": 200, "tool": "get_logs_by_trace_id", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604308.144012, "attempt": 0, "forced": false, "step": 3, "tool": "plan_next", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604320.6879208, "attempt": 0, "service": "ledger", "status": 200, "tool": "get_logs_by_trace_id", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604332.423007, "attempt": 0, "forced": false, "step": 4, "tool": "plan_next", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604368.1574059, "attempt": 0, "request": "The observed ERROR chain is checkout: payments authorize failed (503); payments: ledger connection pool exhausted and ledger call timed out; ledger: max connections reached for client payments. Inventory has WARN messages only. Revise the report to separate these observations. Do not claim inventory caused the failure. State that what triggered connection exhaustion is unknown, and quote the ERROR messages in errors_per_hop.", "tool": "revise_draft", "worker": "activities-A", "workflow_id": "keynote-9cce44f7"}
+{"at": 1793604421.822371, "attempt": 0, "committed": true, "key": "keynote-9cce44f7/1c41e5a8-ae04-4d00-8290-861ebcbbf9b1/conclusion", "tool": "upload_conclusion", "worker": "activities-B", "workflow_id": "keynote-9cce44f7"}

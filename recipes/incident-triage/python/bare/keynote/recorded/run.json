@@ -1,0 +1,341 @@
+{
+  "state": {
+    "phase": "DONE",
+    "last_model_action": {
+      "tool": "draft",
+      "args": {},
+      "hypothesis": "The incident originated in the checkout service, where a slow inventory check was observed. This led to a failure in the payments service, which could not authorize the payment due to a connection pool exhaustion and a subsequent timeout. The ledger service was unable to process the request due to reaching its maximum connection limit.",
+      "conclusion": {
+        "call_path": [
+          "checkout",
+          "payments",
+          "ledger"
+        ],
+        "root_cause": "The root cause appears to be a combination of slow inventory checks and connection pool exhaustion in the payments service, leading to a timeout and max connection limit reached in the ledger service.",
+        "confidence": "low",
+        "summary": "The logs establish a chain of events from the checkout service through payments to the ledger service, but the exact cause of the initial slow inventory check and the state of the connection pools at the time of the incident are not fully clear."
+      }
+    },
+    "injected_proposal": {
+      "tool": "get_logs_by_trace_id",
+      "args": {
+        "service": "inventory"
+      },
+      "source": "deliberate fault injection after second successful tool lookup",
+      "model_generated": false,
+      "executed": false
+    },
+    "evidence": [
+      {
+        "service": "checkout",
+        "lines": [
+          {
+            "at": "10:05:01.120",
+            "level": "WARN",
+            "trace_id": "4bf92f3577b34da6",
+            "msg": "inventory stock check slow",
+            "downstream": "inventory",
+            "latency_ms": "320"
+          },
+          {
+            "at": "10:05:02.402",
+            "level": "ERROR",
+            "trace_id": "4bf92f3577b34da6",
+            "msg": "payments authorize failed",
+            "downstream": "payments",
+            "status": "503",
+            "wait_ms": "2000"
+          }
+        ]
+      },
+      {
+        "service": "payments",
+        "lines": [
+          {
+            "at": "10:05:00.402",
+            "level": "ERROR",
+            "trace_id": "4bf92f3577b34da6",
+            "msg": "ledger connection pool exhausted",
+            "version": "v2.14",
+            "in_use": "50",
+            "max": "50",
+            "downstream": "ledger"
+          },
+          {
+            "at": "10:05:02.398",
+            "level": "ERROR",
+            "trace_id": "4bf92f3577b34da6",
+            "msg": "ledger call timed out",
+            "version": "v2.14",
+            "downstream": "ledger",
+            "wait_ms": "2000"
+          }
+        ]
+      },
+      {
+        "service": "ledger",
+        "lines": [
+          {
+            "at": "10:05:00.401",
+            "level": "ERROR",
+            "trace_id": "4bf92f3577b34da6",
+            "msg": "max connections reached for client payments",
+            "client": "payments",
+            "max_connections": "50"
+          }
+        ]
+      }
+    ],
+    "presentation_checkpoint": "",
+    "params": {
+      "endpoint_id": "post-v1-checkout",
+      "service_name": "api-gateway",
+      "trace_id": "4bf92f3577b34da6"
+    },
+    "stored_path": "traces/api-gateway/post-v1-checkout/4bf92f3577b34da6.json",
+    "lookups": {
+      "gateway logs": {
+        "status": "done",
+        "result": ""
+      },
+      "dependency graph": {
+        "status": "done",
+        "result": ""
+      }
+    },
+    "calls": [
+      "get_logs_by_trace_id{\"service\": \"checkout\"}",
+      "get_logs_by_trace_id{\"service\": \"payments\"}",
+      "get_logs_by_trace_id{\"service\": \"ledger\"}"
+    ],
+    "hops": [
+      "checkout",
+      "payments",
+      "ledger"
+    ],
+    "guidance": [
+      "Follow the ERROR path from checkout through payments to ledger. Explain what the logs establish and what remains uncertain."
+    ],
+    "review_requests": [
+      "For each service, quote the ERROR log that supports the report. If a service has only warnings, say so. Do not infer an unobserved cause.",
+      "The observed ERROR chain is checkout: payments authorize failed (503); payments: ledger connection pool exhausted and ledger call timed out; ledger: max connections reached for client payments. Inventory has WARN messages only. Revise the report to separate these observations. Do not claim inventory caused the failure. State that what triggered connection exhaustion is unknown, and quote the ERROR messages in errors_per_hop."
+    ],
+    "guard": "",
+    "hypothesis": "The incident originated in the checkout service, where a slow inventory check was observed. This led to a failure in the payments service, which could not authorize the payment due to a connection pool exhaustion and a subsequent timeout. The ledger service was unable to process the request due to reaching its maximum connection limit.",
+    "revision": 2,
+    "conclusion": {
+      "call_path": [
+        "api-gateway",
+        "checkout",
+        "payments",
+        "ledger"
+      ],
+      "root_cause": "unknown",
+      "confidence": "low",
+      "summary": "The observed error chain is a 503 from the upstream service, followed by errors in the checkout, payments, and ledger services. The WARN message from the inventory service indicates slow stock checks but does not contribute to the ERROR chain. The trigger for the ledger connection exhaustion is unknown.",
+      "revision_request": "The observed ERROR chain is checkout: payments authorize failed (503); payments: ledger connection pool exhausted and ledger call timed out; ledger: max connections reached for client payments. Inventory has WARN messages only. Revise the report to separate these observations. Do not claim inventory caused the failure. State that what triggered connection exhaustion is unknown, and quote the ERROR messages in errors_per_hop.",
+      "errors_per_hop": [
+        "api-gateway | ERROR | upstream returned 503",
+        "checkout | ERROR | payments authorize failed",
+        "payments | ERROR | ledger connection pool exhausted",
+        "payments | ERROR | ledger call timed out",
+        "ledger | ERROR | max connections reached for client payments"
+      ]
+    },
+    "decision": "approve",
+    "outcome": "conclusion_uploaded",
+    "approval_window_seconds": 86400
+  },
+  "usage": {
+    "calls": 9,
+    "input_tokens": 3901,
+    "output_tokens": 751
+  },
+  "ledger": [
+    {
+      "at": 1793604064.619431,
+      "attempt": 0,
+      "tool": "identify_input_params",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604064.6359968,
+      "attempt": 0,
+      "key": "keynote-9cce44f7/1c41e5a8-ae04-4d00-8290-861ebcbbf9b1/input",
+      "path": "traces/api-gateway/post-v1-checkout/4bf92f3577b34da6.json",
+      "tool": "store_trace",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604080.6501498,
+      "attempt": 0,
+      "endpoint": "post-v1-checkout",
+      "status": 200,
+      "tool": "fetch_dependency_graph",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604092.1068292,
+      "attempt": 0,
+      "service": "api-gateway",
+      "status": 429,
+      "tool": "get_logs_by_trace_id",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604114.5828328,
+      "attempt": 1,
+      "service": "api-gateway",
+      "status": 200,
+      "tool": "get_logs_by_trace_id",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604137.886682,
+      "attempt": 0,
+      "forced": false,
+      "step": 1,
+      "tool": "plan_next",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604151.338196,
+      "attempt": 0,
+      "service": "checkout",
+      "status": 200,
+      "tool": "get_logs_by_trace_id",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604163.186912,
+      "attempt": 0,
+      "forced": false,
+      "step": 2,
+      "tool": "plan_next",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604176.335916,
+      "attempt": 0,
+      "service": "inventory",
+      "status": 200,
+      "tool": "get_logs_by_trace_id",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604199.267339,
+      "attempt": 0,
+      "forced": true,
+      "step": 3,
+      "tool": "plan_next",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604234.991071,
+      "attempt": 0,
+      "request": "For each service, quote the ERROR log that supports the report. If a service has only warnings, say so. Do not infer an unobserved cause.",
+      "tool": "revise_draft",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604258.824121,
+      "attempt": 0,
+      "forced": false,
+      "step": 1,
+      "tool": "plan_next",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604271.5271108,
+      "attempt": 0,
+      "service": "checkout",
+      "status": 200,
+      "tool": "get_logs_by_trace_id",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604283.241056,
+      "attempt": 0,
+      "forced": false,
+      "step": 2,
+      "tool": "plan_next",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604296.1055748,
+      "attempt": 0,
+      "service": "payments",
+      "status": 200,
+      "tool": "get_logs_by_trace_id",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604308.144012,
+      "attempt": 0,
+      "forced": false,
+      "step": 3,
+      "tool": "plan_next",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604320.6879208,
+      "attempt": 0,
+      "service": "ledger",
+      "status": 200,
+      "tool": "get_logs_by_trace_id",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604332.423007,
+      "attempt": 0,
+      "forced": false,
+      "step": 4,
+      "tool": "plan_next",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604368.1574059,
+      "attempt": 0,
+      "request": "The observed ERROR chain is checkout: payments authorize failed (503); payments: ledger connection pool exhausted and ledger call timed out; ledger: max connections reached for client payments. Inventory has WARN messages only. Revise the report to separate these observations. Do not claim inventory caused the failure. State that what triggered connection exhaustion is unknown, and quote the ERROR messages in errors_per_hop.",
+      "tool": "revise_draft",
+      "worker": "activities-A",
+      "workflow_id": "keynote-9cce44f7"
+    },
+    {
+      "at": 1793604421.822371,
+      "attempt": 0,
+      "committed": true,
+      "key": "keynote-9cce44f7/1c41e5a8-ae04-4d00-8290-861ebcbbf9b1/conclusion",
+      "tool": "upload_conclusion",
+      "worker": "activities-B",
+      "workflow_id": "keynote-9cce44f7"
+    }
+  ],
+  "history_events": 201,
+  "service_completed": true,
+  "workflow_id": "keynote-9cce44f7",
+  "run_id": "1c41e5a8-ae04-4d00-8290-861ebcbbf9b1",
+  "url": "http://127.0.0.1:28089/domains/incident-demo/workflows/keynote-9cce44f7/1c41e5a8-ae04-4d00-8290-861ebcbbf9b1/history",
+  "state_dir": "recorded/cadence",
+  "scope": "fresh live Qwen; synthetic incident/logs/tools; explicit 429, injected duplicate and Worker-loss tests; real presentation waits",
+  "start": 1793604047.3563762,
+  "presentation_holds": "Workflow gates and heartbeat-protected pending log Activities, released by recorder"
+}
