@@ -262,9 +262,12 @@ and code blocks. The header's **ContribFest** link opens the event pages in a
 new tab. Relative links open allow-listed documents in the reader, supported
 CLI files in the source view, or external HTTP(S) pages in a new tab. The
 reader opens the root README, CONTRIBFEST, recipe READMEs, the KubeCon event
-pages, CONTRIBUTING.md, WORKFLOW.md, and this README. Other relative links
+pages, CONTRIBUTING.md, WORKFLOW.md, AGENTS.md, agent-context/README.md, and this README. Other relative links
 show the label and the repository path.
+The Incident Triage live retry exercise README also opens in the reader, so its
+setup instructions and links remain usable as you move from browsing to the exercise.
 The reader uses the Explorer's saved dark or light theme. It is a small Markdown
-subset; raw HTML is displayed as text and remote images are not loaded.
+subset; only empty, ID-only anchor tags are preserved for section links.
+Other raw HTML is displayed as text and remote images are not loaded.
 
 Reader previews with the Incident Triage walkthrough: [dark](docs/images/reader-dark.png), [light](docs/images/reader-light.png).

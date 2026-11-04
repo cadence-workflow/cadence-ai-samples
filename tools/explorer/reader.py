@@ -28,7 +28,9 @@ def reader_path(explorer, relative, *, image=False):
     else:
         allowed = relative in {
             'README.md', 'CONTRIBFEST.md', 'CONTRIBUTING.md', 'WORKFLOW.md',
+            'AGENTS.md', 'agent-context/README.md',
             'tools/explorer/README.md',
+            'recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md',
         } or (
             len(parts) == 3 and parts[0] == 'recipes' and parts[2] == 'README.md') or (
             len(parts) == 3 and parts[:2] == ('contribfest', 'kubecon-na-2026') and
@@ -63,7 +65,7 @@ def local_url(explorer, document, target, *, image=False):
 
 
 def render_markdown(explorer, document, source):
-    """Render the supported subset; source HTML is always escaped."""
+    """Render the supported subset, including bounded empty anchor declarations."""
     token = re.compile(r'(`+)(.+?)\1|(!?)\[([^]]*)\]\(([^\s)]+)\)|\*\*([^*]+)\*\*|\*([^*\n]+)\*')
 
     def inline(text):
@@ -118,6 +120,11 @@ def render_markdown(explorer, document, source):
     while index < len(lines):
         line = lines[index]
         if not line.strip():
+            index += 1
+            continue
+        anchor = re.fullmatch(r'\s*<a id="([A-Za-z][A-Za-z0-9_-]{0,127})"></a>\s*', line)
+        if anchor:
+            result.append('<a id="' + anchor[1] + '"></a>')
             index += 1
             continue
         fence = re.match(r'^\s*(`{3,}|~{3,})(.*)$', line)
@@ -193,7 +200,7 @@ def reader_page(explorer, document):
     title = html.escape(path.name)
     return (f'<!doctype html><html lang="en"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width, initial-scale=1">'
-            f'<title>{title} — Samples Explorer</title>'
+            f'<title>{title} | Samples Explorer</title>'
             '<script src="/theme.js"></script><link rel="stylesheet" href="/style.css">'
             '</head><body><main class="reader"><nav><a href="/">Samples Explorer</a>'
             ' · <a href="/doc?path=contribfest%2Fkubecon-na-2026%2FREADME.md">ContribFest</a>'

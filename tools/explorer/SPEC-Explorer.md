@@ -450,7 +450,11 @@ Milestones motivating later prioritization: Seattle tech talk in approximately
 ## Local documentation reader
 
 Recipe README links and the ContribFest header entry open an escaped Markdown
-reader. It allows only root README/CONTRIBFEST, recipe-root READMEs, event Markdown
-pages, and recipe/event image directories. It rejects traversal, symlinks, hidden
+reader. It allows root README/CONTRIBFEST/CONTRIBUTING/WORKFLOW/AGENTS,
+the exact agent-context/README.md context map, the Explorer README,
+recipe-root READMEs, event Markdown pages, the exact Incident Triage live retry
+exercise README, and recipe/event image directories. It rejects traversal, symlinks, hidden
 and excluded paths, rewrites supported local links, and keeps the plain source
-view for CLI files. SVG responses are sandboxed. Existing themes apply.
+view for CLI files. Exact empty, ID-only anchor tags with bounded safe identifiers
+preserve existing section links; all other raw HTML remains escaped.
+SVG responses are sandboxed. Existing themes apply.

@@ -25,7 +25,9 @@ class ReaderTests(unittest.TestCase):
         self.addCleanup(self.explorer.close)
         self.doc = 'recipes/demo/README.md'
         for name in ('README.md', 'CONTRIBFEST.md', 'CONTRIBUTING.md', 'WORKFLOW.md',
+                     'AGENTS.md', 'agent-context/README.md',
                      'tools/explorer/README.md', self.doc,
+                     'recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md',
                      'recipes/demo/python/bare/main.py',
                      'contribfest/kubecon-na-2026/setup.md',
                      'contribfest/kubecon-na-2026/README.md',
@@ -110,9 +112,8 @@ class ReaderTests(unittest.TestCase):
         external = self.render('See [Local\nservices](https://example.com/docs).')
         self.assertIn('href="https://example.com/docs"', external)
         self.assertIn('Local\nservices', external)
-        hidden = self.render('See [the contract](../../AGENTS.md).')
-        self.assertNotIn('<a ', hidden)
-        self.assertIn('the contract <code>AGENTS.md</code>', hidden)
+        contract = self.render('See [the contract](../../AGENTS.md).')
+        self.assertIn('href="/doc?path=AGENTS.md"', contract)
         hostile = self.render(
             '![x" onerror="alert(1)](docs/images/screen.png) '
             '[go](https://e.com/"onmouseover="alert(1)) '
@@ -129,6 +130,63 @@ class ReaderTests(unittest.TestCase):
                 reader_path(self.explorer, 'recipes/demo/docs/images/screen.png', image=True),
                 self.root / 'recipes/demo/docs/images/screen.png')
 
+    def test_live_exercise_opens_as_document_without_broadening_nested_access(self):
+        exercise = 'recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md'
+        expected = '/doc?path=' + quote(exercise, safe='') + '#prepare-before-the-session'
+        self.assertEqual(local_url(
+            self.explorer, 'contribfest/kubecon-na-2026/setup.md',
+            '../../' + exercise + '#prepare-before-the-session'), expected)
+        self.assertIn('href="' + expected + '"', render_markdown(
+            self.explorer, 'recipes/incident-triage/README.md',
+            '[Exercise](python/bare/exercises/retry_policy_live/README.md#prepare-before-the-session)'))
+        for name in (
+                'recipes/incident-triage/python/bare/exercises/other/README.md',
+                'recipes/incident-triage/python/bare/exercises/retry_policy_live/../retry_policy_live/README.md'):
+            with self.subTest(name=name), self.assertRaises(InvalidSelection):
+                reader_path(self.explorer, name)
+        path = self.root / exercise
+        path.unlink()
+        path.symlink_to(self.root / 'README.md')
+        with self.assertRaises(InvalidSelection):
+            reader_path(self.explorer, exercise)
+
+    def test_empty_named_anchors_keep_existing_setup_links_working(self):
+        result = self.render('<a id="local-ai-services"></a>\n\n'
+                             '## Optional local AI services\n\n'
+                             '[Setup](#local-ai-services)')
+        self.assertIn('<a id="local-ai-services"></a>', result)
+        self.assertIn('href="#local-ai-services"', result)
+        for hostile in ('<a id="ok" onclick="alert(1)"></a>',
+                        '<a id="ok"><script>alert(1)</script></a>',
+                        '<a id="ok" href="javascript:alert(1)"></a>',
+                        '<a id="x\" onmouseover=\"bad"></a>',
+                        '<a id="' + 'a' * 129 + '"></a>'):
+            with self.subTest(hostile=hostile):
+                rendered = self.render(hostile)
+                self.assertNotIn('<a ', rendered)
+                self.assertIn('&lt;a ', rendered)
+
+    def test_agent_entry_documents_keep_contract_and_context_navigation(self):
+        self.assertEqual(local_url(self.explorer, 'CONTRIBUTING.md', 'AGENTS.md'),
+                         '/doc?path=AGENTS.md')
+        self.assertEqual(local_url(self.explorer, 'AGENTS.md', 'agent-context/README.md'),
+                         '/doc?path=agent-context%2FREADME.md')
+        self.assertEqual(local_url(self.explorer, 'agent-context/README.md', '../AGENTS.md'),
+                         '/doc?path=AGENTS.md')
+        for name in ('agent-context/private.md', 'agent-context/../AGENTS.md',
+                     'recipes/demo/AGENTS.md', '../AGENTS.md'):
+            path = self.root / name
+            if '..' not in Path(name).parts:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text('# Private\n')
+            with self.subTest(name=name), self.assertRaises(InvalidSelection):
+                reader_path(self.explorer, name)
+        context = self.root / 'agent-context/README.md'
+        context.unlink()
+        context.symlink_to(self.root / 'README.md')
+        with self.assertRaises(InvalidSelection):
+            reader_path(self.explorer, 'agent-context/README.md')
+
     def test_http_routes_and_image_content_types_keep_security_headers(self):
         server = ExplorerHTTPServer(('127.0.0.1', 0), self.explorer)
         thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -136,6 +194,10 @@ class ReaderTests(unittest.TestCase):
         try:
             for route, name, expected in (
                 ('doc', self.doc, 'text/html; charset=utf-8'),
+                ('doc', 'AGENTS.md', 'text/html; charset=utf-8'),
+                ('doc', 'agent-context/README.md', 'text/html; charset=utf-8'),
+                ('doc', 'recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md',
+                 'text/html; charset=utf-8'),
                 ('source', self.doc, 'text/plain; charset=utf-8'),
                 *(('image', 'recipes/demo/docs/images/screen' + ext, kind)
                   for ext, kind in (('.png', 'image/png'), ('.JPG', 'image/jpeg'), ('.svg', 'image/svg+xml'))),
