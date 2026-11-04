@@ -91,17 +91,19 @@ send Signals, run two at once. Open a `<Finding>` Issue for anything that
 surprised you. No model needed.
 
 **If you'd rather click than type (optional):** from the repository root, run
-`./scripts/explore.sh`. Choose Incident Triage and mock mode.
+`./scripts/explore.sh`. Choose Incident Triage, python, and mock mode (this
+recipe has no framework selector).
 
 1. **Refresh and check services**, then copy the Worker and start commands into
    separate terminals and run them.
 2. **Resolve latest run** to find your Run.
-3. Send guidance, a revision and approval as the recipe walkthrough describes.
-   Complete the typed fields, click **Send**, then review the payload and click **Confirm**.
+3. Follow the [recipe walkthrough](../../recipes/incident-triage/README.md) to
+   send guidance, a revision and approval: enter the field, select **Send …**,
+   then **Confirm …**.
 4. **Open history** to see the recorded Activities and Signals in Cadence Web.
 
 The Explorer is a helper for navigation and controls; the terminal path above
-works on its own. More details are in [setup](setup.md#explore-the-samples-in-your-browser).
+works on its own. More details are in [setup](setup.md#optional-explore-the-samples-in-your-browser).
 
 ## Leave a useful result
 
