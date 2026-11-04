@@ -45,7 +45,8 @@ Use it to:
   request a revision or approve a result. Check the Run's state afterward to
   see how it handled your input.
 
-For a first try, choose **Incident Triage → Python → bare → mock** and follow
+For a first try, choose **Incident Triage**, **python**, **mock** (this recipe
+has no framework selector) and follow
 the [recipe runbook](../../recipes/incident-triage/README.md). Mock mode uses
 scripted responses and needs no model or API key. Running the Workflow still
 needs Cadence; the Run links need Cadence Web. The Explorer prepares recipe
