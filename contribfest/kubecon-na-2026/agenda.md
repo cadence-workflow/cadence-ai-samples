@@ -1,15 +1,17 @@
 # Session outline
 
-1. **Welcome and setup check.** Make sure Cadence, Ollama and `qwen2.5:7b` are
-   running. [Join CNCF Slack](https://slack.cncf.io/) and use
-   `#cadence-contributors` for follow-up questions.
-   If your laptop can't run the model, pair with someone.
+1. **Welcome and setup check.** Browse examples with the
+   [Samples Explorer](README.md#try-the-samples-explorer). For the live warm-up,
+   check Cadence, Ollama and `qwen2.5:7b`. You can also choose a mock-mode task
+   or pair with someone if your laptop cannot run the model.
+   [Join CNCF Slack](https://slack.cncf.io/) and use `#cadence-contributors`
+   for questions and follow-up.
 2. **Warm-up, everyone together.** See a rate-limited lookup fail, write a
    retry policy so it recovers, and make sure a 404 isn't retried. Check both in Cadence Web.
 3. **Bring your own workflow and make it durable.** No workflow? Take a
    ContribFest Issue. Both are in [Find something to work on](shortlist.md).
-   If you choose an Issue, comment that you want to take it and wait for
-   ownership to be recorded before starting. Maintainers move between tables.
+   Comment on the Issue you want to take and wait for a facilitator to record
+   your ownership before starting. Maintainers move between tables.
 4. **Share and hand off.** Show what you got working. Open a pull request or
    write down the next step.
 

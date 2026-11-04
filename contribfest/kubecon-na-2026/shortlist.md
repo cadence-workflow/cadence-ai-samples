@@ -1,43 +1,58 @@
 # Find something to work on
 
 Start with the [retry-policy exercise](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md).
-Then [bring your own workflow](#bring-your-own-workflow), or take a ContribFest
-Issue below if you didn't bring one.
+For your contribution, [bring your own workflow](#bring-your-own-workflow), or
+take a ContribFest Issue below if you didn't bring one.
 
-## Choose a ContribFest Issue
+<a id="choose-a-contribfest-issue"></a>
 
-Pick a recipe task from the [approved ContribFest pool](https://github.com/cadence-workflow/cadence-ai-samples/issues?q=is%3Aissue%20is%3Aopen%20milestone%3A%22KubeCon%20NA%202026%20ContribFest%2C%202026-11-11%22%20label%3Aevent%3Acontribfest%20label%3Astatus%3Aready%20no%3Aassignee%20label%3Aarea%3Arecipes%20label%3Aformat%3Ahuman-first).
-Each task should tell you what to run, what to change and how to check your
-work. Choose one that fits your setup and the time you have.
+## ContribFest Issues
 
-A task is available only while it is open, unassigned and labeled
-`status:ready`, with no existing claim or active implementation PR. If the
-list is empty, ask a facilitator for a task.
+Check the [approved recipe tasks](https://github.com/cadence-workflow/cadence-ai-samples/issues?q=is%3Aissue%20is%3Aopen%20milestone%3A%22KubeCon%20NA%202026%20ContribFest%2C%202026-11-11%22%20label%3Aevent%3Acontribfest%20label%3Astatus%3Aready%20no%3Aassignee%20label%3Aarea%3Arecipes%20label%3Aformat%3Ahuman-first) for work that fits your setup.
+A task is available while it is open, unassigned and labeled `status:ready`,
+with no existing claim or active implementation PR. If the pool is empty,
+ask a facilitator about another approved task or explore a sample while you wait.
 
-Before you start, comment on the Issue:
+To request a task, comment on its Issue:
 
 > I'd like to take this. GitHub: @yourname. Proposed branch:
 > `issue-N-short-slug`.
 
-Wait for the coordinator to record you as the owner and change the label to
-`status:in-progress`, then create your branch. The
-[claim guide](../../CONTRIBFEST.md#2-claim-one-issue) covers the full process.
+A facilitator records your ownership and changes the label to
+`status:in-progress`. You can then create the branch in your fork. You do not
+need label or assignment permissions. Follow the
+[claim guide](../../CONTRIBFEST.md#2-claim-one-issue) for sign-off and review.
 
-### Keep the recipe useful to the next developer
+### Recipe tasks
 
-Someone may copy one recipe into their own project. For
-[#112](https://github.com/cadence-workflow/cadence-ai-samples/issues/112), the
-clean-copy check must pass, and the catalog tests must still run in a full
-checkout. Removing those tests is not a fix. The Issue has the files and
-commands to check both cases.
+These examples show what you can work on. Check the approved pool above for
+current availability before requesting a claim.
+
+| Issue | What you'll do | Cadence idea | Level | Needs |
+| --- | --- | --- | --- | --- |
+| [#110](https://github.com/cadence-workflow/cadence-ai-samples/issues/110) | Prove `revise` reuses evidence and `guidance` investigates again | Signals, Queries, Workflow tests | low | Python only |
+| [#112](https://github.com/cadence-workflow/cadence-ai-samples/issues/112) | Make the Incident Triage clean-copy check pass | Self-contained samples | low | Python only |
+| [#121](https://github.com/cadence-workflow/cadence-ai-samples/issues/121) | Prove a lost reply doesn't save the conclusion twice | Idempotent writes | low | Python only |
+| [#111](https://github.com/cadence-workflow/cadence-ai-samples/issues/111) | Show a model call recovering from a rate limit | Activity retry policy | mid | Cadence, Ollama, `qwen2.5:7b` |
+| [#120](https://github.com/cadence-workflow/cadence-ai-samples/issues/120) | Let an unanswered approval expire | Durable timers | mid | Cadence, Ollama, `qwen2.5:7b` |
+| [#109](https://github.com/cadence-workflow/cadence-ai-samples/issues/109) | Help the model identify the deepest observed error | Human review of agent output | mid | Cadence, Ollama, `llama3.2` and `qwen2.5:7b` |
+
+### Copying a recipe
+
+A recipe should work when copied into another project. For
+[#112](https://github.com/cadence-workflow/cadence-ai-samples/issues/112),
+verify both the clean-copy check and the catalog tests in a full checkout.
+Keep both checks passing; the Issue lists the files and commands.
 
 ## Extend the exercise
 
-Every scenario in
+Each scenario in the Incident Triage recipe's
 [`run_exercise.py`](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/run_exercise.py)
-is a prepared failure plus the checks that prove Cadence handled it. To add one,
-for example an approval that never arrives (a durable timer) or a write whose
-reply is lost (an idempotency key), copy the `rate-limit` scenario, change the
+pairs a prepared failure with checks of the Workflow's behavior. To add one,
+for example an approval that never arrives
+([durable timers](https://cadenceworkflow.io/docs/concepts/timers/)) or a write
+whose reply is lost
+([Activity execution](https://cadenceworkflow.io/docs/concepts/activities/)), copy the `rate-limit` scenario, change the
 failure, and write its checks. Open an Issue describing it before the pull
 request.
 
@@ -55,8 +70,11 @@ model or tool call. Work through as many depths as you have time for:
 2. **Break it.** Pick the call most likely to fail (a rate-limited API, a slow
    model, a flaky tool). Make it fail on purpose and watch what happens.
 3. **Make it durable.** Move that call into its own Activity with a retry
-   policy and a timeout. Mark errors a retry can't fix as non-retryable.
-4. **Steer (stretch).** Add a Signal so a person approves before the agent
+   policy and a timeout. Read the retry guides for
+   [Python](https://cadenceworkflow.io/docs/python-client/retries/) or
+   [Go](https://cadenceworkflow.io/docs/go-client/retries/), then mark permanent
+   errors as non-retryable.
+4. **Steer (stretch).** Add a [Signal](https://cadenceworkflow.io/docs/python-client/signals/) so a person approves before the agent
    acts.
 
 The [Incident Triage recipe](../../recipes/incident-triage/python/bare/workflow.py)
@@ -71,6 +89,19 @@ and open an Issue so someone can continue.
 [#119](https://github.com/cadence-workflow/cadence-ai-samples/issues/119): run Incident Triage in mock mode, stop the worker mid-run,
 send Signals, run two at once. Open a `<Finding>` Issue for anything that
 surprised you. No model needed.
+
+**If you'd rather click than type (optional):** from the repository root, run
+`./scripts/explore.sh`. Choose Incident Triage and mock mode.
+
+1. **Refresh and check services**, then copy the Worker and start commands into
+   separate terminals and run them.
+2. **Resolve latest run** to find your Run.
+3. Send guidance, a revision and approval as the recipe walkthrough describes.
+   Complete the typed fields, click **Send**, then review the payload and click **Confirm**.
+4. **Open history** to see the recorded Activities and Signals in Cadence Web.
+
+The Explorer is a helper for navigation and controls; the terminal path above
+works on its own. More details are in [setup](setup.md#explore-the-samples-in-your-browser).
 
 ## Leave a useful result
 

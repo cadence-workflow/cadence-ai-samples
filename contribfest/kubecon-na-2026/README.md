@@ -6,6 +6,51 @@ CloudNativeCon North America 2026.
 - **When:** Wednesday, November 11, 2:20 to 3:40 PM MST
 - **Where:** Salt Palace, Level 2, room 255 D, Salt Lake City
 
+## Try the Samples Explorer
+
+Start with the [Samples Explorer](../../tools/explorer/README.md) to choose
+an agent recipe, prepare its dependencies and follow a Run in Cadence Web.
+It reads your local code, including your edits, and gives you matching Worker
+and Workflow commands.
+
+![Choose Incident Triage and check local Cadence connections in the Samples Explorer](images/explorer-start.png)
+
+*Browse first, then start the services your recipe needs. Here the checks show
+that Cadence and Cadence Web are not running.*
+
+From the repository root:
+
+```bash
+./scripts/explore.sh
+```
+
+You can browse with Python 3.10+ and venv support, before installing Cadence or
+a model. The first launch downloads a Python dependency. See
+[setup](setup.md#explore-the-samples-in-your-browser) for requirements.
+
+Use it to:
+
+- **Choose an example.** Select a recipe, language, framework and mock or live
+  mode. The Explorer generates commands for that implementation.
+- **Prepare and check your setup.** Install the recipe's dependencies with
+  **Prepare recipe dependencies**, then use **Refresh and check services**.
+  For a local live model, **Warm up selected local services** checks a small
+  request before you start the Workflow.
+- **Run your code.** Copy the Worker and Workflow commands into separate
+  terminals. On macOS, **Open in Terminal** pastes a command for you to review
+  and run.
+- **Follow a Run.** Use **Resolve latest run**, then **Open history** or
+  **Open queries** to inspect it in Cadence Web.
+- **Send review input.** Recipes with Signal controls let you send guidance,
+  request a revision or approve a result. Check the Run's state afterward to
+  see how it handled your input.
+
+For a first try, choose **Incident Triage** and **mock** mode, then follow
+the [recipe runbook](../../recipes/incident-triage/README.md). Mock mode uses
+scripted responses and needs no model or API key. Running the Workflow still
+needs Cadence; the Run links need Cadence Web. The Explorer prepares recipe
+dependencies, but you start the services, Worker and Workflow yourself.
+
 ## What you'll do
 
 **Bring your own workflow and make it durable.** Bring an agent or script you
@@ -17,10 +62,10 @@ investigating a fictional checkout outage with a real local model.
 
 - **See it fail:** a log lookup gets an HTTP 429 rate limit, and with no retry
   policy the agent stops before it starts reasoning.
-- **First win:** you write your first Cadence retry policy, in one file. Run it
+- **First win:** you add a [Cadence Activity retry policy](https://cadenceworkflow.io/docs/python-client/retries/), in one file. Run it
   again: the lookup waits, retries and the agent carries on. No retry loop in
   your code.
-- **Block the reverse:** a 404 means the resource is gone, so retrying it only
+- **Handle a permanent failure:** in this exercise, a 404 is non-retryable, so retrying it only
   wastes time. Your policy must stop it after one attempt. Check both outcomes
   in Cadence Web.
 
@@ -29,11 +74,11 @@ Instructions:
 
 **2. Make your own workflow durable (the rest of the session).**
 
-1. Wrap: run your agent inside one Cadence Activity, started by a Workflow.
+1. Wrap: run your agent inside one [Activity](https://cadenceworkflow.io/docs/concepts/activities/), started by a [Workflow](https://cadenceworkflow.io/docs/concepts/workflows/).
    Every run, input, result and retry shows up in Cadence Web.
 2. Split: move the model call and each tool call into their own Activities,
    so each one retries on its own and finished work isn't redone.
-3. Steer (stretch): add a Signal so a person can approve or redirect.
+3. Steer (stretch): add a [Signal](https://cadenceworkflow.io/docs/python-client/signals/) so a person can approve or redirect.
 
 Stop at any depth. Start from [#118](https://github.com/cadence-workflow/cadence-ai-samples/issues/118): open your own Issue for your
 workflow, so someone can continue it if you don't finish. Steps are in
@@ -42,18 +87,18 @@ workflow, so someone can continue it if you don't finish. Steps are in
 **Want to explore first?** [#119](https://github.com/cadence-workflow/cadence-ai-samples/issues/119): break a running agent on purpose
 (stop the worker, send a Signal mid-run) and file what surprised you.
 
-**Didn't bring one?** Choose a task from the
-[ContribFest issue pool](shortlist.md#choose-a-contribfest-issue). Check its
-setup requirements and leave a claim request before starting.
+**Looking for a task?** Browse the [six recipe examples](shortlist.md#recipe-tasks),
+then check the [approved issue pool](shortlist.md#contribfest-issues) and ask a
+facilitator to record your claim before starting.
 
 A merged fix, a draft pull request or a written next step are all good
-outcomes. You can work by hand or with a coding agent.
+outcomes. You can work by hand or with a coding agent. If you use an agent,
+start it with the repository's [agent instructions](../../AGENTS.md).
 
 ## Get ready
 
 - [Set up your laptop](setup.md).
-- [Join CNCF Slack](https://slack.cncf.io/) and use `#cadence-contributors`
-  before the session.
+- [Join CNCF Slack](https://slack.cncf.io/) and use `#cadence-contributors` for questions and follow-up.
 - [Find something to work on](shortlist.md).
 - [See the session outline](agenda.md).
 
