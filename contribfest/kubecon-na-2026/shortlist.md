@@ -25,24 +25,10 @@ need label or assignment permissions. Follow the
 
 ### Recipe tasks
 
-These examples show what you can work on. Check the approved pool above for
-current availability before requesting a claim.
-
-| Issue | What you'll do | Cadence idea | Level | Needs |
-| --- | --- | --- | --- | --- |
-| [#110](https://github.com/cadence-workflow/cadence-ai-samples/issues/110) | Prove `revise` reuses evidence and `guidance` investigates again | Signals, Queries, Workflow tests | low | Python only |
-| [#112](https://github.com/cadence-workflow/cadence-ai-samples/issues/112) | Make the Incident Triage clean-copy check pass | Self-contained samples | low | Python only |
-| [#121](https://github.com/cadence-workflow/cadence-ai-samples/issues/121) | Prove a lost reply doesn't save the conclusion twice | Idempotent writes | low | Python only |
-| [#111](https://github.com/cadence-workflow/cadence-ai-samples/issues/111) | Show a model call recovering from a rate limit | Activity retry policy | mid | Cadence, Ollama, `qwen2.5:7b` |
-| [#120](https://github.com/cadence-workflow/cadence-ai-samples/issues/120) | Let an unanswered approval expire | Durable timers | mid | Cadence, Ollama, `qwen2.5:7b` |
-| [#109](https://github.com/cadence-workflow/cadence-ai-samples/issues/109) | Help the model identify the deepest observed error | Human review of agent output | mid | Cadence, Ollama, `llama3.2` and `qwen2.5:7b` |
-
-### Copying a recipe
-
-A recipe should work when copied into another project. For
-[#112](https://github.com/cadence-workflow/cadence-ai-samples/issues/112),
-verify both the clean-copy check and the catalog tests in a full checkout.
-Keep both checks passing; the Issue lists the files and commands.
+Browse the [full attendee issue pool in Get started](README.md#issue-pool).
+It lists the prepared tasks for every recipe and links to each Issue's
+requirements. Check the approved tasks above for current availability before
+requesting a claim.
 
 ## Extend the exercise
 

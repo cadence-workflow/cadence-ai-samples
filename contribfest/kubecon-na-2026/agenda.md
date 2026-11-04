@@ -4,8 +4,9 @@
    [Samples Explorer](README.md#try-the-samples-explorer). For the live warm-up,
    check Cadence, Ollama and `qwen2.5:7b`. You can also choose a mock-mode task
    or pair with someone if your laptop cannot run the model.
-   [Join CNCF Slack](https://slack.cncf.io/) and use `#cadence-contributors`
-   for questions and follow-up.
+   **Join `#cadence-contributors` on CNCF Slack.** [Sign up or sign in](https://slack.cncf.io/),
+   then search for the channel and join. Use it for setup, task and review
+   questions during and after the session.
 2. **Warm-up, everyone together.** See a rate-limited lookup fail, write a
    retry policy so it recovers, and make sure a 404 isn't retried. Check both in Cadence Web.
 3. **Bring your own workflow and make it durable.** No workflow? Take a
