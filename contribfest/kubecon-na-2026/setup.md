@@ -4,6 +4,9 @@ Download the dependencies before the session so you can spend the time working
 with the model and Cadence. The selected recipe's README is authoritative for
 versions, services and commands. Prepare only what your task needs.
 
+[Clone your fork](../../CONTRIBUTING.md#first-time-contributor-path) before
+following the commands below.
+
 <a id="optional-explore-the-samples-in-your-browser"></a>
 
 ## Explore the samples in your browser
@@ -28,8 +31,8 @@ with Ctrl+C.
 
 1. **Choose an example.** Select the recipe, language and framework. Choose
    mock mode for scripted responses or live mode to call the selected model.
-   Start with Incident Triage, Python, bare, mock if you want to explore without
-   downloading a model. Preparing this implementation needs Python 3.12 or
+   Start with Incident Triage, Python, mock to explore without downloading a
+   model. Incident Triage has no framework selector. Preparing this implementation needs Python 3.12 or
    3.13; browsing the Explorer itself needs only Python 3.10+.
 2. **Prepare the recipe.** Install the language runtime named in its README,
    then click **Prepare recipe dependencies**. This runs the recipe's
@@ -46,16 +49,17 @@ with Ctrl+C.
    or **Open queries**. Queries need a running Worker.
    Resolve again after Continue-As-New to follow the new Run.
 6. **Try a Signal.** Where the recipe provides controls, enter the requested
-   fields and review the payload before sending. Confirm when prompted.
+   fields, select **Send …**, then **Confirm …** when prompted.
    Acceptance means Cadence received the request; check a Query or history
    to see what the Workflow did. For Ticket Routing, use the
    [Acknowledge Ticket control in Cadence Web](../../recipes/ticket-routing/README.md#cadence-web-cwc).
 
 On a shared Cadence server, use a task list and Workflow ID unique to you in
-both generated commands. The Explorer's example names are fixed. Its
-**Resolve** and **Signal** controls follow only the Workflow ID it generates;
-changing a copied command does not retarget them. For your own Workflow ID,
-use Cadence Web or the recipe CLI.
+both generated commands. For recipes with a
+generated Workflow ID, the Explorer's **Resolve** and **Signal** controls follow
+that ID; changing a copied command does not retarget them. For your own Workflow
+ID, use Cadence Web or the recipe CLI. Recipes that ask you to enter an exact
+Workflow ID can follow the ID you enter.
 
 The [Explorer documentation](../../tools/explorer/README.md) covers service
 checks, preparation, local warm-up and Run controls. Its checks are advice:
@@ -66,6 +70,7 @@ can also run every exercise directly from the terminal and Cadence Web.
 
 | Symptom | Next step |
 | --- | --- |
+| The launcher asks for Python 3.10+ | Install Python 3.10+ with venv support, then reopen your terminal and retry. |
 | Cadence or Cadence Web is unreachable | If you use Docker, start it and check `docker ps` for the containers and published ports. Follow the recipe's setup instructions, then refresh the checks. |
 | Cadence is reachable but nothing runs | Check the domain and Worker task list. The connection check does not verify that the Worker is ready. |
 | Ollama warm-up fails | Check `ollama list` for the selected model. Download a missing model with its documented `ollama pull` command. Warm-up cannot download it for you. |
@@ -105,7 +110,6 @@ from the time needed to run an already prepared example.
 
 ## Check that a real model answers
 
-This step needs [the retry exercise in PR #116](https://github.com/cadence-workflow/cadence-ai-samples/pull/116).
 With Cadence and Ollama running, from the same recipe directory:
 
 ```bash
@@ -129,10 +133,8 @@ drafts the wrong cause. Paid providers need `MODEL_AI_KEY`.
 
 ## The introductory retry exercise
 
-The exercise is being prepared in [PR #116](https://github.com/cadence-workflow/cadence-ai-samples/pull/116).
-The commands above that use `exercises/retry_policy_live/` need that PR merged.
 Read [Activity retries](https://cadenceworkflow.io/docs/python-client/retries/),
-then follow the exercise README once it is available.
+then follow the [exercise README](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md).
 You edit one file to make a temporary 429 recover and a permanent 404 stop,
 then see the repeated-call guard and how `revise` and `guidance` differ.
 

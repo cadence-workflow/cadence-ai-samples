@@ -1,8 +1,8 @@
 # Find something to work on
 
-The opening [retry-policy exercise](https://github.com/cadence-workflow/cadence-ai-samples/pull/116)
-is being prepared in PR #116. For your contribution, [bring your own workflow](#bring-your-own-workflow), or take a ContribFest
-Issue below if you didn't bring one.
+Start with the [retry-policy exercise](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md).
+For your contribution, [bring your own workflow](#bring-your-own-workflow), or
+take a ContribFest Issue below if you didn't bring one.
 
 Comment on the Issue you want to take. A helper will record your claim and
 update its label and assignment. You do not need label or assignment permissions.
@@ -21,8 +21,8 @@ Find all issues using [this filter](https://github.com/cadence-workflow/cadence-
 | [#109](https://github.com/cadence-workflow/cadence-ai-samples/issues/109) | Help a small local model name the root cause | Human review of agent output | mid | Cadence, Ollama, `llama3.2` and `qwen2.5:7b` |
 
 Each Issue explains the problem, shows the command that reproduces it, names the
-file to change and says how to check the fix. Issues #109, #111 and #120 need the
-exercise merged first; the Issue says so at the top.
+file to change and says how to check the fix. Check the Issue's current status
+and claim instructions before starting.
 
 To claim one:
 
@@ -37,10 +37,9 @@ has the current list.
 
 ## Extend the exercise
 
-Once [PR #116](https://github.com/cadence-workflow/cadence-ai-samples/pull/116)
-is merged, each scenario in
-`exercises/retry_policy_live/run_exercise.py` in the Incident Triage recipe
-is a prepared failure plus the checks that prove Cadence handled it. To add one,
+Each scenario in the Incident Triage recipe's
+[`run_exercise.py`](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/run_exercise.py)
+pairs a prepared failure with checks of the Workflow's behavior. To add one,
 for example an approval that never arrives
 ([durable timers](https://cadenceworkflow.io/docs/concepts/timers/)) or a write
 whose reply is lost

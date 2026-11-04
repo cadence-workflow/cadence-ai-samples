@@ -70,7 +70,7 @@ investigating a fictional checkout outage with a real local model.
   in Cadence Web.
 
 Instructions:
-[retry-policy exercise (PR #116)](https://github.com/cadence-workflow/cadence-ai-samples/pull/116).
+[retry-policy exercise](../../recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md).
 
 **2. Make your own workflow durable (the rest of the session).**
 
@@ -99,7 +99,8 @@ workflow, so someone can continue it if you don't finish. Steps are in
 | [#109](https://github.com/cadence-workflow/cadence-ai-samples/issues/109) | Help a small local model name the root cause | mid | yes |
 
 A merged fix, a draft pull request or a written next step are all good
-outcomes. You can work by hand or with a coding agent.
+outcomes. You can work by hand or with a coding agent. If you use an agent,
+start it with the repository's [agent instructions](../../AGENTS.md).
 
 ## Get ready
 

@@ -46,19 +46,6 @@ Then work with a maintainer on an AI sample, a small workflow of your own or
 another approved Cadence Issue. Most work will be in this repository. Leave
 a useful change or a clear next step for the next contributor.
 
-## Try the Samples Explorer
-
-Browse recipes, prepare their dependencies and follow a Run from a local browser:
-
-```bash
-./scripts/explore.sh
-```
-
-Start with mock mode if you do not have a model installed. See
-[the Explorer introduction](contribfest/kubecon-na-2026/README.md#try-the-samples-explorer)
-for its features and a first example, or follow the
-[setup steps](contribfest/kubecon-na-2026/setup.md#explore-the-samples-in-your-browser).
-
 ## Plan your session
 
 - [What you'll work on](contribfest/kubecon-na-2026/README.md)
@@ -115,7 +102,7 @@ Prepare only the local services named by your Issue:
 | --- | --- | --- |
 | Cadence | Run and inspect the workflow | [Ticket Routing requirements](recipes/ticket-routing/README.md#requirements) |
 | Laya | Local classification | [Install Laya](README.md#install-laya) |
-| Ollama with `qwen2.5:7b` | Incident Triage live exercise | [Exercise setup, pending PR #116](https://github.com/cadence-workflow/cadence-ai-samples/pull/116) |
+| Ollama with `qwen2.5:7b` | Incident Triage live exercise | [Exercise setup](recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md#prepare-before-the-session) |
 | Ollama with `llama3.2` | Local model inference | [Install Ollama and llama3.2](README.md#install-ollama-and-llama32) |
 | Full local example | Exercise Laya and `llama3.2` together | [Recurring AI Watch setup](recipes/recurring-ai-watch/README.md#setup) |
 
