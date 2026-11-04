@@ -1,0 +1,161 @@
+{
+  "scope": "Synthetic local keynote demo only. No production evidence.",
+  "files": {
+    "source/activities.py": {
+      "original_sha256": "bbe0529f8d81fb58b242a2871aca6642f9e4c757b3b5851b7057b6c12ab340d3",
+      "export_sha256": "bbe0529f8d81fb58b242a2871aca6642f9e4c757b3b5851b7057b6c12ab340d3",
+      "byte_identical": true
+    },
+    "source/workflow.py": {
+      "original_sha256": "26e152c872089131a724f2d29f6bd2ccdd9b7a8b4481f2627406095d724cd18d",
+      "export_sha256": "26e152c872089131a724f2d29f6bd2ccdd9b7a8b4481f2627406095d724cd18d",
+      "byte_identical": true
+    },
+    "source/live_model.py": {
+      "original_sha256": "e3d256061c1b1cb02e4d04918bbead1c59a1c02a2e79971a97316ff34075bd9f",
+      "export_sha256": "e3d256061c1b1cb02e4d04918bbead1c59a1c02a2e79971a97316ff34075bd9f",
+      "byte_identical": true
+    },
+    "source/story.py": {
+      "original_sha256": "645b7882080fb2ce4fe882b7e820c568e34beea8e648f1555b823244d7cd44eb",
+      "export_sha256": "645b7882080fb2ce4fe882b7e820c568e34beea8e648f1555b823244d7cd44eb",
+      "byte_identical": true
+    },
+    "source/worker.py": {
+      "original_sha256": "5941307a444988b44ea0e2cedebc2385e25a6a7eae1a5a111121bc7d6ea685ca",
+      "export_sha256": "5941307a444988b44ea0e2cedebc2385e25a6a7eae1a5a111121bc7d6ea685ca",
+      "byte_identical": true
+    },
+    "source/main.py": {
+      "original_sha256": "86b6abac9572140b25463e207da8a07e199d40b82e67df049546a12d9a0404cc",
+      "export_sha256": "86b6abac9572140b25463e207da8a07e199d40b82e67df049546a12d9a0404cc",
+      "byte_identical": true
+    },
+    "source/run_rehearsal.py": {
+      "original_sha256": "1940a41e637f72e16ea8543a99facd700ab055e7601f78959a8221f08f5f4466",
+      "export_sha256": "1940a41e637f72e16ea8543a99facd700ab055e7601f78959a8221f08f5f4466",
+      "byte_identical": true
+    },
+    "source/fixtures/context.json": {
+      "original_sha256": "b90ffe71272745a1d81555c464d004adf3f328f879f5e2a9e212ee726dd5b4f2",
+      "export_sha256": "b90ffe71272745a1d81555c464d004adf3f328f879f5e2a9e212ee726dd5b4f2",
+      "byte_identical": true
+    },
+    "source/fixtures/graph.json": {
+      "original_sha256": "355c5506340849704a301f91bc8145906f12e14daeab7a60856a9b3558a271f0",
+      "export_sha256": "355c5506340849704a301f91bc8145906f12e14daeab7a60856a9b3558a271f0",
+      "byte_identical": true
+    },
+    "source/fixtures/trace.json": {
+      "original_sha256": "314a68a126165ee2a4c12b7c3e7e6f2151e16c4ecd7a6e8dd02585b8e8127d6a",
+      "export_sha256": "314a68a126165ee2a4c12b7c3e7e6f2151e16c4ecd7a6e8dd02585b8e8127d6a",
+      "byte_identical": true
+    },
+    "source/models.yaml": {
+      "original_sha256": "d70f4f2016b2bf1d4467c17ff98866baf3d3ef93de99f8d25f9f4a886d54c474",
+      "export_sha256": "d70f4f2016b2bf1d4467c17ff98866baf3d3ef93de99f8d25f9f4a886d54c474",
+      "byte_identical": true
+    },
+    "run_capture.py": {
+      "original_sha256": "f3db8f7083d97ed43ff159081308f919ab90ea42c8fed4e20d2ffec2c6799f80",
+      "export_sha256": "10ce459895b9ed4c7380d686ab83989e39ded014a98e4f96c632699c0f384bcb",
+      "byte_identical": false
+    },
+    "record-live.cjs": {
+      "original_sha256": "759f44c99d4a2d60c910d5aaf75ae0e7dd3740aec53bc9388e1e029486987619",
+      "export_sha256": "8b37d0924142a1cb95194c7ee45a80380ab488e2fcf81c1696a8fced2d68b8f3",
+      "byte_identical": false
+    },
+    "comparison/protocol.py": {
+      "original_sha256": "b23d09f5cbcb9314abb814f1173959d9d82e5c1ade4af030176064aa84eba30d",
+      "export_sha256": "b23d09f5cbcb9314abb814f1173959d9d82e5c1ade4af030176064aa84eba30d",
+      "byte_identical": true
+    },
+    "comparison/raw_runner.py": {
+      "original_sha256": "2af061ca433a9f316a23188785af0fb194e1526379a4778f7026c545f5d40bfb",
+      "export_sha256": "1ef96d53382dfbb539f8f5c498e20a8a71b36850f0c21ab09d7e2b92bf65822a",
+      "byte_identical": false
+    },
+    "comparison/measurement_helpers.py": {
+      "original_sha256": "624efa097a10ef7362ade3e594a5540f101ee625564b7034231329b774b9314e",
+      "export_sha256": "8eb06051e7b8382cb54779b4a1ddbdafdbe1765703b4bc8268b4c4c3571db724",
+      "byte_identical": false
+    },
+    "comparison/derive_comparison.py": {
+      "original_sha256": "fd48dd4d13ee07b3614c8830178c0392be0ed10f51da0924de8eac7a9a2185c4",
+      "export_sha256": "b00cb792ee3152fc5d1ad8ffddd9b5b6974409cfeb022e2a08f859291bc81772",
+      "byte_identical": false
+    },
+    "recorded/cadence/model-responses.jsonl": {
+      "original_sha256": "b4fd3122a0d6b6862f80f9af277638fea7ad6c523ba220c8b7b4c9b521296fd3",
+      "export_sha256": "b4fd3122a0d6b6862f80f9af277638fea7ad6c523ba220c8b7b4c9b521296fd3",
+      "byte_identical": true
+    },
+    "recorded/cadence/model-spend.jsonl": {
+      "original_sha256": "6c43d271ecf37627a328654a9de8801b004bdab1a29202a0d49e81e0e076028c",
+      "export_sha256": "6c43d271ecf37627a328654a9de8801b004bdab1a29202a0d49e81e0e076028c",
+      "byte_identical": true
+    },
+    "recorded/cadence/ledger.jsonl": {
+      "original_sha256": "4da4a9ba07ceeb7834c1f571182da7ecbd94f992b42a591da40ef064080a300d",
+      "export_sha256": "4da4a9ba07ceeb7834c1f571182da7ecbd94f992b42a591da40ef064080a300d",
+      "byte_identical": true
+    },
+    "recorded/cadence/store.db": {
+      "original_sha256": "1d7b6c547141a5d98825842bb9d9f0bab8c18cbe6047bde7e211936eb2e207c1",
+      "export_sha256": "1d7b6c547141a5d98825842bb9d9f0bab8c18cbe6047bde7e211936eb2e207c1",
+      "byte_identical": true
+    },
+    "recorded/raw/model-responses.jsonl": {
+      "original_sha256": "a2b02a49dddbefb50cd0718affb2207a9fd563908344cef7d2a57adc90bb2503",
+      "export_sha256": "a2b02a49dddbefb50cd0718affb2207a9fd563908344cef7d2a57adc90bb2503",
+      "byte_identical": true
+    },
+    "recorded/raw/model-spend.jsonl": {
+      "original_sha256": "6968535b079c6c94f540d4f5bd7eb3592948bc4f6f7d8725c7065fd1e9ed5f81",
+      "export_sha256": "6968535b079c6c94f540d4f5bd7eb3592948bc4f6f7d8725c7065fd1e9ed5f81",
+      "byte_identical": true
+    },
+    "recorded/raw/ledger.jsonl": {
+      "original_sha256": "8ac3d3bbfdfcd932a3156e86d77bddf938468a200218b25457cb90f62eea5c8a",
+      "export_sha256": "8ac3d3bbfdfcd932a3156e86d77bddf938468a200218b25457cb90f62eea5c8a",
+      "byte_identical": true
+    },
+    "recorded/raw/store.db": {
+      "original_sha256": "60ede08bff5582bfe5fb08f1557185ec9213da2cfffd03b0388664612a12c040",
+      "export_sha256": "60ede08bff5582bfe5fb08f1557185ec9213da2cfffd03b0388664612a12c040",
+      "byte_identical": true
+    },
+    "recorded/final-history.json": {
+      "original_sha256": "217b6d062c9077fb7598f339d18e33fdf09f859523408dfd385af68023f0b210",
+      "export_sha256": "217b6d062c9077fb7598f339d18e33fdf09f859523408dfd385af68023f0b210",
+      "byte_identical": true
+    }
+  },
+  "adaptations": {
+    "run_capture.py": "Added configurable loopback frontend/domain/Web URLs and catalog; refuse to overwrite a capture directory. Workflow input, fault schedule, Worker stop/restart and query loop are retained.",
+    "record-live.cjs": "Replaced personal module/browser/logo paths with a local Playwright dependency, optional CHROME_BIN, and text branding; configurable capture directory. UI navigation, Signal inputs and process commands are unchanged. This is the original browser recorder before subsequent clip editing and CLI overlays.",
+    "comparison/derive_comparison.py": "Added KEYNOTE_CAPTURE_DIR selection. This opt-in script makes new local-model requests and produces new measurements. It is not the offline verifier.",
+    "comparison/raw_runner.py": "Honor explicitly selected catalog/model environment variables; default remains the recorded qwen-local selection. Prompts, request capture, fault behavior and comparison protocol are unchanged.",
+    "comparison/measurement_helpers.py": "Honor explicitly selected catalog/model environment variables; default remains the recorded qwen-local selection. Prompts, request capture, fault behavior and comparison protocol are unchanged."
+  },
+  "recorded": {
+    "workflow_id": "keynote-9cce44f7",
+    "run_id": "1c41e5a8-ae04-4d00-8290-861ebcbbf9b1",
+    "domain": "incident-demo",
+    "completion_event": 201,
+    "model": "qwen2.5:7b",
+    "python": "3.12.14",
+    "dependencies": {
+      "cadence-python-client": "0.4.1",
+      "pydantic": "2.12.5",
+      "playwright": "1.62.1"
+    },
+    "recorded_endpoints": {
+      "cadence": "localhost:27833",
+      "web": "http://127.0.0.1:28089",
+      "ollama": "http://127.0.0.1:11435"
+    },
+    "receipt_edits": "run.json and comparison.json use relative receipt paths. Raw histories, JSONL receipts and synthetic SQLite stores are byte-identical. Worker-stop/restart receipts are retained. Videos, decks and production material are excluded."
+  }
+}
