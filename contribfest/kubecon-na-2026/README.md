@@ -119,6 +119,10 @@ ownership live on GitHub: choose only an open, unassigned `status:ready` Issue
 with no existing claim or active implementation PR. Ask a facilitator to
 record your claim before creating a branch.
 
+**On hold:** [#109](https://github.com/cadence-workflow/cadence-ai-samples/issues/109)
+has not passed its model-output quotation checks. Choose another task while
+its `status:ready` label is absent.
+
 [#118](https://github.com/cadence-workflow/cadence-ai-samples/issues/118) and
 [#119](https://github.com/cadence-workflow/cadence-ai-samples/issues/119) are
 invitations to propose your own work or report a finding, so do not claim
@@ -127,7 +131,7 @@ those umbrella Issues. Organizer preparation is tracked separately in
 
 | Recipe | Issue | What you will practice |
 | --- | --- | --- |
-| Incident Triage | [#109: Help the triage model identify the deepest observed error](https://github.com/cadence-workflow/cadence-ai-samples/issues/109) | Trace an observed error and preserve uncertainty |
+| Incident Triage | [#109: Help the triage model identify the deepest observed error](https://github.com/cadence-workflow/cadence-ai-samples/issues/109) | On hold: model-output quotation checks have not passed |
 | Incident Triage | [#110: Test that revision reuses evidence and guidance collects more](https://github.com/cadence-workflow/cadence-ai-samples/issues/110) | Test review Signals and evidence reuse |
 | Incident Triage | [#111: Demonstrate recovery from a rate-limited model call](https://github.com/cadence-workflow/cadence-ai-samples/issues/111) | Recover a model Activity after a rate limit |
 | Incident Triage | [#112: Fix the Incident Triage clean-copy check](https://github.com/cadence-workflow/cadence-ai-samples/issues/112) | Keep copied recipes independent of repository files |
@@ -146,6 +150,7 @@ those umbrella Issues. Organizer preparation is tracked separately in
 | Human in the Loop | [#129: Prevent duplicate rides after a lost booking reply](https://github.com/cadence-workflow/cadence-ai-samples/issues/129) | Use a stable key to avoid duplicate rides |
 | Human in the Loop | [#130: Limit repeated approval rounds](https://github.com/cadence-workflow/cadence-ai-samples/issues/130) | Bound repeated human approval rounds |
 | Human in the Loop | [#131: Show whether a ride approval was applied](https://github.com/cadence-workflow/cadence-ai-samples/issues/131) | Show whether a review Signal took effect |
+| Human in the Loop | [#165: Make the Human in the Loop tests run in a copied recipe](https://github.com/cadence-workflow/cadence-ai-samples/issues/165) | Keep recipe tests usable outside the full repository |
 | Auto Research | [#134: Expire unanswered research reviews](https://github.com/cadence-workflow/cadence-ai-samples/issues/134) | Expire an unanswered research review |
 | Auto Research | [#135: Stop retrying invalid research sources](https://github.com/cadence-workflow/cadence-ai-samples/issues/135) | Exclude invalid sources from Activity retries |
 | Auto Research | [#136: Reject research plans that exceed the limits](https://github.com/cadence-workflow/cadence-ai-samples/issues/136) | Reject plans that exceed the agreed limits |
