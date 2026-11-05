@@ -56,6 +56,18 @@ a useful change or a clear next step for the next contributor.
 You do not need to claim an Issue to try the introductory exercise. Use the
 claim process below when choosing an upstream contribution.
 
+## Bring your own agent idea
+
+[Propose an agent workflow](contribfest/kubecon-na-2026/shortlist.md#bring-your-own-workflow)
+and demonstrate how it recovers from one failure. Start with a useful result,
+such as a research briefing, a reviewed travel plan or a coding task. Describe
+the external calls, failure and observable recovery in your own recipe issue.
+Ask a facilitator to review the proposal and record your claim before upstream
+implementation. Use synthetic data and provide a mock path so others can try it.
+
+If you prefer a prepared task, claim its existing issue below instead of
+creating a duplicate.
+
 ## Find a ContribFest Issue
 
 Session candidates live on this repository under the
