@@ -24,9 +24,9 @@ from urllib.parse import quote, urlencode, urlsplit, urlunsplit
 
 import yaml
 
-from source import (InvalidSelection, Unsupported, go_classifier, go_cli,
-                    go_function, go_validate, java_classifier, java_cli,
-                    python_cli, python_guard, value)
+from source import (AmbiguousExecution, InvalidSelection, Unsupported,
+                    go_classifier, go_cli, go_function, go_validate,
+                    java_classifier, java_cli, python_cli, python_guard, value)
 from signal_metadata import (SignalMetadataError, load_metadata,
                              metadata_revision, serialize_arguments,
                              validate_arguments)
@@ -869,7 +869,7 @@ class Explorer:
         listing = self.workflow_json(listing_url + query)
         executions = listing.get('workflows')
         if not isinstance(executions, list) or len(executions) > 1:
-            raise ValueError('ambiguous open execution')
+            raise AmbiguousExecution('ambiguous open execution')
         token = listing.get('nextPage')
         if token is not None and not isinstance(token, str):
             raise ValueError('invalid continuation')
@@ -879,12 +879,12 @@ class Explorer:
             continuation = self.workflow_json(listing_url + query + '&'
                 + urlencode(dict(nextPage=token)))
             if continuation.get('workflows') != [] or continuation.get('nextPage') not in (None, ''):
-                raise ValueError('incomplete or ambiguous open execution listing')
+                raise AmbiguousExecution('incomplete or ambiguous open execution listing')
         if not executions:
             return dict(workflowExecutionInfo=None)
         execution = executions[0]
         if not isinstance(execution, dict) or execution.get('workflowID') != workflow_id:
-            raise ValueError('workflow identity mismatch')
+            raise AmbiguousExecution('workflow identity mismatch')
         run_id = execution.get('runID')
         if (not isinstance(run_id, str) or not run_id.strip() or len(run_id) > 255
                 or any(ord(character) < 32 for character in run_id)):
@@ -896,7 +896,7 @@ class Explorer:
             raise ValueError('missing execution description')
         identity = info.get('workflowExecution', {})
         if identity.get('workflowId') != workflow_id or identity.get('runId') != run_id:
-            raise ValueError('execution identity mismatch')
+            raise AmbiguousExecution('execution identity mismatch')
         if info.get('closeTime') or info.get('closeStatus') not in (
                 None, '', 'WORKFLOW_EXECUTION_CLOSE_STATUS_INVALID'):
             return dict(workflowExecutionInfo=None)
@@ -971,6 +971,10 @@ class Explorer:
             result.update(state=state, detail=detail)
         except (URLError, TimeoutError, OSError) as error:
             result['detail'] = self.safe_error(error, 'Cadence-Web could not be reached.')
+        except AmbiguousExecution:
+            result.update(state='ambiguous execution',
+                detail=('Cadence-Web listed an ambiguous or changing open '
+                    'execution. Wait a moment and resolve again.'))
         except (ValueError, TypeError, AttributeError, json.JSONDecodeError):
             result.update(state='malformed response',
                 detail='Cadence-Web returned an unreadable workflow response.')
