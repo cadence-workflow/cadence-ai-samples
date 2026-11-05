@@ -20,7 +20,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
-from urllib.parse import quote, urlsplit, urlunsplit
+from urllib.parse import quote, urlencode, urlsplit, urlunsplit
 
 import yaml
 
@@ -844,6 +844,64 @@ class Explorer:
                 services.append(self.classifier_probe(resolved['classifier']))
         return dict(checked_at=checked_at, selection=self.selection_key(resolved), services=services)
 
+    def workflow_json(self, endpoint):
+        with self.opener(Request(endpoint, headers={'Accept': 'application/json'}),
+                         timeout=self.workflow_timeout) as response:
+            body = response.read(1024 * 1024 + 1)
+        if len(body) > 1024 * 1024:
+            raise ValueError('response is too large')
+        payload = json.loads(body)
+        if not isinstance(payload, dict):
+            raise ValueError('response is not an object')
+        return payload
+
+    def current_open_workflow(self, domain, cluster, workflow_id):
+        # Some supported Web builds expose Describe only with an explicit Run ID.
+        # Visibility is advisory: verify the exact open candidate with Describe
+        # before allowing controls. A closed or ambiguous candidate fails closed.
+        segments = [quote(item, safe='') for item in (domain, cluster)]
+        base = self.cadence_web_url + '/api/domains/' + '/'.join(segments)
+        query = urlencode(dict(kind='open', pageSize=2, workflowId=workflow_id,
+            timeRangeStart='1970-01-01T00:00:00.000Z',
+            timeRangeEnd=datetime.now(timezone.utc).isoformat(
+                timespec='milliseconds').replace('+00:00', 'Z')))
+        listing_url = base + '/workflows-basic?'
+        listing = self.workflow_json(listing_url + query)
+        executions = listing.get('workflows')
+        if not isinstance(executions, list) or len(executions) > 1:
+            raise ValueError('ambiguous open execution')
+        token = listing.get('nextPage')
+        if token is not None and not isinstance(token, str):
+            raise ValueError('invalid continuation')
+        if token:
+            if len(token) > 4096 or any(ord(character) < 32 for character in token):
+                raise ValueError('invalid continuation')
+            continuation = self.workflow_json(listing_url + query + '&'
+                + urlencode(dict(nextPage=token)))
+            if continuation.get('workflows') != [] or continuation.get('nextPage') not in (None, ''):
+                raise ValueError('incomplete or ambiguous open execution listing')
+        if not executions:
+            return dict(workflowExecutionInfo=None)
+        execution = executions[0]
+        if not isinstance(execution, dict) or execution.get('workflowID') != workflow_id:
+            raise ValueError('workflow identity mismatch')
+        run_id = execution.get('runID')
+        if (not isinstance(run_id, str) or not run_id.strip() or len(run_id) > 255
+                or any(ord(character) < 32 for character in run_id)):
+            raise ValueError('invalid Run ID')
+        payload = self.workflow_json(base + '/workflows/'
+            + quote(workflow_id, safe='') + '/' + quote(run_id, safe=''))
+        info = payload.get('workflowExecutionInfo')
+        if not isinstance(info, dict):
+            raise ValueError('missing execution description')
+        identity = info.get('workflowExecution', {})
+        if identity.get('workflowId') != workflow_id or identity.get('runId') != run_id:
+            raise ValueError('execution identity mismatch')
+        if info.get('closeTime') or info.get('closeStatus') not in (
+                None, '', 'WORKFLOW_EXECUTION_CLOSE_STATUS_INVALID'):
+            return dict(workflowExecutionInfo=None)
+        return payload
+
     def workflow_run(self, request):
         resolved = self.resolve(request)
         workflow_id = resolved.get('workflow_id')
@@ -873,14 +931,14 @@ class Explorer:
         endpoint = (self.cadence_web_url + '/api/domains/' + segments[0] + '/'
             + segments[1] + '/workflows/' + segments[2])
         try:
-            with self.opener(Request(endpoint, headers={'Accept':'application/json'}),
-                    timeout=self.workflow_timeout) as response:
-                body = response.read(1024 * 1024 + 1)
-            if len(body) > 1024 * 1024:
-                raise ValueError('response is too large')
-            payload = json.loads(body)
-            if not isinstance(payload, dict):
-                raise ValueError('response is not an object')
+            try:
+                payload = self.workflow_json(endpoint)
+            except HTTPError as error:
+                if error.code != 404:
+                    raise
+                error.close()
+                payload = self.current_open_workflow(
+                    resolved['domain'], self.cadence_cluster, workflow_id)
             workflow_info = payload.get('workflowExecutionInfo')
             if workflow_info is None:
                 result.update(state='no execution',

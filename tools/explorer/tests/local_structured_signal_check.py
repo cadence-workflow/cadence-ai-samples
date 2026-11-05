@@ -20,6 +20,8 @@ from pathlib import Path
 
 from cadence import Client, workflow
 from cadence.contrib.pydantic import PydanticDataConverter
+from cadence.api.v1.common_pb2 import WorkflowExecution
+from cadence.api.v1.service_workflow_pb2 import DescribeWorkflowExecutionRequest
 from cadence.worker import Registry, Worker
 
 
@@ -122,6 +124,22 @@ async def observed_state(
             await asyncio.sleep(0.2)
 
 
+async def cancel_and_wait(client: Client, workflow_id: str, run_id: str) -> None:
+    await client.cancel_workflow(workflow_id, run_id)
+    async with asyncio.timeout(15):
+        while True:
+            description = await client.workflow_stub.DescribeWorkflowExecution(
+                DescribeWorkflowExecutionRequest(
+                    domain=client.domain,
+                    workflow_execution=WorkflowExecution(
+                        workflow_id=workflow_id, run_id=run_id),
+                )
+            )
+            if description.workflow_execution_info.close_status:
+                return
+            await asyncio.sleep(0.2)
+
+
 async def main() -> None:
     with tempfile.TemporaryDirectory(
         prefix="explorer-structured-signal-"
@@ -129,20 +147,23 @@ async def main() -> None:
         checkout = Path(temporary)
         shutil.copytree(ROOT / "recipes", checkout / "recipes",
                         ignore=shutil.ignore_patterns(
-                            ".venv", "venv", "__pycache__"))
+                            ".venv", "venv", "__pycache__", ".run-state"))
         for name in ("README.md", "models.yaml", "classifiers.yaml"):
             shutil.copy(ROOT / name, checkout / name)
-        (checkout / "recipes" / "auto-research" /
-         "explorer.yaml").write_text(metadata())
+        sample = "explorer-structured-check-" + uuid.uuid4().hex
+        recipe = checkout / "recipes" / sample
+        (checkout / "recipes" / "auto-research").rename(recipe)
+        (recipe / "explorer.yaml").write_text(metadata())
 
         explorer = Explorer(checkout)
         selection = {
-            "sample": "auto-research",
-            "implementation": "recipes/auto-research/python/openai-agents",
+            "sample": sample,
+            "implementation": f"recipes/{sample}/python/openai-agents",
             "mode": "mock",
+            "model": "gemini-flash-lite",
         }
         resolved = explorer.resolve(selection)
-        workflow_id = "explorer-structured-check-" + uuid.uuid4().hex
+        workflow_id = resolved["workflow_id"]
         task_list = "explorer-structured-check-" + uuid.uuid4().hex
         client = Client(
             domain="cadence-ai-samples",
@@ -159,28 +180,39 @@ async def main() -> None:
                     execution_start_to_close_timeout=timedelta(minutes=3),
                     task_start_to_close_timeout=timedelta(seconds=30),
                 )
-                values = {
-                    "expected_revision": 2,
-                    "detail": "structured feedback",
-                }
-                result = await asyncio.to_thread(
-                    explorer.workflow_signal,
-                    {
-                        **selection,
-                        "workflow_id": workflow_id,
-                        "run_id": execution.run_id,
-                        "signal_id": "revise",
-                        "signal_metadata_revision":
-                            resolved["signal_metadata_revision"],
-                        "arguments": {"request": values},
-                    },
-                )
-                assert result["state"] == "accepted", result
-                state = await observed_state(
-                    client, workflow_id, execution.run_id)
-                assert state == RevisionState(**values), state
-                await client.cancel_workflow(
-                    workflow_id, execution.run_id)
+                try:
+                    async with asyncio.timeout(30):
+                        while True:
+                            current = await asyncio.to_thread(
+                                explorer.workflow_run,
+                                {**selection, "run_id": execution.run_id},
+                            )
+                            if current["state"] == "found":
+                                break
+                            assert current["state"] == "no execution", current
+                            await asyncio.sleep(0.2)
+                    values = {
+                        "expected_revision": 2,
+                        "detail": "structured feedback",
+                    }
+                    result = await asyncio.to_thread(
+                        explorer.workflow_signal,
+                        {
+                            **selection,
+                            "workflow_id": workflow_id,
+                            "run_id": execution.run_id,
+                            "signal_id": "revise",
+                            "signal_metadata_revision":
+                                resolved["signal_metadata_revision"],
+                            "arguments": {"request": values},
+                        },
+                    )
+                    assert result["state"] == "accepted", result
+                    state = await observed_state(
+                        client, workflow_id, execution.run_id)
+                    assert state == RevisionState(**values), state
+                finally:
+                    await cancel_and_wait(client, workflow_id, execution.run_id)
         finally:
             await client.close()
 

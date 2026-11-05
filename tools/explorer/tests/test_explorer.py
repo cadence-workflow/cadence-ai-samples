@@ -135,7 +135,7 @@ class ExplorerTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory(prefix='cadence explorer ')
         self.root = Path(self.temp.name)
         shutil.copytree(ROOT/'recipes',self.root/'recipes',
-            ignore=shutil.ignore_patterns('.venv','venv','__pycache__'))
+            ignore=shutil.ignore_patterns('.venv','venv','__pycache__','.run-state'))
         for name in ('models.yaml','classifiers.yaml','README.md'):
             shutil.copy(ROOT/name,self.root/name)
         self.explorer = Explorer(self.root)
@@ -1131,6 +1131,77 @@ while :; do sleep 1; done
             self.assertEqual([path for path,_ in ProbeStub.posts],['/api/generate','/v1/systemone'])
             blocked=self.explorer.post_json('remote','https://example.com/v1',{},1)
             self.assertEqual(blocked['state'],'unavailable check')
+        finally:
+            stub.shutdown();stub.server_close();thread.join()
+
+    def test_explicit_run_web_fallback_checks_exact_open_identity(self):
+        request=dict(sample='auto-research',
+            implementation='recipes/auto-research/python/openai-agents',
+            mode='mock',model='gemini-flash-lite')
+        workflow_id=self.explorer.resolve(request)['workflow_id']
+        mode={'value':'found'}
+        paths=[]
+        class ExplicitRunWeb(ProbeStub):
+            def do_GET(handler):
+                from urllib.parse import parse_qs, urlsplit
+                paths.append(handler.path)
+                parts=urlsplit(handler.path)
+                if parts.path.endswith('/workflows/'+workflow_id):
+                    handler.send_json(404,dict(message='route unavailable'))
+                elif parts.path.endswith('/workflows-basic'):
+                    query=parse_qs(parts.query)
+                    if query.get('kind')!=['open'] or query.get('workflowId')!=[workflow_id]:
+                        handler.send_json(400,dict(message='wrong filter'));return
+                    if query.get('pageSize')!=['2'] or not query['timeRangeEnd'][0].endswith('Z'):
+                        handler.send_json(400,dict(message='unbounded or invalid request'));return
+                    if 'nextPage' in query:
+                        more=[] if mode['value']!='truncated' else [dict(
+                            workflowID=workflow_id,runID='second-run')]
+                        token='again' if mode['value']=='looping' else None
+                        handler.send_json(200,dict(workflows=more,nextPage=token));return
+                    item=dict(workflowID=workflow_id,runID='run-current')
+                    if mode['value']=='wrong-list-id':item['workflowID']='other-workflow'
+                    if mode['value']=='bad-run':item['runID']='\n'
+                    items=[] if mode['value']=='empty' else [item]
+                    if mode['value']=='ambiguous':items.append(dict(item))
+                    token=42 if mode['value']=='bad-token' else 'opaque-token'
+                    if mode['value']=='long-token':token='x'*4097
+                    handler.send_json(200,dict(workflows=items,nextPage=token))
+                else:
+                    identity=dict(workflowId=workflow_id,runId='run-current')
+                    if mode['value']=='wrong-describe-id':identity['workflowId']='other-workflow'
+                    if mode['value']=='wrong-describe-run':identity['runId']='other-run'
+                    info=dict(workflowExecution=identity,
+                        closeStatus='WORKFLOW_EXECUTION_CLOSE_STATUS_INVALID')
+                    if mode['value']=='closed':info['closeStatus']='WORKFLOW_EXECUTION_CLOSE_STATUS_COMPLETED'
+                    handler.send_json(200,dict(workflowExecutionInfo=info))
+        stub=ThreadingHTTPServer(('127.0.0.1',0),ExplicitRunWeb)
+        thread=threading.Thread(target=stub.serve_forever,daemon=True);thread.start()
+        try:
+            explorer=Explorer(self.root,cadence_web_url=f'http://127.0.0.1:{stub.server_port}')
+            result=explorer.workflow_run(request)
+            self.assertEqual((result['state'],result['run_id']),('found','run-current'))
+            self.assertTrue(paths[-1].endswith('/'+workflow_id+'/run-current'))
+            stale=explorer.workflow_run({**request,'run_id':'old-run'})
+            self.assertEqual(stale['state'],'stale run')
+            ProbeStub.posts.clear()
+            signal={**request,'run_id':'old-run','signal_id':'approve-report',
+                'signal_metadata_revision':explorer.resolve(request)['signal_metadata_revision'],
+                'arguments':{'expected_revision':0}}
+            self.assertEqual(explorer.workflow_signal(signal)['state'],'stale run')
+            self.assertEqual(ProbeStub.posts,[])
+            for value,expected in [('empty','no execution'),('closed','no execution'),
+                    ('ambiguous','malformed response'),('bad-run','malformed response'),
+                    ('truncated','malformed response'),('looping','malformed response'),
+                    ('bad-token','malformed response'),('long-token','malformed response'),
+                    ('wrong-list-id','malformed response'),
+                    ('wrong-describe-id','malformed response'),
+                    ('wrong-describe-run','malformed response')]:
+                with self.subTest(value=value):
+                    mode['value']=value
+                    self.assertEqual(explorer.workflow_run(request)['state'],expected)
+                    self.assertEqual(explorer.workflow_signal(signal)['state'],expected)
+                    self.assertEqual(ProbeStub.posts,[])
         finally:
             stub.shutdown();stub.server_close();thread.join()
 
