@@ -64,13 +64,15 @@ and the `event:contribfest` label. Open, unassigned Issues labeled
 `status:ready` are available to claim through the coordinator path below.
 Recheck ownership and linked pull requests before claiming.
 
-Choose a difficulty that matches your time and energy:
+Choose a difficulty that matches your experience and what you want to learn.
+The [task index groups prepared work by level](contribfest/kubecon-na-2026/shortlist.md#choose-your-level)
+and separates the change's complexity from the tools and services it needs:
 
 | Path | Good when you want to… |
 | --- | --- |
-| **Low-stakes** | Get a first win: one prepared failure, a small file set, exact commands |
-| **Mid-level** | Harden a real durability gap with a bit more surface area |
-| **High-level / stretch** | Investigate recovery or replay across several steps |
+| **Beginner** | Read one focused example and improve a test or a small, well-defined behavior. |
+| **Intermediate** | Change retry, review or state behavior across a few functions and test its edge cases. |
+| **Advanced** | Investigate persistent state, replay or recovery across multiple steps or Runs. |
 
 Pick the task that fits you. Excited contributors should feel empowered to claim
 a stretch Issue; maintainers are in the room to help. Claim through the

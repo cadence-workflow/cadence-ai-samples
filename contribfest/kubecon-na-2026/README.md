@@ -6,6 +6,26 @@ CloudNativeCon North America 2026.
 - **When:** Wednesday, November 11, 2:20 to 3:40 PM MST
 - **Where:** Salt Palace, Level 2, room 255 D, Salt Lake City
 
+## New to Cadence? Start here
+
+1. [Set up your local checkout](setup.md#first-time-here-start-with-your-selected-task).
+2. [Choose a task by interest and difficulty](shortlist.md#choose-your-level).
+3. Read the issue's scenario and contribution goal. Try its starting check,
+   request the claim, make the change and compare the result with its success
+   criteria. The issue links back here if you need to find your way again.
+
+A **Workflow** records how a job progresses. An **Activity** is a step that
+does work such as calling a model, reading logs or saving a report. A
+**Signal** delivers input to a running Workflow, such as a review decision.
+The examples let you change one behavior and inspect the result. You do not
+need to learn every Cadence feature before choosing a focused task.
+
+Each issue follows a short learning path: **What you will learn**, **Before
+you start**, **Understand the problem**, **Your contribution**, **Check your
+work**, and **Ready to hand off**. Pick the topic you want to learn, then
+check the language and services it needs. Difficulty and setup requirements
+are separate: a small test change may still require a language toolchain.
+
 ## Try the Samples Explorer
 
 Start with the [Samples Explorer](../../tools/explorer/README.md) to choose
