@@ -150,6 +150,7 @@ those umbrella Issues. Organizer preparation is tracked separately in
 | Auto Research | [#135: Stop retrying invalid research sources](https://github.com/cadence-workflow/cadence-ai-samples/issues/135) | Exclude invalid sources from Activity retries |
 | Auto Research | [#136: Reject research plans that exceed the limits](https://github.com/cadence-workflow/cadence-ai-samples/issues/136) | Reject plans that exceed the agreed limits |
 | Auto Research | [#137: Test early, invalid and duplicate research decisions](https://github.com/cadence-workflow/cadence-ai-samples/issues/137) | Test early, stale and duplicate review Signals |
+| Ticket Routing | [#34: Align Ticket Routing tests with the declared Go 1.23 version](https://github.com/cadence-workflow/cadence-ai-samples/issues/34) | Keep example tests compatible with the supported toolchain |
 | Ticket Routing | [#138: Stop retrying invalid mock tickets](https://github.com/cadence-workflow/cadence-ai-samples/issues/138) | Stop retrying invalid mock input |
 | Ticket Routing | [#139: Add a low-confidence mock ticket example](https://github.com/cadence-workflow/cadence-ai-samples/issues/139) | Make uncertain routing visible in mock mode |
 | Ticket Routing | [#140: Show the ticket acknowledgment deadline in parent status](https://github.com/cadence-workflow/cadence-ai-samples/issues/140) | Expose a child Workflow deadline in parent status |
@@ -158,6 +159,7 @@ those umbrella Issues. Organizer preparation is tracked separately in
 | Recurring AI Watch | [#143: Retry report generation without repeating classification](https://github.com/cadence-workflow/cadence-ai-samples/issues/143) | Retain completed classification across report retries |
 | Recurring AI Watch | [#144: Preserve check-now requests across Workflow Runs](https://github.com/cadence-workflow/cadence-ai-samples/issues/144) | Carry pending requests through Continue-As-New |
 | Recipe documentation | [#145: Add Cadence Web screenshots to the recipe guides](https://github.com/cadence-workflow/cadence-ai-samples/issues/145) | Connect runbook instructions to visible Run state |
+| Java templates | [#71: Add Java 17 profile tests to pull-request CI](https://github.com/cadence-workflow/cadence-ai-samples/issues/71) | Generate and test copyable examples in CI |
 | Your own contribution | [#118: Bring an agent and make one failure recoverable](https://github.com/cadence-workflow/cadence-ai-samples/issues/118) | Invitation: propose your own durable agent example |
 | Your own contribution | [#119: Explore how an agent recovers from interruption](https://github.com/cadence-workflow/cadence-ai-samples/issues/119) | Invitation: explore recovery and report a finding |
 

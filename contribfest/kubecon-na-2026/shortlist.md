@@ -13,6 +13,11 @@ A task is available while it is open, unassigned and labeled `status:ready`,
 with no existing claim or active implementation PR. If the pool is empty,
 ask a facilitator about another approved task or explore a sample while you wait.
 
+For alternatives such as Java profile CI, browse
+[all approved event tasks](https://github.com/cadence-workflow/cadence-ai-samples/issues?q=is%3Aissue%20is%3Aopen%20milestone%3A%22KubeCon%20NA%202026%20ContribFest%2C%202026-11-11%22%20label%3Aevent%3Acontribfest%20label%3Astatus%3Aready%20no%3Aassignee).
+Each Issue states its language, dependencies and checks. The same claim rules
+apply to every task.
+
 To request a task, comment on its Issue:
 
 > I'd like to take this. GitHub: @yourname. Proposed branch:
