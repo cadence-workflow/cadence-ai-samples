@@ -171,6 +171,12 @@ omission, and keep the earlier working path reliable.
 - Report missing, unreachable, stale, and Continue-As-New-related run changes
   without guessing. Keep domain navigation available after lookup failures.
 - Do not claim a Workflow has started merely because its command was generated.
+- When a supported Web build requires an explicit Run ID for Describe, fall back
+  from a missing Workflow-ID-only route to a bounded exact-ID open-execution
+  listing. Follow at most one continuation with the same filters/time window;
+  reject extra results or further continuation. Verify both execution IDs and
+  open status through Describe before enabling controls. Visibility lag,
+  ambiguity or a closed candidate must leave Signals unavailable.
 - After resolving one exact current Run, show only the Signal controls declared
   by the selected recipe's valid optional `explorer.yaml`.
 - A manually entered historical Run may open History and Queries, but it never
