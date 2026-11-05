@@ -12,6 +12,17 @@ Agent Examples** during KubeCon + CloudNativeCon North America 2026.
 - **Event work:** [ContribFest
   milestone](https://github.com/cadence-workflow/cadence-ai-samples/milestone/2)
 
+## Start with an outcome
+
+Run a prepared agent, make one focused contribution and show what it enables.
+You might recover an investigation after a failed call, prevent a duplicate
+booking or give a reviewer a deadline. If you improve a test, show which
+incorrect behavior it now catches.
+
+New to Cadence? Use the [prepared mock-agent path](contribfest/kubecon-na-2026/README.md#new-to-cadence-start-here)
+to see a draft before choosing a change. Then select work by purpose,
+difficulty and setup in the [task selection page](contribfest/kubecon-na-2026/shortlist.md).
+
 ## Samples Explorer
 
 Choose an agent recipe, get matching commands and see its execution in
@@ -94,21 +105,20 @@ coordinator path below; do not open competing branches for the same Issue.
 
 ### 1. Choose a workflow problem
 
-Each event Issue starts with a common AI workflow failure and asks you to add or
-demonstrate the Cadence protection for it. Examples include:
+Choose a useful outcome for an agent: produce a report, book a trip, route a
+ticket or keep a release watch moving. Then choose one behavior to improve.
+The issue explains what you will make possible, the Cadence concept it uses
+and how you will observe the result.
 
-| Common failure | Cadence protection |
-| --- | --- |
-| A provider call fails temporarily or permanently | Bounded retries and non-retryable errors |
-| Human approval never arrives or targets the wrong request | Signals, durable timers, and queryable state |
-| A tool performs an external action but loses its response | Stable idempotency keys and activity retry boundaries |
-| Long-running work stalls partway through | Heartbeats and progress recovery |
-| A Worker restarts after completing part of the work | Event history and deterministic replay |
-| A concurrent task fails or an agent loop never stops | Explicit partial-failure policies and hard bounds |
+Cadence coordinates retries, records completed Activity results and delivers
+human input. Your application still defines valid input, safe repeated writes,
+review rules and whether the result is useful. A passing Workflow alone does
+not prove that an agent's answer is correct.
 
-The Issue gives you the scaffold, injected failure, files to change, exact
-validation, and visible proof. Choose a difficulty and failure mode that fit
-your experience and the time remaining. Coding agents are optional.
+Each issue includes a short experiment and a dedicated resources section.
+Predict the result, run the smallest relevant case and inspect its state or
+output. For a coverage task, keep the existing runtime behavior and prove the
+new test detects the documented mistake.
 
 Prepare only the local services named by your Issue:
 
@@ -171,6 +181,11 @@ then search for `#cadence-contributors` and join the channel. Use the same
 channel to continue the conversation after the session.
 
 ### 4. Finish or hand off
+
+Show the result before handing it over: the receipt reused, the approval
+expired, the calls not repeated or the test that catches a deliberate bug.
+Include the observation in your PR or issue comment and say what it enables
+in an application. Record only what you actually ran.
 
 Choose the safe outcome that fits the remaining time:
 

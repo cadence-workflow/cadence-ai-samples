@@ -1,7 +1,7 @@
 # Set up your laptop
 
-Download the dependencies before the session so you can spend the time working
-with the model and Cadence. The selected recipe's README is authoritative for
+Choose what you want to make happen, then prepare only its dependencies before
+the session. The selected recipe's README is authoritative for
 versions, services and commands. Prepare only what your task needs.
 
 [Clone your fork](../../CONTRIBUTING.md#first-time-contributor-path) before
@@ -13,8 +13,9 @@ following the commands below.
    Your **checkout** is the local `cadence-ai-samples` folder created by the
    clone. Keep the complete repository: some tests read the root `models.yaml`
    catalog. You do not need a separate Git worktree to take part.
-2. [Choose a task by interest and difficulty](shortlist.md#choose-your-level).
-   Read its **Before you start** section before downloading anything. A
+2. [Choose a task by outcome, purpose and difficulty](shortlist.md#choose-your-level).
+   Read its opening outcome and **Before you start** section before
+   downloading anything. A
    Python test task may need neither Docker nor a model; a live Workflow task
    needs the services named in its recipe.
 3. Open the task's linked recipe folder inside your checkout. Run its setup
@@ -24,10 +25,12 @@ following the commands below.
 4. [Request the claim](../../CONTRIBUTING.md#claim-approved-work) before
    implementing an upstream task. Wait for maintainer-confirmed ownership and
    `status:in-progress`, then create the issue's branch in your fork.
-5. Work through **Understand the problem**, **Your contribution** and
-   **Check your work** in the issue. You can work by hand or with a coding
+5. Work through the issue's short experiment, **Your contribution** and
+   **See your result**. Compare the starting behavior with what your change
+   enables. You can work by hand or with a coding
    agent. Keep private credentials out of commands, screenshots and commits.
-6. Use **Ready to hand off** to leave changed files, commands, observed results
+6. Explain one observation that shows your contribution worked. Use
+   **Ready to hand off** to leave changed files, commands, observed results
    and the next step. A useful test, a draft PR or a clear unfinished handoff
    can all help the project.
 
