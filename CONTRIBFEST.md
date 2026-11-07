@@ -12,6 +12,17 @@ Agent Examples** during KubeCon + CloudNativeCon North America 2026.
 - **Event work:** [ContribFest
   milestone](https://github.com/cadence-workflow/cadence-ai-samples/milestone/2)
 
+## Start with an outcome
+
+Run a prepared agent, make one focused contribution and show what it enables.
+You might recover an investigation after a failed call, prevent a duplicate
+booking or give a reviewer a deadline. If you improve a test, show which
+incorrect behavior it now catches.
+
+New to Cadence? Use the [prepared mock-agent path](contribfest/kubecon-na-2026/README.md#new-to-cadence-start-here)
+to see a draft before choosing a change. Then select work by purpose,
+difficulty and setup in the [task selection page](contribfest/kubecon-na-2026/shortlist.md).
+
 ## Samples Explorer
 
 Choose an agent recipe, get matching commands and see its execution in
@@ -56,45 +67,58 @@ a useful change or a clear next step for the next contributor.
 You do not need to claim an Issue to try the introductory exercise. Use the
 claim process below when choosing an upstream contribution.
 
+## Bring your own agent idea
+
+[Propose an agent workflow](contribfest/kubecon-na-2026/shortlist.md#bring-your-own-workflow)
+and demonstrate how it recovers from one failure. Start with a useful result,
+such as a research briefing, a reviewed travel plan or a coding task. Describe
+the external calls, failure and observable recovery in your own recipe issue.
+Ask a facilitator to review the proposal and record your claim before upstream
+implementation. Use synthetic data and provide a mock path so others can try it.
+
+If you prefer a prepared task, claim its existing issue below instead of
+creating a duplicate.
+
 ## Find a ContribFest Issue
 
 Session candidates live on this repository under the
 [ContribFest milestone](https://github.com/cadence-workflow/cadence-ai-samples/milestone/2)
 and the `event:contribfest` label. Open, unassigned Issues labeled
-`status:ready` are available to claim through the coordinator path below.
+`status:ready` are available to claim through the `/claim` path below.
 Recheck ownership and linked pull requests before claiming.
 
-Choose a difficulty that matches your time and energy:
+Choose a difficulty that matches your experience and what you want to learn.
+The [task index groups prepared work by level](contribfest/kubecon-na-2026/shortlist.md#choose-your-level)
+and separates the change's complexity from the tools and services it needs:
 
 | Path | Good when you want to… |
 | --- | --- |
-| **Low-stakes** | Get a first win: one prepared failure, a small file set, exact commands |
-| **Mid-level** | Harden a real durability gap with a bit more surface area |
-| **High-level / stretch** | Investigate recovery or replay across several steps |
+| **Beginner** | Read one focused example and improve a test or a small, well-defined behavior. |
+| **Intermediate** | Change retry, review or state behavior across a few functions and test its edge cases. |
+| **Advanced** | Investigate persistent state, replay or recovery across multiple steps or Runs. |
 
 Pick the task that fits you. Excited contributors should feel empowered to claim
 a stretch Issue; maintainers are in the room to help. Claim through the
-coordinator path below; do not open competing branches for the same Issue.
+`/claim` path below; do not open competing branches for the same Issue.
 
 ## Participant guide
 
 ### 1. Choose a workflow problem
 
-Each event Issue starts with a common AI workflow failure and asks you to add or
-demonstrate the Cadence protection for it. Examples include:
+Choose a useful outcome for an agent: produce a report, book a trip, route a
+ticket or keep a release watch moving. Then choose one behavior to improve.
+The issue explains what you will make possible, the Cadence concept it uses
+and how you will observe the result.
 
-| Common failure | Cadence protection |
-| --- | --- |
-| A provider call fails temporarily or permanently | Bounded retries and non-retryable errors |
-| Human approval never arrives or targets the wrong request | Signals, durable timers, and queryable state |
-| A tool performs an external action but loses its response | Stable idempotency keys and activity retry boundaries |
-| Long-running work stalls partway through | Heartbeats and progress recovery |
-| A Worker restarts after completing part of the work | Event history and deterministic replay |
-| A concurrent task fails or an agent loop never stops | Explicit partial-failure policies and hard bounds |
+Cadence coordinates retries, records completed Activity results and delivers
+human input. Your application still defines valid input, safe repeated writes,
+review rules and whether the result is useful. A passing Workflow alone does
+not prove that an agent's answer is correct.
 
-The Issue gives you the scaffold, injected failure, files to change, exact
-validation, and visible proof. Choose a difficulty and failure mode that fit
-your experience and the time remaining. Coding agents are optional.
+Each issue includes a short experiment and a dedicated resources section.
+Predict the result, run the smallest relevant case and inspect its state or
+output. For a coverage task, keep the existing runtime behavior and prove the
+new test detects the documented mistake.
 
 Prepare only the local services named by your Issue:
 
@@ -115,24 +139,26 @@ paid inference or provider credentials.
 Choose an open, unassigned candidate from the organizer-published event pool.
 Candidates use `event:contribfest`, the event milestone, and one setup lane.
 Those markers group event work; the `status:*` label records whether work is
-available or claimed.
+available or claimed. Every open Issue has exactly one lifecycle label:
+`status:needs-triage`, `status:ready`, or `status:in-progress`. A transition
+replaces the prior lifecycle label rather than adding another one.
 
 Use the [first-time contributor
 path](CONTRIBUTING.md#first-time-contributor-path) and its [approved-work claim
-instructions](CONTRIBUTING.md#claim-approved-work). During the event, the claim
-coordinator applies that workflow:
+instructions](CONTRIBUTING.md#claim-approved-work). During the event:
 
 1. You choose an open, unassigned `status:ready` candidate.
-2. You post the documented claim request with your GitHub username and proposed
-   `issue-N-short-slug` branch.
-3. The coordinator rechecks assignees, comments, labels, and active linked pull
-   requests.
-4. The coordinator records ownership and changes `status:ready` to
-   `status:in-progress`.
+2. You post an Issue comment whose trimmed body is exactly `/claim`.
+3. The workflow selects the earliest eligible request in the current readiness
+   window, regardless of Actions delivery order.
+4. The winning immutable comment plus `status:in-progress` records ownership.
 5. Only then do you create the branch on your fork and begin work.
 
-There is no informal event claim. If two people want the same Issue, wait for
-the coordinator's ownership record rather than creating competing branches.
+There is no informal event claim. If Actions is unavailable or fails closed, a
+facilitator follows the manual recheck-and-transition fallback in
+[`CONTRIBUTING.md`](CONTRIBUTING.md#claim-approved-work). There is no `/release`
+command; abandonment remains manual and starts a new claim window only when a
+maintainer returns the Issue to `status:ready`.
 
 ### 3. Plan, work, and validate
 
@@ -158,6 +184,11 @@ channel to continue the conversation after the session.
 
 ### 4. Finish or hand off
 
+Show the result before handing it over: the receipt reused, the approval
+expired, the calls not repeated or the test that catches a deliberate bug.
+Include the observation in your PR or issue comment and say what it enables
+in an application. Record only what you actually ran.
+
 Choose the safe outcome that fits the remaining time:
 
 - **Draft pull request:** create a DCO-signed commit on your fork branch, push
@@ -178,8 +209,8 @@ the normal abandonment workflow only after preserving the current state.
   staff. Do not paste credentials.
 - **Setup is taking too long:** Ask a helper. You can pair on a working laptop
   or choose work with fewer local requirements.
-- **You cannot claim an Issue:** Post the documented claim request and ask event
-  staff to record ownership and update the lifecycle label.
+- **Your `/claim` request is not processed:** Ask event staff to use the manual
+  recheck-and-transition fallback. Do not repair lifecycle labels yourself.
 - **GitHub Actions is waiting for approval:** Stop and ask a maintainer to
   review the fork changes. Workflow-run approval is not pull-request approval.
 - **A validation command fails:** Preserve the command, complete output, current
