@@ -1,7 +1,25 @@
 # Incident Triage: the recorded keynote demo
 
-Start with [the code map](CODE-MAP.md), then inspect the [saved Run](recorded/run.json).
-This is the source behind the five keynote clips. It uses real local Qwen2.5:7b calls and synthetic checkout logs, tools and incident data. The production case in the presentation is separate and is not included here.
+Public source for keynote citation: [PR #162](https://github.com/cadence-workflow/cadence-ai-samples/pull/162).
+Browse the same tree on the public contributor branch without signing in:
+[`recipes/incident-triage/python/bare/keynote`](https://github.com/zawadzkidiana/cadence-ai-samples/tree/issue-159-keynote-source/recipes/incident-triage/python/bare/keynote).
+
+Start with [the code map](CODE-MAP.md) and [methodology](METHODOLOGY.md), then inspect the [saved Run](recorded/run.json).
+This is the source behind the five keynote clips. The experiment path is synthetic checkout logs into a local Qwen2.5:7b model, with injected failures and automated review Signals. The production case in the presentation is separate and is not included here.
+
+### External review in one command
+
+No Cadence, Ollama, browser, paid API, or GitHub login is required to audit the frozen evidence:
+
+```sh
+git clone https://github.com/zawadzkidiana/cadence-ai-samples.git
+cd cadence-ai-samples
+git checkout issue-159-keynote-source
+cd recipes/incident-triage/python/bare/keynote
+python3 verify_recording.py
+```
+
+Expect `checks: PASS`, 201 events, Cadence 9 responses / 4,652 logical tokens, and the uncheckpointed baseline 18 responses / 9,304 logical tokens.
 
 The reusable [Incident Triage recipe](../../../README.md) remains the attendee starting point. Its current constrained planner can follow the ERROR path directly. It is not expected to reproduce the recorded wrong turn, wording or token counts. This folder preserves the earlier presentation runtime so the recording can be audited without weakening that recipe.
 

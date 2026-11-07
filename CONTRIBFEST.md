@@ -12,6 +12,41 @@ Agent Examples** during KubeCon + CloudNativeCon North America 2026.
 - **Event work:** [ContribFest
   milestone](https://github.com/cadence-workflow/cadence-ai-samples/milestone/2)
 
+## Start with an outcome
+
+Run a prepared agent, make one focused contribution and show what it enables.
+You might recover an investigation after a failed call, prevent a duplicate
+booking or give a reviewer a deadline. If you improve a test, show which
+incorrect behavior it now catches.
+
+New to Cadence? Use the [prepared mock-agent path](contribfest/kubecon-na-2026/README.md#new-to-cadence-start-here)
+to see a draft before choosing a change. Then select work by purpose,
+difficulty and setup in the [task selection page](contribfest/kubecon-na-2026/shortlist.md).
+
+## Samples Explorer
+
+Choose an agent recipe, get matching commands and see its execution in
+Cadence Web. The Explorer reads your local checkout, including your edits.
+
+![Samples Explorer with Incident Triage selected and local service checks](contribfest/kubecon-na-2026/images/explorer-start.png)
+
+| Start here when you want to | Use the Explorer to |
+| --- | --- |
+| Find an example to build on | Choose a recipe, language, framework and mock or live mode. |
+| Get past local setup | Prepare dependencies and check which services respond. |
+| Understand an agent Run | Open history and Queries, then send supported review Signals. |
+
+From the repository root, launch the local browser tool:
+
+```bash
+./scripts/explore.sh
+```
+
+Browsing needs Python 3.10+ with venv support; the first launch downloads a
+Python dependency. Each recipe has its own runtime and service requirements.
+See [the Explorer walkthrough](contribfest/kubecon-na-2026/setup.md#explore-the-samples-in-your-browser)
+for selection, setup, Run links and review Signals.
+
 ## Build durable AI examples
 
 Start with Incident Triage to get familiar with the agent and Cadence. Inspect
@@ -32,6 +67,18 @@ a useful change or a clear next step for the next contributor.
 You do not need to claim an Issue to try the introductory exercise. Use the
 claim process below when choosing an upstream contribution.
 
+## Bring your own agent idea
+
+[Propose an agent workflow](contribfest/kubecon-na-2026/shortlist.md#bring-your-own-workflow)
+and demonstrate how it recovers from one failure. Start with a useful result,
+such as a research briefing, a reviewed travel plan or a coding task. Describe
+the external calls, failure and observable recovery in your own recipe issue.
+Ask a facilitator to review the proposal and record your claim before upstream
+implementation. Use synthetic data and provide a mock path so others can try it.
+
+If you prefer a prepared task, claim its existing issue below instead of
+creating a duplicate.
+
 ## Find a ContribFest Issue
 
 Session candidates live on this repository under the
@@ -40,13 +87,15 @@ and the `event:contribfest` label. Open, unassigned Issues labeled
 `status:ready` are available to claim through the coordinator path below.
 Recheck ownership and linked pull requests before claiming.
 
-Choose a difficulty that matches your time and energy:
+Choose a difficulty that matches your experience and what you want to learn.
+The [task index groups prepared work by level](contribfest/kubecon-na-2026/shortlist.md#choose-your-level)
+and separates the change's complexity from the tools and services it needs:
 
 | Path | Good when you want to… |
 | --- | --- |
-| **Low-stakes** | Get a first win: one prepared failure, a small file set, exact commands |
-| **Mid-level** | Harden a real durability gap with a bit more surface area |
-| **High-level / stretch** | Take on deeper multi-step durability work; still scaffolded, with a clear 45-minute stopping point if you cannot finish |
+| **Beginner** | Read one focused example and improve a test or a small, well-defined behavior. |
+| **Intermediate** | Change retry, review or state behavior across a few functions and test its edge cases. |
+| **Advanced** | Investigate persistent state, replay or recovery across multiple steps or Runs. |
 
 Pick the task that fits you. Excited contributors should feel empowered to claim
 a stretch Issue; maintainers are in the room to help. Claim through the
@@ -56,21 +105,20 @@ coordinator path below; do not open competing branches for the same Issue.
 
 ### 1. Choose a workflow problem
 
-Each event Issue starts with a common AI workflow failure and asks you to add or
-demonstrate the Cadence protection for it. Examples include:
+Choose a useful outcome for an agent: produce a report, book a trip, route a
+ticket or keep a release watch moving. Then choose one behavior to improve.
+The issue explains what you will make possible, the Cadence concept it uses
+and how you will observe the result.
 
-| Common failure | Cadence protection |
-| --- | --- |
-| A provider call fails temporarily or permanently | Bounded retries and non-retryable errors |
-| Human approval never arrives or targets the wrong request | Signals, durable timers, and queryable state |
-| A tool performs an external action but loses its response | Stable idempotency keys and activity retry boundaries |
-| Long-running work stalls partway through | Heartbeats and progress recovery |
-| A Worker restarts after completing part of the work | Event history and deterministic replay |
-| A concurrent task fails or an agent loop never stops | Explicit partial-failure policies and hard bounds |
+Cadence coordinates retries, records completed Activity results and delivers
+human input. Your application still defines valid input, safe repeated writes,
+review rules and whether the result is useful. A passing Workflow alone does
+not prove that an agent's answer is correct.
 
-The Issue gives you the scaffold, injected failure, files to change, exact
-validation, and visible proof. Choose a difficulty and failure mode that fit
-your experience and the time remaining. Coding agents are optional.
+Each issue includes a short experiment and a dedicated resources section.
+Predict the result, run the smallest relevant case and inspect its state or
+output. For a coverage task, keep the existing runtime behavior and prove the
+new test detects the documented mistake.
 
 Prepare only the local services named by your Issue:
 
@@ -78,7 +126,7 @@ Prepare only the local services named by your Issue:
 | --- | --- | --- |
 | Cadence | Run and inspect the workflow | [Ticket Routing requirements](recipes/ticket-routing/README.md#requirements) |
 | Laya | Local classification | [Install Laya](README.md#install-laya) |
-| Ollama with `qwen2.5:7b` | Incident Triage exercise (everyone) | [Exercise setup](recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md#prepare-before-the-session) |
+| Ollama with `qwen2.5:7b` | Incident Triage live exercise | [Exercise setup](recipes/incident-triage/python/bare/exercises/retry_policy_live/README.md#prepare-before-the-session) |
 | Ollama with `llama3.2` | Local model inference | [Install Ollama and llama3.2](README.md#install-ollama-and-llama32) |
 | Full local example | Exercise Laya and `llama3.2` together | [Recurring AI Watch setup](recipes/recurring-ai-watch/README.md#setup) |
 
@@ -91,7 +139,9 @@ paid inference or provider credentials.
 Choose an open, unassigned candidate from the organizer-published event pool.
 Candidates use `event:contribfest`, the event milestone, and one setup lane.
 Those markers group event work; the `status:*` label records whether work is
-available or claimed.
+available or claimed. Every open Issue has exactly one lifecycle label:
+`status:needs-triage`, `status:ready`, or `status:in-progress`. A transition
+replaces the prior lifecycle label rather than adding another one.
 
 Use the [first-time contributor
 path](CONTRIBUTING.md#first-time-contributor-path) and its [approved-work claim
@@ -103,7 +153,7 @@ coordinator applies that workflow:
    `issue-N-short-slug` branch.
 3. The coordinator rechecks assignees, comments, labels, and active linked pull
    requests.
-4. The coordinator records ownership and changes `status:ready` to
+4. The coordinator records ownership and replaces `status:ready` with
    `status:in-progress`.
 5. Only then do you create the branch on your fork and begin work.
 
@@ -127,12 +177,17 @@ contract](AGENTS.md).
   Architecture, priority, pull-request approval, and merge authorization stay
   with the designated humans.
 
-Ask the in-room team for help first. The facilitator will publish the event
-Slack channel and escalation format before the session; room staff route
-overflow questions to the remote support pool so participants do not have to
-coordinate that queue.
+Ask the in-room team for help, or join **`#cadence-contributors` on CNCF Slack**
+for setup, task and review questions. [Sign up or sign in](https://slack.cncf.io/),
+then search for `#cadence-contributors` and join the channel. Use the same
+channel to continue the conversation after the session.
 
 ### 4. Finish or hand off
+
+Show the result before handing it over: the receipt reused, the approval
+expired, the calls not repeated or the test that catches a deliberate bug.
+Include the observation in your PR or issue comment and say what it enables
+in an application. Record only what you actually ran.
 
 Choose the safe outcome that fits the remaining time:
 
@@ -155,7 +210,8 @@ the normal abandonment workflow only after preserving the current state.
 - **Setup is taking too long:** Ask a helper. You can pair on a working laptop
   or choose work with fewer local requirements.
 - **You cannot claim an Issue:** Post the documented claim request and ask event
-  staff to record ownership and update the lifecycle label.
+  staff to record ownership and replace the lifecycle label. Do not repair
+  lifecycle labels yourself.
 - **GitHub Actions is waiting for approval:** Stop and ask a maintainer to
   review the fork changes. Workflow-run approval is not pull-request approval.
 - **A validation command fails:** Preserve the command, complete output, current

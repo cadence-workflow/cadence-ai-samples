@@ -1,3 +1,4 @@
+import ast
 import io
 import json
 import os
@@ -46,6 +47,28 @@ def fake_client(**start_workflow: object) -> SimpleNamespace:
     return SimpleNamespace(
         start_workflow=AsyncMock(**start_workflow), close=AsyncMock()
     )
+
+
+class HttpFailureTests(unittest.TestCase):
+    def test_access_denial_does_not_retry_until_credentials_change(self) -> None:
+        for status in (401, 403):
+            with self.subTest(status=status):
+                error = activities.http_error(status)
+                self.assertIsInstance(error, activities.NonRetryableHttpError)
+                self.assertIn(
+                    type(error).__name__,
+                    QUICK_ACTIVITY["retry_policy"]["non_retryable_error_reasons"],
+                )
+
+    def test_transient_tool_failures_can_retry(self) -> None:
+        for status in (429, 503):
+            with self.subTest(status=status):
+                error = activities.http_error(status)
+                self.assertIsInstance(error, activities.RateLimited)
+                self.assertNotIn(
+                    type(error).__name__,
+                    QUICK_ACTIVITY["retry_policy"]["non_retryable_error_reasons"],
+                )
 
 
 class StoryTests(unittest.TestCase):
@@ -258,6 +281,19 @@ class WorkflowTests(unittest.IsolatedAsyncioTestCase):
                     f"{workflow_id}/{second.run_id}/input",
                 },
             )
+
+    def test_model_activities_use_the_model_timeout(self) -> None:
+        recipe = Path(__file__).resolve().parents[1]
+        tree = ast.parse((recipe / "workflow.py").read_text(encoding="utf-8"))
+        options = [
+            next(k.value.id for k in node.keywords if k.arg is None)
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and getattr(node.func, "attr", "") == "execute_activity"
+            and getattr(node.args[0], "id", "") in {"PLAN_ACTIVITY", "REVISE_ACTIVITY"}
+        ]
+        self.assertEqual(len(options), 4)
+        self.assertEqual(set(options), {"MODEL_ACTIVITY"})
 
     def test_retry_policy_is_bounded_and_strict(self) -> None:
         retry = QUICK_ACTIVITY["retry_policy"]
