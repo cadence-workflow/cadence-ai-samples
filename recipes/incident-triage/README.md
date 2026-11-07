@@ -235,3 +235,7 @@ If the launcher cannot prepare the environment, run:
 python3.13 -m venv .venv
 .venv/bin/python -m pip install -e .
 ```
+
+## Laptop measurements
+
+[Measured Mac results](2026-11-02-m4-max.md) cover both local models, review timing and observed memory allocation. The 16 GB x86 check remains open; these results do not establish support for that machine.
