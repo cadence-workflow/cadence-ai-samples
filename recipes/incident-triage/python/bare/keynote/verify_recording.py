@@ -1,4 +1,8 @@
-"""Check the frozen synthetic recording without services or model calls."""
+"""Check the frozen synthetic recording without services or model calls.
+
+Prints an attribution block so scripted demo setup is never mistaken for
+Cadence platform behavior. Frozen source/ and recorded/ hashes stay authoritative.
+"""
 from pathlib import Path
 import base64
 import hashlib
@@ -6,6 +10,39 @@ import json
 import sqlite3
 
 HERE = Path(__file__).resolve().parent
+
+# Scripted demo setup vs Cadence platform behavior. Kept next to the assertions
+# that prove each row so reviewers can audit claims mechanically.
+ATTRIBUTION = {
+    'scripted': [
+        'synthetic incident text and fixtures',
+        'one gateway HTTP 429 via capture faults.json',
+        'inject_duplicate copies a prior proposal (model_generated=false)',
+        'presentation_mode gates and capture Activity holds',
+        'automated revise, guidance, and approval Signals',
+        'kill of capture-owned Worker PIDs only',
+    ],
+    'application': [
+        'Activity retry policy declared on the Workflow',
+        'ordinary repeated-call guard on tool name and sorted arguments',
+        'review vs guidance semantics in Workflow code',
+    ],
+    'cadence': [
+        'schedules Activity retry after the raised 429',
+        'delivers Signals into the open Run',
+        'keeps service and database up across demo Worker kill',
+        'replays history so replacement Workers resume the approval wait',
+        'records completion; does not certify diagnosis correctness',
+    ],
+    'not_claimed': [
+        'Cadence invented the duplicate or the 429',
+        'Signals were human operator judgment',
+        'presentation pacing equals production latency',
+        'half tokens for every agent or monetary savings',
+        'Workflow completion certifies the root cause',
+    ],
+}
+
 
 def read(path):
     return json.loads((HERE / path).read_text())
@@ -97,10 +134,23 @@ def verify():
     for name, values in manifest['files'].items():
         if name.startswith('source/') and name.endswith('.py'):
             assert values['original_sha256'] == summary['source_sha256'][Path(name).name]
-    return {'checks':'PASS','frozen_files':len(manifest['files']), 'events':len(history),
-        'workflow_id':run['workflow_id'],'run_id':run['run_id'], 'observed':observed,
-        'recovery_model_responses':0, 'token_reduction':0.5,
-        'scope':'Offline verification of saved synthetic evidence. No provider or Cadence calls.'}
+    return {
+        'checks': 'PASS',
+        'frozen_files': len(manifest['files']),
+        'events': len(history),
+        'workflow_id': run['workflow_id'],
+        'run_id': run['run_id'],
+        'observed': observed,
+        'recovery_model_responses': 0,
+        'token_reduction': 0.5,
+        'attribution': ATTRIBUTION,
+        'scope': (
+            'Offline verification of saved synthetic evidence. '
+            'No provider or Cadence calls. '
+            'Scripted demo setup is listed under attribution.scripted; '
+            'Cadence platform behavior under attribution.cadence.'
+        ),
+    }
 
 if __name__ == '__main__':
     print(json.dumps(verify(), indent=2))

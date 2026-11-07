@@ -1,5 +1,5 @@
 {
-  "scope": "Synthetic local keynote demo only. No production evidence.",
+  "scope": "Synthetic local keynote demo only. No production evidence. Includes source/fixtures/logs required for fresh capture.",
   "files": {
     "source/activities.py": {
       "original_sha256": "bbe0529f8d81fb58b242a2871aca6642f9e4c757b3b5851b7057b6c12ab340d3",
@@ -129,6 +129,31 @@
     "recorded/final-history.json": {
       "original_sha256": "217b6d062c9077fb7598f339d18e33fdf09f859523408dfd385af68023f0b210",
       "export_sha256": "217b6d062c9077fb7598f339d18e33fdf09f859523408dfd385af68023f0b210",
+      "byte_identical": true
+    },
+    "source/fixtures/logs/api-gateway.log": {
+      "original_sha256": "cf10ee30b8d9c9a0deb093b7d0e010ad5a7b046f6bf4bdbff3773d198d07e738",
+      "export_sha256": "cf10ee30b8d9c9a0deb093b7d0e010ad5a7b046f6bf4bdbff3773d198d07e738",
+      "byte_identical": true
+    },
+    "source/fixtures/logs/checkout.log": {
+      "original_sha256": "28d65f625a9f85c19620e20bf574b59774c935fc9b7384ef0ea1d35808f83c24",
+      "export_sha256": "28d65f625a9f85c19620e20bf574b59774c935fc9b7384ef0ea1d35808f83c24",
+      "byte_identical": true
+    },
+    "source/fixtures/logs/inventory.log": {
+      "original_sha256": "313bddd46f9a30e828e6800924ec11f809acc7b2a9271f734d013b04a5b5a72e",
+      "export_sha256": "313bddd46f9a30e828e6800924ec11f809acc7b2a9271f734d013b04a5b5a72e",
+      "byte_identical": true
+    },
+    "source/fixtures/logs/ledger.log": {
+      "original_sha256": "7d87e77e34ad8e7271ecd38f0628722968ff03e3ef18654e4a482cdeeabb660f",
+      "export_sha256": "7d87e77e34ad8e7271ecd38f0628722968ff03e3ef18654e4a482cdeeabb660f",
+      "byte_identical": true
+    },
+    "source/fixtures/logs/payments.log": {
+      "original_sha256": "f127002426e9d480bdf33b0d23b3bfadff1cfaa5c89219299b6099e361f14460",
+      "export_sha256": "f127002426e9d480bdf33b0d23b3bfadff1cfaa5c89219299b6099e361f14460",
       "byte_identical": true
     }
   },

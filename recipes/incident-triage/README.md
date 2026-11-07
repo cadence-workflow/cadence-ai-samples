@@ -245,7 +245,10 @@ python3.13 -m venv .venv
 The [keynote source snapshot](python/bare/keynote/README.md) preserves the runtime,
 recording controller and synthetic evidence behind the five presentation clips.
 Cite the public export as [PR #162](https://github.com/cadence-workflow/cadence-ai-samples/pull/162).
-It is separate from this reusable recipe: the current constrained planner can
-follow the error path directly, and its outputs and counters can differ. The
-snapshot includes an offline verifier and explains the injected duplicate,
-automated review inputs and Worker recovery comparison. The frozen recording source is unchanged and exercised a 429.
+It is separate from this reusable recipe and from the recommended agent install
+path. Scripted demo setup (injected 429, capture-only duplicate, automated
+Signals, presentation holds, controlled Worker kill) is labeled separately from
+Cadence behavior (retry scheduling, Signal delivery, replay, completion). The
+current constrained planner can follow the error path directly, and its outputs
+and counters can differ. The snapshot's offline verifier prints that attribution
+with the frozen receipts.

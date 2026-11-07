@@ -209,6 +209,9 @@ The recipe treats HTTP 400, 401, 403 and 404 as nonretryable tool errors. HTTP 4
 ## Keynote source snapshot
 
 The [recorded keynote source](python/bare/keynote/README.md) is historical
-synthetic evidence, separate from this recipe contract. Its prompts, presentation
-gates, injected proposal, explicit review sequence and measured logical tokens
-are not the mock baseline or a promise of identical live-model output.
+synthetic evidence, separate from this recipe contract. Capture-scheduled faults,
+`inject_duplicate`, presentation gates, and automated review Signals are
+scripted demo setup. Cadence behavior in that export is retry scheduling, Signal
+delivery, history replay across a controlled Worker stop, and completion
+recording. Its prompts and measured logical tokens are not the mock baseline or a
+promise of identical live-model output. See that folder's attribution table.
