@@ -2,6 +2,8 @@
 
 Use this map to separate **scripted demo setup**, **application policy**, and **Cadence platform behavior**. The frozen `source/` tree is hash-pinned; do not treat capture-only branches as product defaults.
 
+For teaching order and clip seek times, use [PLAYBACK.md](PLAYBACK.md) and [checkpoints.json](checkpoints.json). Explain the whole agent before individual failures.
+
 ## Attribution legend
 
 | Label | Meaning |

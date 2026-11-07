@@ -214,4 +214,7 @@ synthetic evidence, separate from this recipe contract. Capture-scheduled faults
 scripted demo setup. Cadence behavior in that export is retry scheduling, Signal
 delivery, history replay across a controlled Worker stop, and completion
 recording. Its prompts and measured logical tokens are not the mock baseline or a
-promise of identical live-model output. See that folder's attribution table.
+promise of identical live-model output. See that folder's attribution table and
+[playback guide](python/bare/keynote/PLAYBACK.md). Teaching order: whole agent
+map, then failures; measured comparison before Reset; production observation
+kept separate from the synthetic demo.

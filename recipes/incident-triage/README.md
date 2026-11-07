@@ -249,6 +249,9 @@ It is separate from this reusable recipe and from the recommended agent install
 path. Scripted demo setup (injected 429, capture-only duplicate, automated
 Signals, presentation holds, controlled Worker kill) is labeled separately from
 Cadence behavior (retry scheduling, Signal delivery, replay, completion). The
-current constrained planner can follow the error path directly, and its outputs
-and counters can differ. The snapshot's offline verifier prints that attribution
-with the frozen receipts.
+[playback guide](python/bare/keynote/PLAYBACK.md) explains the whole agent first,
+then failed lookup, incomplete diagnosis, guidance, and same-Run recovery, with
+checkpoints and seek times verified against the current clips. The current
+constrained planner can follow the error path directly, and its outputs and
+counters can differ. Offline verifiers cover frozen receipts and checkpoint
+references.

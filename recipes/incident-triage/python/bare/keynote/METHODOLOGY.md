@@ -31,6 +31,8 @@ This document states what was measured and what was deliberately arranged. It do
 
 For these saved receipts, each investigation received nine responses and reported 3,901 input plus 751 output tokens. The raw process did the investigation twice, so its totals are 18 responses and 9,304 tokens. The Cadence Run retained its nine recorded responses and 4,652 tokens. Stopped, replacement, and final receipts show unchanged Cadence usage. The reduction is `(9304 - 4652) / 9304 = 0.5`.
 
+Present this measured comparison immediately after same-Run recovery in teaching order. Introduce **Reset** only afterward: Reset starts a new Run under the same Workflow ID from a supported boundary and does not undo external effects. Same-Run Worker recovery in this experiment is not Reset.
+
 ## Explicit non-claims
 
 This is one controlled interruption at an approval wait. It does not:

@@ -6,7 +6,11 @@ Browse the same tree on the public contributor branch without signing in:
 
 This folder is **historical synthetic evidence** behind five presentation clips. It is not the recommended install path for Cadence agents, and it is not the attendee Incident Triage recipe. Credibility depends on keeping scripted demo setup separate from Cadence platform behavior. Read the attribution table before the narrative.
 
-Start with [the code map](CODE-MAP.md) and [methodology](METHODOLOGY.md), then inspect the [saved Run](recorded/run.json).
+**Opening hook:** agents fail mid-investigation; Workflows can recover from recorded state.
+
+**Explain the whole agent first:** Trace → read logs → draft report → engineer reviews → save. Then follow failed lookup, incomplete diagnosis, human guidance, and same-Run recovery. Use the [playback guide](PLAYBACK.md) and [checkpoints.json](checkpoints.json) for that order. Keep the real production observation separate from this reconstructed public demo. Show the measured work comparison before introducing Reset.
+
+Start with [PLAYBACK.md](PLAYBACK.md), then [CODE-MAP.md](CODE-MAP.md) and [METHODOLOGY.md](METHODOLOGY.md), and inspect the [saved Run](recorded/run.json).
 
 ## Attribution: scripted setup vs Cadence behavior
 
@@ -38,9 +42,10 @@ cd cadence-ai-samples
 git checkout issue-159-keynote-source
 cd recipes/incident-triage/python/bare/keynote
 python3 verify_recording.py
+python3 verify_checkpoints.py
 ```
 
-Expect `checks: PASS`, an `attribution` block naming scripted vs Cadence responsibilities, 201 events, Cadence 9 responses / 4,652 logical tokens, and the uncheckpointed baseline 18 responses / 9,304 logical tokens.
+Expect `checks: PASS` from both, an `attribution` block naming scripted vs Cadence responsibilities, nine playback checkpoints, 201 events, Cadence 9 responses / 4,652 logical tokens, and the uncheckpointed baseline 18 responses / 9,304 logical tokens.
 
 The reusable recipe's current constrained planner can follow the ERROR path directly. It is not expected to reproduce the recorded wrong turn, wording, or token counts.
 
@@ -73,6 +78,14 @@ It verifies frozen-file hashes, reported usage, request equality, model completi
 | New model responses during recovery | 0 | 9 |
 
 That is 50% fewer logical tokens in this recovery comparison. It is not a monetary savings measurement. Local inference has compute costs, and a Python design with persistent checkpoints can recover differently.
+
+### Reset (after the comparison)
+
+**Reset** starts a new Run under the same Workflow ID from a supported boundary. It does not undo external effects. The deck may show a Ctrl+Z visual; keep that limit explicit. Same-Run Worker recovery in the clips is not Reset.
+
+## Credits
+
+Thanks to Ethan Lee, Sean Po, Daniel Yao, and the Michelangelo team for the production context that motivated this teaching reconstruction. Public materials here use synthetic fixtures only.
 
 ## Set up a fresh local capture (optional, not bit-identical)
 
