@@ -213,6 +213,9 @@ echo "Dependencies prepared."
                             hitl['variants']+watch['variants']+ticket['variants']))
         self.assertEqual([v['id'] for v in triage['variants']],
                          ['recipes/incident-triage/python/bare'])
+        self.assertTrue(all(
+            recipe['readme'] == '/doc?path=recipes%2F' + recipe['id'] + '%2FREADME.md'
+            for recipe in state['recipes']))
         self.assertTrue(triage['variants'][0]['supported'])
         self.assertEqual(triage['variants'][0]['modes'],['mock','live'])
         triage_result=self.explorer.resolve(dict(
@@ -233,6 +236,19 @@ echo "Dependencies prepared."
             sorted(entry['id'] for entry in state['classifiers']),
             ['jev-default', 'laya-local'],
         )
+
+    def test_docs_directories_are_not_implementations(self):
+        (self.root/'recipes/incident-triage/python/docs').mkdir()
+        images=self.root/'recipes/new-simple/docs/images'
+        images.mkdir(parents=True)
+        (images/'shot.png').write_bytes(b'png')
+        recipes=self.explorer.snapshot()['recipes']
+        triage=next(r for r in recipes if r['id']=='incident-triage')
+        self.assertEqual([v['id'] for v in triage['variants']],
+                         ['recipes/incident-triage/python/bare'])
+        self.assertTrue(all('docs' not in Path(v['id']).parts
+                            for r in recipes for v in r['variants']))
+        self.assertIn('new-simple',[r['id'] for r in recipes])
 
     def test_agent_handoffs_resolves_both_framework_commands_without_imports(self):
         for framework in ('google-adk','openai-agents'):
@@ -888,8 +904,8 @@ echo "Dependencies prepared."
         launcher=self.root/implementation/'run.sh'
         package_bin=self.root/'package-bin';package_bin.mkdir()
         package_tool=package_bin/'pip'
-        package_tool.write_text(
-            f"#!{sys.executable}\n"
+        package_script=package_bin/'pip.py'
+        package_script.write_text(
             "import os\n"
             "for key, value in os.environ.items(): print(f'{key}={value}')\n"
             "print('Authorization: Bearer printed-authorization')\n"
@@ -900,6 +916,9 @@ echo "Dependencies prepared."
             "print('final package failure')\n"
             "print('retry with the documented setup command')\n"
             "raise SystemExit(17)\n")
+        package_tool.write_text(
+            '#!/bin/sh\nexec ' + shlex.quote(sys.executable) + ' ' +
+            shlex.quote(str(package_script)) + ' "$@"\n')
         package_tool.chmod(0o755)
         launcher.write_text('#!/bin/sh\nexec pip install\n')
         launcher.chmod(0o755)
