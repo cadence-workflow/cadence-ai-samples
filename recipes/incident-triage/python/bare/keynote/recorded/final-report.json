@@ -1,0 +1,19 @@
+{
+  "call_path": [
+    "api-gateway",
+    "checkout",
+    "payments",
+    "ledger"
+  ],
+  "root_cause": "unknown",
+  "confidence": "low",
+  "summary": "The observed error chain is a 503 from the upstream service, followed by errors in the checkout, payments, and ledger services. The WARN message from the inventory service indicates slow stock checks but does not contribute to the ERROR chain. The trigger for the ledger connection exhaustion is unknown.",
+  "revision_request": "The observed ERROR chain is checkout: payments authorize failed (503); payments: ledger connection pool exhausted and ledger call timed out; ledger: max connections reached for client payments. Inventory has WARN messages only. Revise the report to separate these observations. Do not claim inventory caused the failure. State that what triggered connection exhaustion is unknown, and quote the ERROR messages in errors_per_hop.",
+  "errors_per_hop": [
+    "api-gateway | ERROR | upstream returned 503",
+    "checkout | ERROR | payments authorize failed",
+    "payments | ERROR | ledger connection pool exhausted",
+    "payments | ERROR | ledger call timed out",
+    "ledger | ERROR | max connections reached for client payments"
+  ]
+}

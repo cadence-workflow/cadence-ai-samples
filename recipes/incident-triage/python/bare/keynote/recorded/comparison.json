@@ -1,0 +1,113 @@
+{
+  "scope": "The exact Cadence Run shown in all five clips compared with two newly measured uncheckpointed executions of the same investigation protocol. Local synthetic incident/tools and real Qwen inference.",
+  "model": "qwen2.5:7b",
+  "cadence_workflow_id": "keynote-9cce44f7",
+  "cadence_run_id": "1c41e5a8-ae04-4d00-8290-861ebcbbf9b1",
+  "cadence": {
+    "calls": 9,
+    "input_tokens": 3901,
+    "output_tokens": 751,
+    "model_invocations": 9,
+    "response_receipts": 9,
+    "invocations_without_response_receipt": 0,
+    "setup_repeated": 0,
+    "writes": 1,
+    "database_report_rows": 1,
+    "ledger_counts": {
+      "identify_input_params": 1,
+      "store_trace": 1,
+      "fetch_dependency_graph": 1,
+      "get_logs_by_trace_id": 7,
+      "plan_next": 7,
+      "revise_draft": 2,
+      "upload_conclusion": 1
+    },
+    "recovery_calls": 0
+  },
+  "raw": {
+    "calls": 18,
+    "input_tokens": 7802,
+    "output_tokens": 1502,
+    "model_invocations": 18,
+    "response_receipts": 18,
+    "invocations_without_response_receipt": 0,
+    "setup_repeated": 4,
+    "writes": 1,
+    "database_report_rows": 1,
+    "ledger_counts": {
+      "identify_input_params": 2,
+      "store_trace": 2,
+      "fetch_dependency_graph": 2,
+      "get_logs_by_trace_id": 13,
+      "plan_next": 14,
+      "model_action": 14,
+      "duplicate_blocked": 2,
+      "operator_revision": 4,
+      "revise_draft": 4,
+      "revision_complete": 2,
+      "operator_guidance": 2,
+      "second_revision_complete": 2,
+      "awaiting_approval": 2,
+      "operator_approval": 1,
+      "upload_conclusion": 1
+    },
+    "recovery_calls": 9
+  },
+  "request_equivalence": {
+    "cadence_and_raw_first_exact_request_bodies_equal": true,
+    "raw_first_and_restart_exact_request_bodies_equal": true,
+    "cadence_raw_first_mismatch_at_response": null,
+    "raw_first_restart_mismatch_at_response": null,
+    "cadence_response_count": 9,
+    "raw_first_response_count": 9,
+    "raw_restart_response_count": 9,
+    "note": "Protocol/configuration are fixed; exact equality is checked, not assumed. A mismatch limits causal token comparisons; each path's actual recovery usage remains separately observed."
+  },
+  "raw_execution": {
+    "run_id": "paired-raw-c20247848d",
+    "recovery_calls": 9,
+    "first": {
+      "calls": 9,
+      "input_tokens": 3901,
+      "output_tokens": 751
+    },
+    "restart": {
+      "calls": 9,
+      "input_tokens": 3901,
+      "output_tokens": 751
+    },
+    "service_status": "local process completed",
+    "fault_scope": "one429 consumed once overall; duplicate injection repeats in each restarted initial investigation because its execution flag was in memory"
+  },
+  "source_sha256": {
+    "activities.py": "bbe0529f8d81fb58b242a2871aca6642f9e4c757b3b5851b7057b6c12ab340d3",
+    "worker.py": "5941307a444988b44ea0e2cedebc2385e25a6a7eae1a5a111121bc7d6ea685ca",
+    "story.py": "645b7882080fb2ce4fe882b7e820c568e34beea8e648f1555b823244d7cd44eb",
+    "run_variants.py": "5be19903704d6dddf3ad5f8a3f0f248e2e6cd6e65eb22c3ae943b8eb6f29d003",
+    "run_rehearsal.py": "1940a41e637f72e16ea8543a99facd700ab055e7601f78959a8221f08f5f4466",
+    "live_model.py": "e3d256061c1b1cb02e4d04918bbead1c59a1c02a2e79971a97316ff34075bd9f",
+    "raw_agent.py": "d26004ff72e910744cca398bccc6585849e9213577c669edb53e1bc892c8a570",
+    "durability_manifest.py": "53634fe1cf050f1aea0060380c8029353d36b0712831b893c16e2d1972be491b",
+    "check_clean_copy.py": "186821e0ef344dec5585e31338914d0bf5d90676d30fcfdad0da05bfd4421aad",
+    "verify_comparisons.py": "7557effc9223e7e415213a6d9d07e67b5b40957a37cb701781b2e6ff262f41d0",
+    "drill.py": "ee65b1f87455f030e5b0f79c6d0ee5a04a31f8007daa04d9634155193aa92a17",
+    "workflow.py": "26e152c872089131a724f2d29f6bd2ccdd9b7a8b4481f2627406095d724cd18d",
+    "main.py": "86b6abac9572140b25463e207da8a07e199d40b82e67df049546a12d9a0404cc",
+    "run_compare.py": "337e451ca85d52fd7438f377619d90f92f69bf3f997da59c8dbf91acc4809c8b"
+  },
+  "cadence_receipts": "recorded/cadence",
+  "raw_receipts": "recorded/raw",
+  "actual_external_api_usd": 0,
+  "local_compute_cost_usd": null,
+  "limits": [
+    "One observed interruption at an approval wait after all model/tool completions were recorded.",
+    "Input tokens include reported cached prompt tokens. Logical tokens are not a bill.",
+    "Raw baseline retains input/report side effects but no execution checkpoint. A checkpointed Python design can behave differently.",
+    "Presentation gates and log Activity heartbeats control capture pacing. Reviewer and approval Signals are sent by recorder automation.",
+    "A copied tool proposal is an explicit injection, not spontaneous model looping."
+  ],
+  "cadence_total_tokens": 4652,
+  "raw_total_tokens": 9304,
+  "token_reduction": 0.5,
+  "token_ratio": 2.0
+}

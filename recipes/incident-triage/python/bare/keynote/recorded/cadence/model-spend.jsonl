@@ -1,0 +1,9 @@
+{"call": "plan_next", "external_usd": 0.0, "input_tokens": 265, "model": "qwen2.5:7b", "note": "local Ollama, external API $0, local compute unpriced", "output_tokens": 31, "phase": "cadence", "provider": "ollama"}
+{"call": "plan_next", "external_usd": 0.0, "input_tokens": 420, "model": "qwen2.5:7b", "note": "local Ollama, external API $0, local compute unpriced", "output_tokens": 38, "phase": "cadence", "provider": "ollama"}
+{"call": "plan_next", "external_usd": 0.0, "input_tokens": 500, "model": "qwen2.5:7b", "note": "local Ollama, external API $0, local compute unpriced", "output_tokens": 117, "phase": "cadence", "provider": "ollama"}
+{"call": "revise_draft", "external_usd": 0.0, "input_tokens": 309, "model": "qwen2.5:7b", "note": "local Ollama, external API $0, local compute unpriced", "output_tokens": 102, "phase": "cadence", "provider": "ollama"}
+{"call": "plan_next", "external_usd": 0.0, "input_tokens": 287, "model": "qwen2.5:7b", "note": "local Ollama, external API $0, local compute unpriced", "output_tokens": 35, "phase": "cadence", "provider": "ollama"}
+{"call": "plan_next", "external_usd": 0.0, "input_tokens": 442, "model": "qwen2.5:7b", "note": "local Ollama, external API $0, local compute unpriced", "output_tokens": 51, "phase": "cadence", "provider": "ollama"}
+{"call": "plan_next", "external_usd": 0.0, "input_tokens": 615, "model": "qwen2.5:7b", "note": "local Ollama, external API $0, local compute unpriced", "output_tokens": 29, "phase": "cadence", "provider": "ollama"}
+{"call": "plan_next", "external_usd": 0.0, "input_tokens": 693, "model": "qwen2.5:7b", "note": "local Ollama, external API $0, local compute unpriced", "output_tokens": 178, "phase": "cadence", "provider": "ollama"}
+{"call": "revise_draft", "external_usd": 0.0, "input_tokens": 370, "model": "qwen2.5:7b", "note": "local Ollama, external API $0, local compute unpriced", "output_tokens": 170, "phase": "cadence", "provider": "ollama"}

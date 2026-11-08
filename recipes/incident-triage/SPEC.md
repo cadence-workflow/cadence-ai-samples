@@ -27,8 +27,8 @@ makes synthetic work faster.
 - Mock mode, the rehearsal, the variants, and the comparison do not call a
   model provider or invent token prices.
 - Live mode calls one catalog model from the existing plan and revise
-  activities and prints reported usage. It does not replace the scripted
-  inventory wrong turn.
+  Activities and prints reported usage. Its choices come from the model and
+  need not reproduce the scripted inventory wrong turn.
 - No production data, autonomous remediation, or real paging, ticketing, or
   monitoring system.
 - No claim that Cadence is faster or that an Activity executes exactly once.
@@ -51,8 +51,8 @@ Generated from the `python/bare` profile defined by the
 - **Agent integration:** none
 - **Implementation directory:** `python/bare`
 - **Mock and live behavior:** Mock runs the scripted planner, including the
-  inventory wrong turn modeled on the real run. Live reads `models.yaml` and
-  calls that model from the plan and revise activities. The default live model
+  inventory wrong turn used as a synthetic teaching scenario. Live reads
+  `models.yaml` and calls that model from the plan and revise activities. The default live model
   is `llama3.2-local`. Start does not select a model. Ollama requests carry a
   JSON schema that allows only the fixture's services and bounded text,
   requires a lookup before the first draft, excludes services already looked
@@ -205,3 +205,16 @@ URLs, people, customers, or deployed-system claims.
 ## Tool error classification
 
 The recipe treats HTTP 400, 401, 403 and 404 as nonretryable tool errors. HTTP 429 and temporary service failures remain eligible for its bounded retry policy. Access failures require changed credentials or permissions; waiting alone does not resolve them. This classification is application code. Cadence applies the retry policy to the raised error reason.
+
+## Keynote source snapshot
+
+The [recorded keynote source](python/bare/keynote/README.md) is historical
+synthetic evidence, separate from this recipe contract. Capture-scheduled faults,
+`inject_duplicate`, presentation gates, and automated review Signals are
+scripted demo setup. Cadence behavior in that export is retry scheduling, Signal
+delivery, history replay across a controlled Worker stop, and completion
+recording. Its prompts and measured logical tokens are not the mock baseline or a
+promise of identical live-model output. See that folder's attribution table and
+[playback guide](python/bare/keynote/PLAYBACK.md). Teaching order: whole agent
+map, then failures; measured comparison before Reset; production observation
+kept separate from the synthetic demo.
