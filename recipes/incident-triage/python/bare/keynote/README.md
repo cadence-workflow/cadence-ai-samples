@@ -1,8 +1,9 @@
 # Incident Triage: the recorded keynote demo
 
 Public source for keynote citation: [PR #162](https://github.com/cadence-workflow/cadence-ai-samples/pull/162).
-Browse the same tree on the public contributor branch without signing in:
-[`recipes/incident-triage/python/bare/keynote`](https://github.com/zawadzkidiana/cadence-ai-samples/tree/issue-159-keynote-source/recipes/incident-triage/python/bare/keynote).
+Browse the export in that PR without signing in. After merge, the same tree lives on
+upstream `main` at
+[`recipes/incident-triage/python/bare/keynote`](https://github.com/cadence-workflow/cadence-ai-samples/tree/main/recipes/incident-triage/python/bare/keynote).
 
 This folder is **historical synthetic evidence** behind five presentation clips. It is not the recommended install path for Cadence agents, and it is not the attendee Incident Triage recipe. Credibility depends on keeping scripted demo setup separate from Cadence platform behavior. Read the attribution table before the narrative.
 
@@ -37,9 +38,9 @@ Every row below is intentional. Do not treat the left column as a Cadence featur
 No Cadence, Ollama, browser, paid API, or GitHub login is required to audit the frozen evidence:
 
 ```sh
-git clone https://github.com/zawadzkidiana/cadence-ai-samples.git
+git clone https://github.com/cadence-workflow/cadence-ai-samples.git
 cd cadence-ai-samples
-git checkout issue-159-keynote-source
+gh pr checkout 162   # after merge: stay on main
 cd recipes/incident-triage/python/bare/keynote
 python3 verify_recording.py
 python3 verify_checkpoints.py
