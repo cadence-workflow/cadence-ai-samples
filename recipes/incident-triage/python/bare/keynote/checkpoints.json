@@ -1,0 +1,291 @@
+{
+  "schema": "keynote-playback-checkpoints/v1",
+  "workflow_id": "keynote-9cce44f7",
+  "run_id": "1c41e5a8-ae04-4d00-8290-861ebcbbf9b1",
+  "domain": "incident-demo",
+  "public_source": "https://github.com/cadence-workflow/cadence-ai-samples/pull/162",
+  "step_history": ["Trace", "Graph", "Logs", "Draft", "Review", "Save"],
+  "clips": [
+    {
+      "id": "clip-01",
+      "slide": 18,
+      "file": "01-temporary-error-retry.mp4",
+      "duration_s": 28.32,
+      "sha256": "a3da282b4c1c6e4ac842d3ba63acd6c8a95b3660b1dd03f3c78378a6d29fbb5a"
+    },
+    {
+      "id": "clip-02",
+      "slide": 21,
+      "file": "02-repeated-lookup-prevention.mp4",
+      "duration_s": 43.24,
+      "sha256": "c22c924215492f969380fd9f109137b62b7bf91d3dcf0efe8f605046842da4e5"
+    },
+    {
+      "id": "clip-03",
+      "slide": 24,
+      "file": "03-review-existing-evidence.mp4",
+      "duration_s": 18.08,
+      "sha256": "58d2978765673fa00ede0c99b301f661d23d07f2b4b54425039e53cc63b29376"
+    },
+    {
+      "id": "clip-04",
+      "slide": 27,
+      "file": "04-guidance-and-new-evidence.mp4",
+      "duration_s": 74.72,
+      "sha256": "955d171440799acc3b0413cb004b0d55dd59a4b0238cde425649a4380859fc2a"
+    },
+    {
+      "id": "clip-05",
+      "slide": 30,
+      "file": "05-worker-stop-and-recovery.mp4",
+      "duration_s": 57.08,
+      "sha256": "3939e162bf0b77d711de5d4524d45a9e4019f6fde951e552836e5ea3d4612f73"
+    }
+  ],
+  "timestamp_verification": {
+    "method": "sha256 match of final edited MP4s against Keynote-Readability-2026-11-07 Media manifest; seek times are chapter_start within each edited clip",
+    "verified_on": "2026-11-07",
+    "note": "Reading holds are editorial pauses, not measured retry delays. Do not reuse older slide numbers."
+  },
+  "checkpoints": [
+    {
+      "id": "setup-and-agent-map",
+      "title": "Customer impact and setup",
+      "already_executed": [],
+      "waiting": ["Trace"],
+      "current_step": "Trace",
+      "workflow_state": "Before or at Workflow start; synthetic checkout fails with HTTP 500.",
+      "evidence": [
+        "Synthetic trace and service map in source/fixtures/",
+        "recorded/run.json workflow_id and run_id"
+      ],
+      "takeaway": "Show the whole agent path first: Trace → Logs → Draft → Review → Save. The public demo reconstructs an incident; it does not resume a production execution.",
+      "question": "What should survive if a Worker disappears mid-investigation?",
+      "continue": "Open clip 01 or start offline verify_recording.py / a fresh capture.",
+      "recording": null,
+      "history_events": [],
+      "attribution": "scripted fixtures"
+    },
+    {
+      "id": "lookup-fails-then-recovers",
+      "title": "Lookup fails, then recovers",
+      "already_executed": ["Trace", "Graph"],
+      "waiting": ["Logs"],
+      "current_step": "Logs",
+      "workflow_state": "Gateway log Activity attempt 0 raised HTTP 429; Cadence scheduled attempt 1 after the Workflow retry policy.",
+      "evidence": [
+        "Event 25 retry policy (10s, max 3)",
+        "Event 32 ActivityTaskStarted attempt 1 after RateLimited",
+        "Graph lookup already completed once"
+      ],
+      "takeaway": "Keep the 429 readable before showing recovery. Cadence schedules the retry; it did not invent the fault.",
+      "question": "Which work needs another attempt, and which result is already saved?",
+      "continue": "Release the presentation hold or watch through gateway-completed.",
+      "recording": {
+        "clip_id": "clip-01",
+        "slide": 18,
+        "seek_s": 5.3,
+        "scene_key": "gateway-retry-started"
+      },
+      "history_events": [25, 32],
+      "attribution": "scripted 429; Cadence retry scheduling"
+    },
+    {
+      "id": "read-returned-evidence",
+      "title": "Read the returned evidence",
+      "already_executed": ["Trace", "Graph", "Logs"],
+      "waiting": ["Draft"],
+      "current_step": "Logs",
+      "workflow_state": "Gateway logs returned after retry. Investigation can continue.",
+      "evidence": [
+        "Event 33 ActivityTaskCompleted",
+        "Gateway ERROR: upstream returned 503"
+      ],
+      "takeaway": "The incident error is HTTP 503 upstream. That is separate from the lookup request's HTTP 429.",
+      "question": "What does the 503 tell the agent to inspect next?",
+      "continue": "Proceed into model tool choices (checkout, then inventory).",
+      "recording": {
+        "clip_id": "clip-01",
+        "slide": 18,
+        "seek_s": 13.6,
+        "scene_key": "gateway-completed"
+      },
+      "history_events": [33],
+      "attribution": "synthetic log content; Cadence recorded completion"
+    },
+    {
+      "id": "copied-lookup-blocked",
+      "title": "Copied lookup is blocked",
+      "already_executed": ["Trace", "Graph", "Logs"],
+      "waiting": ["Draft"],
+      "current_step": "Logs",
+      "workflow_state": "After two successful agent lookups, capture-only inject_duplicate copied the inventory proposal and blocked dispatch.",
+      "evidence": [
+        "Events 71 and 73 inventory lookup",
+        "injected_proposal with model_generated false and executed false",
+        "Decision around event 80"
+      ],
+      "takeaway": "Application guard code blocked a deliberately copied proposal. Cadence does not automatically identify semantically duplicate tool calls.",
+      "question": "What should product code own versus what the platform records?",
+      "continue": "Continue to the first draft.",
+      "recording": {
+        "clip_id": "clip-02",
+        "slide": 21,
+        "seek_s": 23.2,
+        "scene_key": "duplicate-blocked"
+      },
+      "history_events": [71, 73, 80],
+      "attribution": "scripted injection; application guard; Cadence state persistence"
+    },
+    {
+      "id": "first-diagnosis-incomplete",
+      "title": "First diagnosis is incomplete",
+      "already_executed": ["Trace", "Graph", "Logs", "Draft"],
+      "waiting": ["Review"],
+      "current_step": "Draft",
+      "workflow_state": "First draft reports low confidence and leans on inventory without payments or ledger evidence.",
+      "evidence": [
+        "Event 87 draft Activity result",
+        "confidence low",
+        "Missing payments and ledger lookups at this point"
+      ],
+      "takeaway": "Label confidence as model-reported. Low confidence is not a Cadence signal.",
+      "question": "Would you approve this draft with the evidence on screen?",
+      "continue": "Send or watch the revise Signal that asks for ERROR quotations only.",
+      "recording": {
+        "clip_id": "clip-02",
+        "slide": 21,
+        "seek_s": 31.5,
+        "scene_key": "model-9-model_response"
+      },
+      "history_events": [87],
+      "attribution": "model output on synthetic evidence"
+    },
+    {
+      "id": "confidence-not-new-evidence",
+      "title": "Confidence is not new evidence",
+      "already_executed": ["Trace", "Graph", "Logs", "Draft", "Review"],
+      "waiting": ["Review"],
+      "current_step": "Review",
+      "workflow_state": "After revise Signal, reported confidence rises to high while new log lookups remain zero.",
+      "evidence": [
+        "Event 95 revise Signal",
+        "Event 101 revision result confidence high",
+        "No get-logs scheduled between events 95 and 105"
+      ],
+      "takeaway": "Asking the model to quote existing ERRORs can change confidence without gathering new evidence. Keep the new-lookup count visible.",
+      "question": "What would you require before trusting a confidence jump?",
+      "continue": "Send guidance toward payments and ledger, or watch clip 04.",
+      "recording": {
+        "clip_id": "clip-03",
+        "slide": 24,
+        "seek_s": 9.75,
+        "scene_key": "first-revision"
+      },
+      "history_events": [95, 101],
+      "attribution": "scripted revise Signal; model revision; Cadence Signal delivery"
+    },
+    {
+      "id": "human-guidance-changes-path",
+      "title": "Human guidance changes the investigation",
+      "already_executed": ["Trace", "Graph", "Logs", "Draft", "Review"],
+      "waiting": ["Save"],
+      "current_step": "Review",
+      "workflow_state": "Guidance Signal directs a new pass through payments and ledger in the same Run. Final reviewed report keeps root_cause unknown and confidence low.",
+      "evidence": [
+        "Event 105 guidance Signal",
+        "Event 141 payments logs including ledger pool exhaustion",
+        "Event 180 second revise Signal",
+        "Event 186 final report root_cause unknown confidence low"
+      ],
+      "takeaway": "After guidance, new logs support connection-pool exhaustion. The initiating trigger remains unknown. Guidance starts new tool work; revision alone does not.",
+      "question": "What changed in the evidence set after guidance that was missing from the first draft?",
+      "continue": "Reach the approval wait; do not introduce Reset yet.",
+      "recording": {
+        "clip_id": "clip-04",
+        "slide": 27,
+        "seek_s": 0.0,
+        "scene_key": "signal-guidance"
+      },
+      "history_events": [105, 141, 180, 186],
+      "attribution": "scripted guidance and revise Signals; model and synthetic tools; Cadence same-Run continuation"
+    },
+    {
+      "id": "workers-stop-at-approval",
+      "title": "Workers stop at the approval wait",
+      "already_executed": ["Trace", "Graph", "Logs", "Draft", "Review"],
+      "waiting": ["Save"],
+      "current_step": "Save",
+      "workflow_state": "Workflow is open at approval. Capture kills only the two demo Worker PIDs. Cadence service and database stay up.",
+      "evidence": [
+        "owned-workers-stopped.json pids_alive empty",
+        "Usage at stop equals final Cadence usage (9 responses, 3901/751 tokens)"
+      ],
+      "takeaway": "Make the failure boundary explicit: Workers gone, Workflow Run still open, history retained.",
+      "question": "What must still be true for a replacement Worker to continue without re-calling the model?",
+      "continue": "Start replacement Workers on the same Task List.",
+      "recording": {
+        "clip_id": "clip-05",
+        "slide": 30,
+        "seek_s": 8.95,
+        "scene_key": "workers-stopped"
+      },
+      "history_events": [],
+      "attribution": "scripted Worker kill; Cadence service remains"
+    },
+    {
+      "id": "same-run-recovery",
+      "title": "Replacement Workers finish the same Run",
+      "already_executed": ["Trace", "Graph", "Logs", "Draft", "Review", "Save"],
+      "waiting": [],
+      "current_step": "Save",
+      "workflow_state": "Replacement Workers restore the approval wait. Approval Signal arrives. Keyed write commits on activities-B. Same Workflow ID and Run ID complete.",
+      "evidence": [
+        "owned-workers-restarted.json",
+        "Event 190 approval Signal",
+        "Event 197 write committed on activities-B",
+        "Event 201 Workflow completion",
+        "0 new model calls during recovery"
+      ],
+      "takeaway": "Recovery adds zero model calls in this interruption because earlier calls completed and their results were recorded. Show the same Workflow ID and Run ID before and after.",
+      "question": "How does this differ from starting a new Run?",
+      "continue": "Read the measured comparison table, then discuss Reset separately.",
+      "recording": {
+        "clip_id": "clip-05",
+        "slide": 30,
+        "seek_s": 20.62,
+        "scene_key": "workers-restored"
+      },
+      "history_events": [190, 197, 201],
+      "attribution": "Cadence replay and Signal delivery; scripted approval; application keyed write"
+    }
+  ],
+  "measured_comparison": {
+    "show_before": "reset",
+    "python_restart": {
+      "model_responses": 18,
+      "input_tokens": 7802,
+      "output_tokens": 1502,
+      "logical_tokens": 9304,
+      "additional_model_calls_after_interruption": 9
+    },
+    "cadence_same_run_recovery": {
+      "model_responses": 9,
+      "input_tokens": 3901,
+      "output_tokens": 751,
+      "logical_tokens": 4652,
+      "additional_model_calls_after_interruption": 0
+    },
+    "limits": "One controlled comparison with local Qwen2.5:7b, interrupted at approval wait. No external model API charge; compute and infrastructure unpriced. Not dollar savings."
+  },
+  "reset": {
+    "introduce_after": "measured_comparison",
+    "meaning": "Reset starts a new Run under the same Workflow ID from a supported boundary. It does not undo external effects.",
+    "visual": "Ctrl+Z metaphor may appear in the deck; keep that limit explicit."
+  },
+  "production_observation": {
+    "separate_from_demo": true,
+    "summary": "In the observed on-call run, seven log-access calls were denied and nobody authorized access. Those were not seven Cadence Activity retries. The harness returned normally inside its Activity, so the Workflow completed its code path without a diagnosis. A structured wait for human review was missing.",
+    "public_demo": "The public demo reconstructs an incident with synthetic fixtures and carries the investigation forward narratively. It does not resume the production execution."
+  }
+}

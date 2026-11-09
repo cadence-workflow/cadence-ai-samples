@@ -15,9 +15,9 @@ dependency graph, follows errors through checkout, payments, and ledger, accepts
 operator guidance and a changed output brief, waits for approval, and writes one
 keyed conclusion.
 
-Mock mode uses a deterministic synthetic planner. That planner keeps the
-inventory wrong turn from the real run. Live mode calls a local model. No paid
-API or production data is used.
+Mock mode uses a deterministic synthetic planner. The inventory wrong turn is a
+deliberately scripted teaching scenario, separate from the production example.
+Live mode calls a local model. No paid API or production data is used.
 
 ## Requirements
 
@@ -53,9 +53,11 @@ Terminal 2:
 ./run.sh start --mode mock
 ```
 
-`mock` keeps the scripted planner. `live` calls catalog model `llama3.2-local`
-from the plan and revise activities. Ollama must be running at
-`http://localhost:11434` with `llama3.2:latest` pulled. Set
+`mock` keeps the scripted planner. `live` calls a catalog model from the plan
+and revise Activities. For the keynote and ContribFest model path, select
+`qwen2.5-local` explicitly and pull `qwen2.5:7b` before the event. Ollama must be
+running at `http://localhost:11434`. The generic Worker still defaults to
+`llama3.2-local` when `INCIDENT_TRIAGE_MODEL_ID` is unset. Set
 `INCIDENT_TRIAGE_MODEL_ID` on the Worker to select another catalog model. With
 Ollama, each request carries a JSON schema that allows only the fixture's
 services and bounded text. It also requires a lookup before the first draft,
@@ -67,7 +69,9 @@ an external API charge of $0. Local compute is unpriced. A missing token count
 stays unavailable.
 
 ```bash
-./run.sh worker --mode live
+ollama pull qwen2.5:7b
+INCIDENT_TRIAGE_MODEL_ID=qwen2.5-local ./run.sh worker --mode live
+# In a second terminal:
 ./run.sh start --mode live
 ```
 
@@ -235,3 +239,19 @@ If the launcher cannot prepare the environment, run:
 python3.13 -m venv .venv
 .venv/bin/python -m pip install -e .
 ```
+
+## Recorded keynote source
+
+The [keynote source snapshot](python/bare/keynote/README.md) preserves the runtime,
+recording controller and synthetic evidence behind the five presentation clips.
+Cite the public export as [PR #162](https://github.com/cadence-workflow/cadence-ai-samples/pull/162).
+It is separate from this reusable recipe and from the recommended agent install
+path. Scripted demo setup (injected 429, capture-only duplicate, automated
+Signals, presentation holds, controlled Worker kill) is labeled separately from
+Cadence behavior (retry scheduling, Signal delivery, replay, completion). The
+[playback guide](python/bare/keynote/PLAYBACK.md) explains the whole agent first,
+then failed lookup, incomplete diagnosis, guidance, and same-Run recovery, with
+checkpoints and seek times verified against the current clips. The current
+constrained planner can follow the error path directly, and its outputs and
+counters can differ. Offline verifiers cover frozen receipts and checkpoint
+references.
