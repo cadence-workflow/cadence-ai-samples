@@ -314,12 +314,18 @@ class ActivityTests(unittest.TestCase):
                 attempt=0, workflow_id="activity-test"
             ),
         ):
+            (Path(directory) / "faults.json").write_text(
+                json.dumps({"activity-test": {"upload": {"status": 504, "times": 1}}})
+            )
             request = {"key": "activity-test/conclusion", "conclusion": {"ok": True}}
-            first = activities.upload_conclusion(request)
-            second = activities.upload_conclusion(request)
-        self.assertTrue(first["committed"])
-        self.assertFalse(second["committed"])
-        self.assertEqual(first["receipt"], second["receipt"])
+            with self.assertRaises(activities.ReplyLost):
+                activities.upload_conclusion(request)
+            retry = activities.upload_conclusion(request)
+            database = sqlite3.connect(Path(directory) / "store.db")
+            rows = database.execute("select receipt from conclusions").fetchall()
+            database.close()
+        self.assertFalse(retry["committed"])
+        self.assertEqual(rows, [(retry["receipt"],)])
 
     def test_runs_do_not_share_a_conclusion_receipt(self) -> None:
         with tempfile.TemporaryDirectory() as directory, patch.dict(
