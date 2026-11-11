@@ -15,3 +15,43 @@ models:
     provider: openai
     model: gpt-5-nano
     endpoint: https://api.openai.com/v1
+  - id: qwen2.5-72b-local
+    provider: ollama
+    model: qwen2.5:72b-instruct-q3_K_M
+    endpoint: http://localhost:11434
+  - id: mistral-local
+    provider: ollama
+    model: mistral:latest
+    endpoint: http://localhost:11434
+  - id: qwen3-coder-local
+    provider: ollama
+    model: qwen3-coder:30b
+    endpoint: http://localhost:11434
+  - id: qwen2.5-coder-7b-local
+    provider: ollama
+    model: qwen2.5-coder:7b
+    endpoint: http://localhost:11434
+  - id: codellama-7b-instruct-local
+    provider: ollama
+    model: codellama:7b-Instruct
+    endpoint: http://localhost:11434
+  - id: codellama-local
+    provider: ollama
+    model: codellama:latest
+    endpoint: http://localhost:11434
+  - id: bakllava-local
+    provider: ollama
+    model: bakllava:latest
+    endpoint: http://localhost:11434
+  - id: codellama-7b-code-local
+    provider: ollama
+    model: codellama:7b-code
+    endpoint: http://localhost:11434
+  - id: codellama-code-local
+    provider: ollama
+    model: codellama:code
+    endpoint: http://localhost:11434
+  - id: codellama-7b-local
+    provider: ollama
+    model: codellama:7b
+    endpoint: http://localhost:11434
