@@ -3,6 +3,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from cadence import activity
 from cadence.contrib.pydantic import PydanticDataConverter
 from cadence.testing import TestActivityEnvironment, TestWorkflowEnvironment
 
@@ -72,12 +73,28 @@ class ActivityTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn(directory, repr(first))
         self.assertEqual(files, [first.filename])
 
+
     async def test_source_reader_rejects_non_synthetic_urls(self) -> None:
         with TestActivityEnvironment() as environment:
             with self.assertRaisesRegex(ValueError, "synthetic"):
                 await environment.execute_activity(
                     read_research_source, "https://example.com/private"
                 )
+
+    async def test_source_reader_does_not_retry_synthetic_urls(self) -> None:
+        attempts = []
+
+        @activity.defn(name="capture-read-source")
+        def capture_num_attempts_for_read_research_source(url: str) -> str:
+            attempts.append(activity.info().attempt)
+            return read_research_source.impl_fn(url)
+
+        with TestActivityEnvironment() as environment:
+            with self.assertRaisesRegex(ValueError, "synthetic"):
+                await environment.execute_activity(
+                        capture_num_attempts_for_read_research_source, "https://example.com/private"
+                )
+        self.assertEqual(attempts, [1])
 
 
 class WorkflowTests(unittest.IsolatedAsyncioTestCase):

@@ -74,7 +74,15 @@ TOOL_ACTIVITY_OPTIONS = {
         "maximum_attempts": 3,
     },
 }
-
+NON_RETRYABLE_ACTIVITY_OPTIONS = {
+    "schedule_to_close_timeout": timedelta(seconds=30),
+    "retry_policy": {
+        "initial_interval": timedelta(seconds=1),
+        "maximum_attempts": 1,
+        "backoff_coefficient": 2.0,
+        "non_retryable_error_reasons": ["ValueError"],
+    },
+}
 
 @dataclass(frozen=True)
 class RecipeInput:
@@ -288,7 +296,7 @@ class AutoResearchWorkflow:
                     READ_ACTIVITY,
                     str,
                     url,
-                    **TOOL_ACTIVITY_OPTIONS,
+                    **NON_RETRYABLE_ACTIVITY_OPTIONS,
                 )
                 for url in results.urls[:2]
             ]
