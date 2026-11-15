@@ -171,6 +171,13 @@ generated recipes. Resolution needs neither the Cadence CLI nor a Cadence SDK
 dependency in the Explorer. It never runs automatically and does not imply that
 a Workflow was started.
 
+Some supported Cadence-Web builds require an explicit Run ID for Describe.
+For these builds, Resolve lists open executions for the exact Workflow ID,
+checks a bounded continuation, and verifies the execution identity and open
+status with Describe. Visibility can lag behind a new or closed Run; resolve
+again once the current execution is visible. Ambiguous or closed results keep
+Signal controls disabled. Paste an exact historical Run ID to open its history.
+
 After resolution, **Open history** and **Open queries** target that exact run. The
 Run ID remains editable so an older exact run can be pasted. Resolve again after
 Continue-As-New to replace it with the current run; the Explorer identifies the

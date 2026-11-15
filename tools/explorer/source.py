@@ -22,6 +22,11 @@ class InvalidSelection(ValueError):
     pass
 
 
+class AmbiguousExecution(ValueError):
+    """Open-execution listing is ambiguous or changed during lookup."""
+    pass
+
+
 OPS = {ast.Eq: operator.eq, ast.NotEq: operator.ne, ast.In: lambda a, b: a in b,
        ast.NotIn: lambda a, b: a not in b, ast.Lt: operator.lt, ast.LtE: operator.le,
        ast.Gt: operator.gt, ast.GtE: operator.ge, ast.Is: operator.is_, ast.IsNot: operator.is_not}
